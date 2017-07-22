@@ -1,5 +1,9 @@
 <?php
- 
+
+namespace Cms\Model\Entity;
+
+use PDO;
+
 /**
  * Class to handle articles
  */

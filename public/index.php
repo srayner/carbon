@@ -1,5 +1,7 @@
 <?php
- 
+
+use Cms\Model\Entity\Article;
+
 require("config.php");
 $action = isset($_GET['action']) ? $_GET['action'] : "";
  
