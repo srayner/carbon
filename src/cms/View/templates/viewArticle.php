@@ -1,5 +1,6 @@
 <?php include __DIR__ . "/include/header.php" ?>
- 
+
+<div class="row">
       <h1 style="width: 75%;"><?php echo htmlspecialchars( $results['article']->title )?></h1>
       <div style="width: 75%; font-style: italic;"><?php echo htmlspecialchars( $results['article']->summary )?></div>
       <div style="width: 75%;"><?php echo $results['article']->content?></div>
@@ -7,4 +8,5 @@
  
       <p><a href="./">Return to Homepage</a></p>
  
+</div>
 <?php include __DIR__ . "/include/footer.php" ?>

@@ -55,7 +55,7 @@ class AdminController extends AbstractController
                 header("Location: /admin");
             } else {
                 // Login failed: display an error message to the user
-                $results['errorMessage'] = "Incorrect username or password. Please try again.";
+                $results['errorMessage'] = "Incorrect username or password.";
                 require($this->templatePath . "/admin/loginForm.php");
             }
         } else {
@@ -67,7 +67,7 @@ class AdminController extends AbstractController
     public function logoutAction()
     {
         unset($_SESSION['username']);
-        header("Location: /admin");
+        header("Location: /");
     }
     
     public function addAction()

@@ -1,21 +1,26 @@
 <?php include __DIR__ . "/include/header.php" ?>
- 
-        <ul id="headlines">
- 
-<?php foreach ( $results['articles'] as $article ) { ?>
- 
-        <li>
-            <h2>
-                <span class="pubDate"><?php echo date('j F', $article->publicationDate)?></span><a href="/article?articleId=<?php echo $article->id?>"><?php echo htmlspecialchars( $article->title )?></a>
-            </h2>
-            <p class="summary"><?php echo htmlspecialchars( $article->summary )?></p>
-        </li>
- 
-<?php } ?>
- 
+
+    <div class="row">
+                
+        <h1>Latest Articles</h1>
+        <ul class="list-unstyled">
+
+            <?php foreach ($results['articles'] as $article): ?>
+                    <li>
+                        <a href="/article?articleId=<?php echo $article->id?>">
+                        <h2 class="list-group-item-heading"><?php echo htmlspecialchars( $article->title )?></h2>
+                        </a>
+                        <small class="pubDate"><?php echo date('j F', $article->publicationDate)?></small>
+                        <p class="list-group-item-text"><?php echo htmlspecialchars( $article->summary )?></p>
+                    </li>
+                    <hr>
+            <?php endforeach; ?>
+                               
         </ul>
- 
+        
         <p><a href="/archive">Article Archive</a></p>
- 
+        
+    </div>
+        
 <?php include __DIR__ . "/include/footer.php" ?>
 
