@@ -1,6 +1,6 @@
-<?php include "templates/include/header.php" ?>
+<?php include __DIR__ . "/../include/header.php" ?>
  
-      <form action="admin.php?action=login" method="post" style="width: 50%;">
+      <form action="/login" method="post" style="width: 50%;">
         <input type="hidden" name="login" value="true" />
  
 <?php if ( isset( $results['errorMessage'] ) ) { ?>
@@ -27,4 +27,4 @@
  
       </form>
  
-<?php include "templates/include/footer.php" ?>
+<?php include __DIR__ . "/../include/footer.php" ?>

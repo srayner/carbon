@@ -1,48 +1,23 @@
 <?php
 
-use Cms\Model\Entity\Article;
+use Router\Router;
 
-require("config.php");
-$action = isset($_GET['action']) ? $_GET['action'] : "";
- 
-switch ($action) {
-    case 'archive':
-        archive();
-        break;
-    case 'viewArticle':
-        viewArticle();
-        break;
-    default:
-        homepage();
+// Configuration
+require(__DIR__ . "/../config/config.php");
+ini_set( "display_errors", true );
+date_default_timezone_set("Europe/London");
+session_start();
+
+// Require the autoloader
+require(__DIR__ . "/../autoload.php");
+
+// Route the request.
+$router = new Router($params);
+$route = $router->route();
+if ($route) {
+    $controller = new $route['controller']($params);
+    $action = $route['action'] . 'Action';
+    $controller->$action();
+} else {
+    http_response_code(404);
 }
-
-function archive() {
-    $results = array();
-    $data = Article::getList();
-    $results['articles'] = $data['results'];
-    $results['totalRows'] = $data['totalRows'];
-    $results['pageTitle'] = "Article Archive | Widget News";
-    require(TEMPLATE_PATH . "/archive.php" );
-}
-
-function viewArticle() {
-    if (!isset($_GET["articleId"]) || !$_GET["articleId"]) {
-        homepage();
-        return;
-    }
- 
-    $results = array();
-    $results['article'] = Article::getById((int)$_GET["articleId"]);
-    $results['pageTitle'] = $results['article']->title . " | Widget News";
-    require(TEMPLATE_PATH . "/viewArticle.php");
-}
-
-function homepage() {
-    $results = array();
-    $data = Article::getList(HOMEPAGE_NUM_ARTICLES);
-    $results['articles'] = $data['results'];
-    $results['totalRows'] = $data['totalRows'];
-    $results['pageTitle'] = "Widget News";
-    require(TEMPLATE_PATH . "/homepage.php");
-}
-
