@@ -17,4 +17,4 @@ function handleException( $exception ) {
     error_log( $exception->getMessage() );
 }
  
-set_exception_handler( 'handleException' );
+//set_exception_handler( 'handleException' );

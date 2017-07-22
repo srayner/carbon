@@ -94,11 +94,18 @@ class Article
      * @param string Optional column by which to order the articles (default="publicationDate DESC")
      * @return Array|false A two-element array : results => array, a list of Article objects; totalRows => Total number of articles
      */
-    public static function getList($numRows = 1000000, $order = "publicationDate DESC")
+    public static function getList($numRows = 1000000, $order = "publicationDate", $direction = "DESC")
     {
+        // Sanitize sort order.
+        $sortableColumns = ['publicationDate', 'title', 'sumary'];
+        if (!in_array($order, $sortableColumns)) {
+            $order = 'publicationDate';
+        }
+        $direction = $direction == "DESC" ? "DESC" : "ASC";
+        
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
         $sql = "SELECT SQL_CALC_FOUND_ROWS *, UNIX_TIMESTAMP(publicationDate) AS publicationDate FROM articles
-                ORDER BY " . mysql_escape_string($order) . " LIMIT :numRows";
+                ORDER BY " . $order . " " . $direction . " LIMIT :numRows";
  
         $st = $conn->prepare($sql);
         $st->bindValue(":numRows", $numRows, PDO::PARAM_INT);
