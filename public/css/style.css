@@ -21,7 +21,7 @@ xmp {
     margin-bottom: 15px;
 }
 .header span {
-    margin-top: 35px;
+    margin-top: 32px;
 }
 
 .footer {
@@ -32,6 +32,12 @@ xmp {
     bottom: 0;
     width: 100%;
 }
+
+#logo {
+    margin-left: -5px;
+    height: 85px;
+}
+
 .logo {
     font-size: 32px;
     color: #000;

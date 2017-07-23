@@ -12,15 +12,20 @@
     </head>
     <body>
         <div class="header container-fluid">
-            <a class="logo" href="."><img id="logo" src="/images/logo_96.png" alt="Logo" />Carbon CMS</a>
-            
-            <?php if (isset($_SESSION['username'])): ?>
-            <span class="pull-right">You are logged in as <b><?php echo htmlspecialchars( $_SESSION['username']) ?></b>. <a href="/logout">Log out</a></span>
-            <?php endif; ?>
-            
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="container">
+                        <div class="row">            
+                            <div class="col-sm-12">
+                                <a class="logo" href="."><img id="logo" src="/images/logo_96.png" alt="Logo" />Carbon CMS</a>
+                                <?php if (isset($_SESSION['username'])): ?>
+                                <span class="pull-right">You are logged in as <b><?php echo htmlspecialchars( $_SESSION['username']) ?></b>. <a href="/logout">Log out</a></span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="container">    
 
