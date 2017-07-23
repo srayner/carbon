@@ -10,7 +10,10 @@
                         <a href="/article?articleId=<?php echo $article->id?>">
                         <h2 class="list-group-item-heading"><?php echo htmlspecialchars( $article->title )?></h2>
                         </a>
-                        <small class="pubDate"><?php echo date('j F', $article->publicationDate)?></small>
+                        <small class="pubDate">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                            <?php echo date('jS F, Y', $article->publicationDate)?>
+                        </small>
                         <p class="list-group-item-text"><?php echo htmlspecialchars( $article->summary )?></p>
                     </li>
                     <hr>

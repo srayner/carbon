@@ -12,7 +12,7 @@ class IndexController extends AbstractController
         $data = Article::getList();
         $results['articles'] = $data['results'];
         $results['totalRows'] = $data['totalRows'];
-        $results['pageTitle'] = "Article Archive | Widget News";
+        $results['pageTitle'] = "Article Archive | Carbon CMS";
         require($this->templatePath . "/archive.php" );
     }
     
@@ -22,7 +22,7 @@ class IndexController extends AbstractController
         $data = Article::getList(HOMEPAGE_NUM_ARTICLES);
         $results['articles'] = $data['results'];
         $results['totalRows'] = $data['totalRows'];
-        $results['pageTitle'] = "Widget News";
+        $results['pageTitle'] = "Carbon CMS";
         require($this->templatePath . "/homepage.php");
     }
     
@@ -37,7 +37,7 @@ class IndexController extends AbstractController
         if ($article) {
             $results = [];
             $results['article'] = $article;
-            $results['pageTitle'] = $results['article']->title . " | Widget News";
+            $results['pageTitle'] = $results['article']->title . " | Carbon CMS";
             require($this->templatePath . "/viewArticle.php");
             return;
         }
