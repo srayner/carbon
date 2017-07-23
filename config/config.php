@@ -9,50 +9,77 @@ define("ADMIN_USERNAME", "admin");
 define("ADMIN_PASSWORD", "mypass");
 
 $params = [
+    'acl' => include __DIR__ . '/acl.php',
+    'controllers' => [
+        'index'    => 'Cms\Controller\IndexController',
+        'auth'     => 'Cms\Controller\AdminController',
+        'article'  => 'Cms\Controller\AdminController',
+        'category' => 'Cms\Controller\CategoryController'
+    ],
     'routes' => [
         'home' => [
             'pattern'    => '/',
-            'controller' => 'Cms\Controller\IndexController',
+            'controller' => 'index',
             'action'     => 'index',
         ],
         'archive' => [
             'pattern'    => '/archive',
-            'controller' => 'Cms\Controller\IndexController',
+            'controller' => 'index',
             'action'     => 'archive',
         ],
         'article' => [
             'pattern'    => '/article',
-            'controller' => 'Cms\Controller\IndexController',
+            'controller' => 'index',
             'action'     => 'article',
         ],
         'login' => [
             'pattern'    => '/login',
-            'controller' => 'Cms\Controller\AdminController',
+            'controller' => 'auth',
             'action'     => 'login',
         ],
         'logout' => [
             'pattern'    => '/logout',
-            'controller' => 'Cms\Controller\AdminController',
+            'controller' => 'auth',
             'action'     => 'logout',
         ],
-        'admin' => [
-            'pattern'    => '/admin',
-            'controller' => 'Cms\Controller\AdminController',
+        'article_index' => [
+            'pattern'    => '/articles',
+            'controller' => 'article',
             'action'     => 'index',
         ],
-        'add' => [
-            'pattern'    => '/add',
-            'controller' => 'Cms\Controller\AdminController',
+        'article_add' => [
+            'pattern'    => '/articles/add',
+            'controller' => 'article',
             'action'     => 'add',
         ],
-        'edit' => [
-            'pattern'    => '/edit',
-            'controller' => 'Cms\Controller\AdminController',
+        'article_edit' => [
+            'pattern'    => '/articles/edit',
+            'controller' => 'article',
             'action'     => 'edit',
         ],
-        'delete' => [
-            'pattern'    => '/delete',
-            'controller' => 'Cms\Controller\AdminController',
+        'article_delete' => [
+            'pattern'    => '/articles/delete',
+            'controller' => 'article',
+            'action'     => 'delete',
+        ],
+        'category_index' => [
+            'pattern'    => '/categories',
+            'controller' => 'category',
+            'action'     => 'index',
+        ],
+        'category_add' => [
+            'pattern'    => '/categories/add',
+            'controller' => 'category',
+            'action'     => 'add',
+        ],
+        'category_edit' => [
+            'pattern'    => '/categories/edit',
+            'controller' => 'category',
+            'action'     => 'edit',
+        ],
+        'category_delete' => [
+            'pattern'    => '/categories/delete',
+            'controller' => 'category',
             'action'     => 'delete',
         ],
     ],

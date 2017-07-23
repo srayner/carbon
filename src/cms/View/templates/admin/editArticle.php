@@ -4,7 +4,7 @@
  
         <h1><?php echo $results['pageTitle']?></h1>
  
-        <form action="/<?php echo $results['formAction']?>" method="post">
+        <form action="<?php echo $results['formAction']?>" method="post">
             <input type="hidden" name="articleId" value="<?php echo $results['article']->id ?>"/>
  
             <?php if ( isset( $results['errorMessage'] ) ) { ?>
@@ -40,7 +40,7 @@
  
         <?php if ( $results['article']->id ) { ?>
         <br>
-        <p><a href="/delete?articleId=<?php echo $results['article']->id ?>" onclick="return confirm('Delete This Article?')">Delete This Article</a></p>
+        <p><a href="/articles/delete?articleId=<?php echo $results['article']->id ?>" onclick="return confirm('Delete This Article?')">Delete This Article</a></p>
         <?php } ?>
     </div>
 <?php include __DIR__ . "/../include/footer.php" ?>

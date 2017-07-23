@@ -12,6 +12,8 @@
                 <div class="alert alert-success"><?php echo $results['statusMessage'] ?></div>
         <?php } ?>
  
+        <div class="pull-right"><a href="/articles/add">Add a New Article</a></div>
+                
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -21,7 +23,7 @@
             </thead>
             <tbody>
             <?php foreach ($results['articles'] as $article): ?>
-                <tr onclick="location='/edit?articleId=<?php echo $article->id?>'">
+                <tr onclick="location='/articles/edit?articleId=<?php echo $article->id?>'">
                     <td><?php echo date('j M Y', $article->publicationDate)?></td>
                     <td><?php echo $article->title?></td>
                 </tr>
@@ -31,7 +33,6 @@
  
         <p><?php echo $results['totalRows']?> article<?php echo ( $results['totalRows'] != 1 ) ? 's' : '' ?> in total.</p>
  
-        <p><a href="/add">Add a New Article</a></p>
     </div>
 
 <?php include __DIR__ . "/../include/footer.php" ?>

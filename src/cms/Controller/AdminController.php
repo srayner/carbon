@@ -5,21 +5,9 @@ namespace Cms\Controller;
 use Cms\Model\Entity\Article;
 
 class AdminController extends AbstractController
-{
-    protected $user;
-    
-    public function __construct(array $config)
-    {
-        parent::__construct($config);
-        $this->username = isset($_SESSION['username'] ) ? $_SESSION['username'] : "";
-    }
-    
+{   
     public function indexAction()
-    {
-        if (!$this->username) {
-            return $this->loginAction();
-        }
-        
+    {   
         $results = array();
         $data = Article::getList();
         $results['articles'] = $data['results'];
@@ -52,7 +40,7 @@ class AdminController extends AbstractController
             if ($_POST['username'] == ADMIN_USERNAME && $_POST['password'] == ADMIN_PASSWORD) {
                 // Login successful: Create a session and redirect to the admin homepage
                 $_SESSION['username'] = ADMIN_USERNAME;
-                header("Location: /admin");
+                header("Location: /articles");
             } else {
                 // Login failed: display an error message to the user
                 $results['errorMessage'] = "Incorrect username or password.";
@@ -72,23 +60,19 @@ class AdminController extends AbstractController
     
     public function addAction()
     {
-        if (!$this->username) {
-            return $this->loginAction();
-        }
-        
         $results = array();
         $results['pageTitle'] = "New Article";
-        $results['formAction'] = "add";
+        $results['formAction'] = "/articles/add";
 
         if (isset($_POST['saveChanges'])) {
             // User has posted the article edit form: save the new article
             $article = new Article;
             $article->storeFormValues($_POST);
             $article->insert();
-            header("Location: /admin?status=changesSaved");
+            header("Location: /articles?status=changesSaved");
         } elseif (isset($_POST['cancel'])) {
             // User has cancelled their edits: return to the article list
-            header("Location: /admin");
+            header("Location: /articles");
         } else {
             // User has not posted the article edit form yet: display the form
             $results['article'] = new Article;
@@ -97,27 +81,23 @@ class AdminController extends AbstractController
     }
 
     public function editAction()
-    {
-        if (!$this->username) {
-            return $this->loginAction();
-        }
-        
+    {   
         $results = array();
         $results['pageTitle'] = "Edit Article";
-        $results['formAction'] = "edit";
+        $results['formAction'] = "/articles/edit";
 
         if (isset($_POST['saveChanges'])) {
             // User has posted the article edit form: save the article changes
             if (!$article = Article::getById((int) $_POST['articleId'])) {
-                header("Location: /admin?error=articleNotFound");
+                header("Location: /articles?error=articleNotFound");
                 return;
             }
             $article->storeFormValues($_POST);
             $article->update();
-            header("Location: /admin?status=changesSaved");
+            header("Location: /articles?status=changesSaved");
         } elseif (isset($_POST['cancel'])) {
             // User has cancelled their edits: return to the article list
-            header("Location: /admin");
+            header("Location: /articles");
         } else {
             // User has not posted the article edit form yet: display the form
             $results['article'] = Article::getById((int) $_GET['articleId']);
@@ -127,17 +107,13 @@ class AdminController extends AbstractController
 
     public function deleteAction()
     {
-        if (!$this->username) {
-            return $this->loginAction();
-        }
-        
         if (!$article = Article::getById( (int)$_GET['articleId'])) {
             header("Location: /admin?error=articleNotFound");
             return;
         }
  
         $article->delete();
-        header("Location: /admin?status=articleDeleted");
+        header("Location: /articles?status=articleDeleted");
     }
 }
 

@@ -1,6 +1,7 @@
 <?php
 
 $class_map = [
+    'Acl\\'    => '/src/acl/',
     'Cms\\'    => '/src/cms/',
     'Router\\' => '/src/router/',
 ];

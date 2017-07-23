@@ -80,7 +80,7 @@ class Article
     public static function getById($id)
     {
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $sql = "SELECT *, UNIX_TIMESTAMP(publicationDate) AS publicationDate FROM articles WHERE id = :id";
+        $sql = "SELECT *, UNIX_TIMESTAMP(publicationDate) AS publicationDate FROM article WHERE id = :id";
         $st = $conn->prepare($sql);
         $st->bindValue(":id", $id, PDO::PARAM_INT);
         $st->execute();
@@ -108,7 +108,7 @@ class Article
         $direction = $direction == "DESC" ? "DESC" : "ASC";
         
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $sql = "SELECT SQL_CALC_FOUND_ROWS *, UNIX_TIMESTAMP(publicationDate) AS publicationDate FROM articles
+        $sql = "SELECT SQL_CALC_FOUND_ROWS *, UNIX_TIMESTAMP(publicationDate) AS publicationDate FROM article
                 ORDER BY " . $order . " " . $direction . " LIMIT :numRows";
  
         $st = $conn->prepare($sql);
@@ -141,7 +141,7 @@ class Article
     
         // Insert the Article
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $sql = "INSERT INTO articles (publicationDate, title, summary, content) VALUES (FROM_UNIXTIME(:publicationDate), :title, :summary, :content)";
+        $sql = "INSERT INTO article (publicationDate, title, summary, content) VALUES (FROM_UNIXTIME(:publicationDate), :title, :summary, :content)";
         $st = $conn->prepare ($sql);
         $st->bindValue(":publicationDate", $this->publicationDate, PDO::PARAM_INT);
         $st->bindValue(":title", $this->title, PDO::PARAM_STR);
@@ -164,7 +164,7 @@ class Article
     
         // Update the Article
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $sql = "UPDATE articles SET publicationDate=FROM_UNIXTIME(:publicationDate), title=:title, summary=:summary, content=:content WHERE id = :id";
+        $sql = "UPDATE article SET publicationDate=FROM_UNIXTIME(:publicationDate), title=:title, summary=:summary, content=:content WHERE id = :id";
         $st = $conn->prepare ( $sql );
         $st->bindValue(":publicationDate", $this->publicationDate, PDO::PARAM_INT);
         $st->bindValue(":title", $this->title, PDO::PARAM_STR);
@@ -187,7 +187,7 @@ class Article
  
         // Delete the Article
         $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
-        $st = $conn->prepare ("DELETE FROM articles WHERE id = :id LIMIT 1");
+        $st = $conn->prepare ("DELETE FROM article WHERE id = :id LIMIT 1");
         $st->bindValue(":id", $this->id, PDO::PARAM_INT);
         $st->execute();
         $conn = null;
