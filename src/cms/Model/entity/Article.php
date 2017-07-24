@@ -192,4 +192,18 @@ class Article
         $st->execute();
         $conn = null;
     }
+    
+    /**
+     * Counts the number of articles in the database
+     * 
+     * @return integer The number of articles in the database
+     */
+    public static function count()
+    {
+        $conn = new PDO(DB_DSN, DB_USERNAME, DB_PASSWORD);
+        $st = $conn->prepare("select count(*) from article");
+        $st->execute();
+        $row = $st->fetchColumn();
+        return (int)$row;
+    }
 }

@@ -42,6 +42,11 @@ $params = [
             'controller' => 'auth',
             'action'     => 'logout',
         ],
+        'overview' => [
+            'pattern'    => '/overview',
+            'controller' => 'auth',
+            'action'     => 'overview',
+        ],
         'article_index' => [
             'pattern'    => '/articles',
             'controller' => 'article',

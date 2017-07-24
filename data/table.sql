@@ -4,7 +4,7 @@ CREATE TABLE category
 (
     id           smallint unsigned    NOT NULL auto_increment,
     title        varchar(255)         NOT NULL,
-    show_in_menu smallint unsigned    NOT NULL,
+    showInMenu   smallint unsigned    NOT NULL,
     PRIMARY KEY (id)
 );
 

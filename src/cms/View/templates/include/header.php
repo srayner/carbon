@@ -17,7 +17,7 @@
                     <div class="container">
                         <div class="row">            
                             <div class="col-sm-12">
-                                <a class="logo" href="."><img id="logo" src="/images/logo_96.png" alt="Logo" />Carbon CMS</a>
+                                <a class="logo" href="/"><img id="logo" src="/images/logo_96.png" alt="Logo" />Carbon CMS</a>
                                 <?php if (isset($_SESSION['username'])): ?>
                                 <span class="pull-right">You are logged in as <b><?php echo htmlspecialchars( $_SESSION['username']) ?></b>. <a href="/logout">Log out</a></span>
                                 <?php endif; ?>
