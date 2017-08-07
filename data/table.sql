@@ -1,3 +1,6 @@
+CREATE DATABASE carbon;
+USE DATABASE carbon;
+
 -- Category table
 DROP TABLE IF EXISTS category;
 CREATE TABLE category
