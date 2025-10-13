@@ -1,23 +1,24 @@
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
-const demoContent = [
-  { slug: "project-alpha", text: "Demo content for Project Alpha." },
-  { slug: "project-beta", text: "Demo content for Project Beta." },
-  { slug: "project-gamma", text: "Demo content for Project Gamma." },
-];
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const post = await prisma.content.findUnique({
+    where: { slug },
+  });
 
-interface PageProps {
-  params: { slug: string };
-}
-
-export default function Page({ params }: PageProps) {
-  const content = demoContent.find((c) => c.slug === params.slug);
-  if (!content) return notFound();
+  if (!post) return notFound();
 
   return (
     <main style={{ padding: "2rem" }}>
-      <h1>{content.slug}</h1>
-      <p>{content.text}</p>
+      <h1>{post.title}</h1>
+      <div className="prose prose-lg">
+        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      </div>
     </main>
   );
 }

@@ -10,9 +10,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+type Level = 1 | 2 | 3 | 4 | 5 | 6;
 type Props = {
   editor: Editor | null;
-  maxLevel?: number;
+  maxLevel?: Level;
 };
 
 export default function TiptapHeadingDropdown({ editor, maxLevel = 3 }: Props) {
@@ -52,7 +53,12 @@ export default function TiptapHeadingDropdown({ editor, maxLevel = 3 }: Props) {
     editor.chain().focus();
 
     if (level === 0) editor.chain().focus().setParagraph().run();
-    else editor.chain().focus().toggleHeading({ level }).run();
+    else
+      editor
+        .chain()
+        .focus()
+        .toggleHeading({ level: level as Level })
+        .run();
   }
 
   return (

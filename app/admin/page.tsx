@@ -9,8 +9,11 @@ export default function Home() {
         <Link href="/">
           <Button>Browse Content</Button>
         </Link>
-        <Link href="/admin/posts/add">
-          <Button>Add Post</Button>
+        <Link href="admin/content/">
+          <Button>List Content</Button>
+        </Link>
+        <Link href="/admin/content/add">
+          <Button>Add Content</Button>
         </Link>
       </div>
     </main>
