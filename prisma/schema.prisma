@@ -8,13 +8,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Content {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  content     String   @db.Text
-  excerpt     String?
-  publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Page {
+  id                 String   @id @default(cuid())
+  title              String
+  slug               String   @unique
+  content            String   @db.Text
+  meta               PageMeta?
+  publishedAt        DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model PageMeta {
+  id                 String   @id @default(cuid())
+  pageId             String   @unique
+  page               Page     @relation(fields: [pageId], references: [id])
+  metaTitle          String?  @db.VarChar(160)
+  metaDescription    String?  @db.VarChar(300)
+  metaKeywords       String?  @db.VarChar(500)
+  canonicalPath      String?  
+  ogTitle            String?  @db.VarChar(160)
+  ogDescription      String?  @db.VarChar(300)
+  ogImage            String?  
+  twitterTitle       String?  @db.VarChar(160)
+  twitterDescription String? @db.VarChar(300)
+  twitterImage       String?
+  robots             String?
 }

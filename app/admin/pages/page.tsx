@@ -72,7 +72,7 @@ export default function ContentPage() {
             value={search}
             onChange={(e) => onSearchTextChange(e.target.value)}
           />
-          <Link href="/admin/content/add">
+          <Link href="/admin/pages/add">
             <Button>Add</Button>
           </Link>
         </div>
@@ -95,7 +95,7 @@ export default function ContentPage() {
                 <tr key={item.slug}>
                   <td className="p-2 border-b">
                     <Link
-                      href={`/admin/content/${item.id}`}
+                      href={`/admin/pages/${item.id}`}
                       className="text-blue-600 hover:underline"
                     >
                       {item.title}

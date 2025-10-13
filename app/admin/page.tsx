@@ -7,13 +7,13 @@ export default function Home() {
       <h1 className="text-2xl font-semibold">Carbon CMS Admin</h1>
       <div className="flex gap-4">
         <Link href="/">
-          <Button>Browse Content</Button>
+          <Button>Browse Site</Button>
         </Link>
-        <Link href="admin/content/">
-          <Button>List Content</Button>
+        <Link href="admin/pages/">
+          <Button>List Pages</Button>
         </Link>
-        <Link href="/admin/content/add">
-          <Button>Add Content</Button>
+        <Link href="/admin/pages/add">
+          <Button>Add Pages</Button>
         </Link>
       </div>
     </main>

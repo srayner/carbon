@@ -28,7 +28,7 @@ export default function AddPostPage() {
       if (!response.ok) throw new Error("Failed to save post");
 
       tiptapRef.current.clearContent();
-      router.push("/admin/content");
+      router.push("/admin/pages");
       setTitle("");
     } catch (err: unknown) {
       console.error(err);

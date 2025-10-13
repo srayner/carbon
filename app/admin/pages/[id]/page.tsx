@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
 import { Button } from "@/components/ui/button";
 import { useRouter, useParams } from "next/navigation";
+import { MetaModal } from "@/components/Page/MetaModal";
 
 export default function EditPostPage() {
   const [saving, setSaving] = useState(false);
@@ -45,7 +46,7 @@ export default function EditPostPage() {
       });
 
       if (!response.ok) throw new Error("Failed to update content");
-      router.push("/admin/content");
+      router.push("/admin/pages");
     } catch (err: unknown) {
       console.error(err);
     } finally {
@@ -54,19 +55,49 @@ export default function EditPostPage() {
   };
 
   return (
-    <div className="m-4">
-      <h1>Edit Post</h1>
-      <input
-        type="text"
-        placeholder="Post title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="border p-2 rounded mb-2 w-full"
-      />
-      <Tiptap ref={tiptapRef} />
-      <Button onClick={handleSave} disabled={saving || !title}>
-        {saving ? "Saving..." : "Save Post"}
-      </Button>
+    <div className="flex flex-col h-full">
+      {/* Page title */}
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold">Edit Page</h1>
+      </header>
+
+      {/* Main content area with sidebar */}
+      <div className="flex flex-1 gap-6">
+        {/* Main content editor */}
+        <main className="flex-1">
+          <input
+            type="text"
+            placeholder="Post title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="border p-2 rounded mb-2 w-full"
+          />
+          <Tiptap ref={tiptapRef} />
+          <Button onClick={handleSave} disabled={saving || !title}>
+            {saving ? "Saving..." : "Save Post"}
+          </Button>
+        </main>
+
+        {/* Sidebar */}
+        <aside className="w-80 flex flex-col gap-6">
+          {/* Publishing controls */}
+          <section className="p-4 border rounded">
+            <h2 className="font-semibold mb-2">Publishing</h2>
+            <hr />
+            {/* Buttons, status, publish date, etc. */}
+          </section>
+
+          {/* SEO / Metadata controls */}
+          <section className="p-4 border rounded">
+            <h2 className="font-semibold mb-2">SEO Meta Data</h2>
+            <hr className="mb-4" />
+            <MetaModal
+              pageId={String(id)}
+              trigger={<Button size="sm">Edit</Button>}
+            />
+          </section>
+        </aside>
+      </div>
     </div>
   );
 }
