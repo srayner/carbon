@@ -1,25 +1,20 @@
+"use client";
+
 import React from "react";
+import { HeadingBlock, Block } from "@/types/blocks";
 
-interface HeadingBlock {
-  id: string;
-  type: "Heading";
-  data: {
-    content: string;
-    level: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  };
-}
+/** Type guard to check if a block is a HeadingBlock */
+export const isHeadingBlock = (block: Block): block is HeadingBlock =>
+  block.type === "Heading";
 
+/** Props for the component */
 interface HeadingPreviewProps {
   block: HeadingBlock;
 }
 
-export const isHeadingBlock = (block: any): block is HeadingBlock => {
-  return block.type === "Heading" && block.data?.content !== undefined;
-};
-
+/** Component */
 const HeadingPreview: React.FC<HeadingPreviewProps> = ({ block }) => {
-  console.log(block.data);
-  const { content, level } = block.data;
+  const { content, level } = block;
 
   switch (level) {
     case "h1":

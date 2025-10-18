@@ -81,7 +81,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
 
         return (
           <div key={prop.name} className="flex flex-col">
-            <label className="font-medium">{prop.name}</label>
+            <label className="text-sm font-medium">{prop.displayName}</label>
             {inputEl}
           </div>
         );

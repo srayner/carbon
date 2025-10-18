@@ -12,42 +12,55 @@ export interface TiptapHandle {
   setContent: (html: string) => void;
 }
 
-const Tiptap = forwardRef<TiptapHandle, unknown>((props, ref) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2, 3],
+interface TiptapProps {
+  showMenu?: boolean;
+  onBlur?: (html: string) => void;
+}
+
+const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
+  ({ showMenu = true, onBlur }, ref) => {
+    const editor = useEditor({
+      extensions: [
+        StarterKit.configure({
+          heading: {
+            levels: [1, 2, 3],
+          },
+        }),
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+        }),
+      ],
+      content: "<p>Hello World!</p>",
+      immediatelyRender: false,
+      editorProps: {
+        attributes: {
+          class: "p-2",
         },
-      }),
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-    ],
-    content: "<p>Hello World!</p>",
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        class: "p-2",
       },
-    },
-  });
+      onBlur: () => {
+        if (onBlur) onBlur(editor?.getHTML() || "");
+      },
+    });
 
-  useImperativeHandle(ref, () => ({
-    getHTML: () => editor?.getHTML() || "",
-    clearContent: () => editor?.commands.clearContent(),
-    setContent: (html: string) => editor?.commands.setContent(html),
-  }));
+    useImperativeHandle(ref, () => ({
+      getHTML: () => editor?.getHTML() || "",
+      clearContent: () => editor?.commands.clearContent(),
+      setContent: (html: string) => editor?.commands.setContent(html),
+    }));
 
-  if (!editor) return null;
+    if (!editor) return null;
 
-  return (
-    <div>
-      <TiptapMenu editor={editor} />
-      <EditorContent editor={editor} className="prose prose-sm" />
-    </div>
-  );
-});
+    return (
+      <div>
+        {showMenu && <TiptapMenu editor={editor} />}
+        <EditorContent
+          editor={editor}
+          className="prose prose-sm w-full max-w-none"
+        />
+      </div>
+    );
+  }
+);
 
 Tiptap.displayName = "Tiptap";
 

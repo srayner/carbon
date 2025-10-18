@@ -1,9 +1,9 @@
 import { HeadingBlockConfig } from "./heading";
 import { ImageBlockConfig } from "./image";
-import { TextBlockConfig } from "./text";
+import { ParagraphBlockConfig } from "./paragraph";
 
 export const ALL_BLOCKS = [
   HeadingBlockConfig,
   ImageBlockConfig,
-  TextBlockConfig,
+  ParagraphBlockConfig,
 ];
