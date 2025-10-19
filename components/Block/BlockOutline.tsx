@@ -53,7 +53,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
   };
 
   return (
-    <div className="border p-3 w-64 space-y-2 bg-gray-50">
+    <div className="border p-3 space-y-2 bg-gray-50">
       <h2 className="font-bold text-lg">Blocks</h2>
 
       <div className="space-y-1">

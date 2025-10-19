@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ALL_BLOCKS } from "@/config/blocks";
 import BlockPropertyEditor from "@/components/Block/BlockPropertyEditor";
 import { BlockConfig, BlockData, Block } from "@/types/blocks";
@@ -8,10 +8,37 @@ import { BlockOutline } from "@/components/Block/BlockOutline";
 import HeadingPreview from "@/components/Block/HeadlingPreview";
 import ParagraphEditable from "@/components/Block/ParagraphEditable";
 import RichTextEditable from "@/components/Block/RichTextEditable";
+import { usePageActions } from "@/context/page-actions";
+import EditorSidebar from "@/components/EditorSidebar";
 
 const BlockDemoPage = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const { setPageActions } = usePageActions();
+
+  const handleAdd = () => console.log("Add clicked");
+  const handleSave = () => console.log("Save clicked");
+
+  useEffect(() => {
+    setPageActions({
+      showEditorSidebars: true,
+      showAddButton: true,
+      showSaveButton: true,
+      onAdd: handleAdd,
+      onSave: handleSave,
+    });
+
+    return () => {
+      // reset buttons when leaving page
+      setPageActions({
+        showEditorSidebars: false,
+        showAddButton: false,
+        showSaveButton: false,
+        onAdd: undefined,
+        onSave: undefined,
+      });
+    };
+  }, []);
 
   const handleBlockContentChanged = (blockId: string, content: string) => {
     setBlocks((prevBlocks) =>
@@ -57,8 +84,11 @@ const BlockDemoPage = () => {
   };
 
   return (
-    <div className="flex h-screen w-full">
-      <BlockOutline onAdd={handleBlockAdded} onSelect={handleBlockSelected} />
+    <div className="flex h-full w-full">
+      {/* Left sidebar */}
+      <EditorSidebar side="left">
+        <BlockOutline onAdd={handleBlockAdded} onSelect={handleBlockSelected} />
+      </EditorSidebar>
 
       <div className="flex-1">
         <div className="border-l border-r p-5 prose max-w-none">
@@ -107,19 +137,22 @@ const BlockDemoPage = () => {
         </div>
       </div>
 
-      {/* Property editor */}
-      {selectedBlockId && (
-        <BlockPropertyEditor
-          blockConfig={
-            ALL_BLOCKS.find(
-              (b) =>
-                b.name === blocks.find((bl) => bl.id === selectedBlockId)?.type
-            )!
-          }
-          blockData={blocks.find((bl) => bl.id === selectedBlockId)}
-          onChange={handleBlockChange}
-        />
-      )}
+      {/* Right Sidebar */}
+      <EditorSidebar side="right">
+        {selectedBlockId && (
+          <BlockPropertyEditor
+            blockConfig={
+              ALL_BLOCKS.find(
+                (b) =>
+                  b.name ===
+                  blocks.find((bl) => bl.id === selectedBlockId)?.type
+              )!
+            }
+            blockData={blocks.find((bl) => bl.id === selectedBlockId)}
+            onChange={handleBlockChange}
+          />
+        )}
+      </EditorSidebar>
     </div>
   );
 };

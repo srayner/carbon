@@ -1,6 +1,14 @@
 "use client";
 
-import { LogOut, Moon, SlidersHorizontal, Sun, User } from "lucide-react";
+import {
+  LogOut,
+  Moon,
+  PanelLeft,
+  PanelRight,
+  SlidersHorizontal,
+  Sun,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -15,18 +23,34 @@ import {
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import { SidebarTrigger } from "./ui/sidebar";
+import { useSidebarManager } from "@/context/sidebar-manager";
+import { usePageActions } from "@/context/page-actions";
 //import { handleSignOut } from "@/actions/logout";
 
 const NavBar = () => {
   const { setTheme } = useTheme();
+  const { showEditorSidebars, showAddButton, showSaveButton, onAdd, onSave } =
+    usePageActions();
+  const { toggleLeft, toggleRight } = useSidebarManager();
 
   return (
     <nav className="px-4 py-3 flex items-center justify-between border-b">
       {/* LEFT */}
-      <SidebarTrigger />
+      <div>
+        <SidebarTrigger />
+        {showEditorSidebars && (
+          <Button onClick={toggleLeft} variant="ghost" size="icon">
+            <PanelLeft />
+          </Button>
+        )}
+      </div>
       {/* RIGHT */}
       <div className="flex items-center gap-4">
-        <SidebarTrigger />
+        {showEditorSidebars && (
+          <Button onClick={toggleRight} variant="ghost" size="icon">
+            <PanelRight />
+          </Button>
+        )}
         {/* THEME MENU */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
