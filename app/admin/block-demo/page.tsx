@@ -91,7 +91,7 @@ const BlockDemoPage = () => {
       </EditorSidebar>
 
       <div className="flex-1">
-        <div className="border-l border-r p-5 prose max-w-none">
+        <div className="p-5 prose max-w-none">
           {blocks.map((block) => {
             const isSelected = block.id === selectedBlockId;
             const wrapperClass = isSelected
@@ -101,12 +101,11 @@ const BlockDemoPage = () => {
             let content: React.ReactNode = null;
             switch (block.type) {
               case "Heading":
-                content = <HeadingPreview key={block.id} block={block} />;
+                content = <HeadingPreview block={block} />;
                 break;
               case "Paragraph":
                 content = (
                   <ParagraphEditable
-                    key={block.id}
                     paragraph={block}
                     onUpdate={handleBlockContentChanged}
                   />
@@ -115,7 +114,6 @@ const BlockDemoPage = () => {
               case "RichText":
                 content = (
                   <RichTextEditable
-                    key={block.id}
                     richText={block}
                     onUpdate={handleBlockContentChanged}
                   />
@@ -126,7 +124,7 @@ const BlockDemoPage = () => {
             if (!content) return null;
 
             return (
-              <div className="relative mr-10">
+              <div key={block.id} className="relative mr-10">
                 {content}
                 {isSelected && (
                   <div className="absolute -inset-1 pointer-events-none border-2 border-blue-500"></div>

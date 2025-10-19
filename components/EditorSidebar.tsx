@@ -12,10 +12,7 @@ export default function EditorSidebar({ side, children }: Props) {
   const isOpen = side === "left" ? leftOpen : rightOpen;
   if (!isOpen) return null;
 
-  const classes =
-    side === "left"
-      ? "w-64 border-r p-2 bg-blue-100" // temporary left sidebar bg
-      : "w-64 border-l p-2 bg-green-100"; // temporary right sidebar bg
+  const classes = side === "left" ? "w-72 border-r" : "w-72 border-l";
 
   return (
     <aside className={classes}>
