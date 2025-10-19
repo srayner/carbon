@@ -12,7 +12,7 @@ model Page {
   id                 String   @id @default(cuid())
   title              String
   slug               String   @unique
-  content            String   @db.Text
+  blocks             Block[]   @relation("PageBlocks")
   meta               PageMeta?
   publishedAt        DateTime?
   createdAt          DateTime @default(now())
@@ -34,4 +34,16 @@ model PageMeta {
   twitterDescription String? @db.VarChar(300)
   twitterImage       String?
   robots             String?
+}
+
+model Block {
+  id                 String    @id
+  page               Page      @relation("PageBlocks", fields: [pageId], references: [id])
+  pageId             String
+  type               String
+  data               Json
+  parentId           String?
+  order              Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 }

@@ -5,10 +5,9 @@ import { ALL_BLOCKS } from "@/config/blocks";
 import BlockPropertyEditor from "@/components/Block/BlockPropertyEditor";
 import { BlockConfig, BlockData, Block } from "@/types/blocks";
 import { BlockOutline } from "@/components/Block/BlockOutline";
-import HeadingPreview, {
-  isHeadingBlock,
-} from "@/components/Block/HeadlingPreview";
+import HeadingPreview from "@/components/Block/HeadlingPreview";
 import ParagraphEditable from "@/components/Block/ParagraphEditable";
+import RichTextEditable from "@/components/Block/RichTextEditable";
 
 const BlockDemoPage = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -79,6 +78,15 @@ const BlockDemoPage = () => {
                   <ParagraphEditable
                     key={block.id}
                     paragraph={block}
+                    onUpdate={handleBlockContentChanged}
+                  />
+                );
+                break;
+              case "RichText":
+                content = (
+                  <RichTextEditable
+                    key={block.id}
+                    richText={block}
                     onUpdate={handleBlockContentChanged}
                   />
                 );

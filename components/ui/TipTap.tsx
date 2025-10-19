@@ -30,7 +30,6 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
           types: ["heading", "paragraph"],
         }),
       ],
-      content: "<p>Hello World!</p>",
       immediatelyRender: false,
       editorProps: {
         attributes: {

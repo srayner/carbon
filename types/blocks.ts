@@ -1,6 +1,7 @@
 import { HeadingBlockConfig } from "@/config/blocks/heading";
 import { ImageBlockConfig } from "@/config/blocks/image";
 import { ParagraphBlockConfig } from "@/config/blocks/paragraph";
+import { RichTextBlockConfig } from "@/config/blocks/richText";
 
 /* ----- Helper types ----- */
 
@@ -48,25 +49,31 @@ type ImageProps = PropsFromArray<(typeof ImageBlockConfig)["properties"]>;
 type ParagraphProps = PropsFromArray<
   (typeof ParagraphBlockConfig)["properties"]
 >;
+type RichTextProps = PropsFromArray<(typeof RichTextBlockConfig)["properties"]>;
 
 /* ----- Block type literals ----- */
 type HeadingType = (typeof HeadingBlockConfig)["name"];
 type ImageType = (typeof ImageBlockConfig)["name"];
 type ParagraphType = (typeof ParagraphBlockConfig)["name"];
+type RichTextType = (typeof RichTextBlockConfig)["name"];
 
-/* ----- Concrete blocks (expanded properties, no nested `props`) ----- */
+/* ----- Concrete blocks ----- */
 export type HeadingBlock = { id: string; type: HeadingType } & HeadingProps;
 export type ImageBlock = { id: string; type: ImageType } & ImageProps;
 export type ParagraphBlock = {
   id: string;
   type: ParagraphType;
 } & ParagraphProps;
+export type RichTextBlock = {
+  id: string;
+  type: RichTextType;
+} & RichTextProps;
 
 /* ----- Union of all blocks ----- */
-export type Block = HeadingBlock | ImageBlock | ParagraphBlock;
+export type Block = HeadingBlock | ImageBlock | ParagraphBlock | RichTextBlock;
 
 /* ----- Union of block type strings ----- */
-export type BlockName = HeadingType | ImageType | ParagraphType;
+export type BlockName = HeadingType | ImageType | ParagraphType | RichTextType;
 
 /* ----- Helper to get props type by block name ----- */
 export type PropsForBlockName<T extends BlockName> = T extends HeadingType
@@ -75,4 +82,6 @@ export type PropsForBlockName<T extends BlockName> = T extends HeadingType
   ? ImageProps
   : T extends ParagraphType
   ? ParagraphProps
+  : T extends RichTextType
+  ? RichTextProps
   : never;
