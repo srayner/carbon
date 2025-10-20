@@ -38,8 +38,6 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
       ...getDefaultProps(config),
     } as Block;
 
-    console.log("New block: ", newBlock);
-
     const updatedBlocks = [...blocks, newBlock];
     setBlocks(updatedBlocks);
     setAdding(false);

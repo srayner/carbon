@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { ALL_BLOCKS } from "@/config/blocks";
+import { Block } from "@/types/blocks";
+import { usePageActions } from "@/context/page-actions";
+import EditorSidebar from "@/components/EditorSidebar";
 import BlockPropertyEditor from "@/components/Block/BlockPropertyEditor";
-import { BlockConfig, BlockData, Block } from "@/types/blocks";
 import { BlockOutline } from "@/components/Block/BlockOutline";
 import HeadingPreview from "@/components/Block/HeadlingPreview";
 import ParagraphEditable from "@/components/Block/ParagraphEditable";
 import RichTextEditable from "@/components/Block/RichTextEditable";
-import { usePageActions } from "@/context/page-actions";
-import EditorSidebar from "@/components/EditorSidebar";
 
 const BlockDemoPage = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -49,38 +49,40 @@ const BlockDemoPage = () => {
   };
 
   const handleBlockAdded = (block: Block) => {
-    const config = ALL_BLOCKS.find((b) => b.name === block.type);
-    if (!config) return;
+    setBlocks((prev) => {
+      if (prev.some((b) => b.id === block.id)) {
+        console.error(
+          "handleBlockAdded: duplicate block id detected — not adding",
+          block.id
+        );
+        return prev;
+      }
 
-    const defaultData: BlockData = {};
-    config.properties.forEach((p) => {
-      defaultData[p.name] = p.default ?? "";
+      return [...prev, block];
     });
 
-    setBlocks((prev) => [
-      ...prev,
-      {
-        id: block.id,
-        type: block.type,
-        ...defaultData,
-      },
-    ]);
-
     setSelectedBlockId(block.id);
   };
 
-  const handleBlockSelected = (block: BlockOutlineBlock) => {
+  const handleBlockSelected = (block: Block) => {
     setSelectedBlockId(block.id);
   };
 
-  const handleBlockChange = (newBlockData: BlockData) => {
-    if (!selectedBlockId) return;
+  const handleBlockChange = (updatedBlock: Block) => {
+    setBlocks((prevBlocks) => {
+      const existing = prevBlocks.find((b) => b.id === updatedBlock.id);
+      if (existing && existing.type !== updatedBlock.type) {
+        console.warn(
+          "handleBlockChange: block type mismatch — preserving original type",
+          { id: updatedBlock.id, from: existing.type, attempted: updatedBlock.type }
+        );
 
-    setBlocks((prevBlocks) =>
-      prevBlocks.map((block) =>
-        block.id === selectedBlockId ? { ...block, ...newBlockData } : block
-      )
-    );
+        const merged: Block = { ...updatedBlock, id: existing.id, type: existing.type } as Block;
+        return prevBlocks.map((b) => (b.id === updatedBlock.id ? merged : b));
+      }
+
+      return prevBlocks.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
+    });
   };
 
   return (
