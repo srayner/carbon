@@ -17,7 +17,33 @@ const BlockDemoPage = () => {
   const { setPageActions } = usePageActions();
 
   const handleAdd = () => console.log("Add clicked");
-  const handleSave = () => console.log("Save clicked");
+  const handleSave = async () => {
+    const timestamp = Date.now();
+    const page = {
+      title: `Demo Page ${timestamp}`,
+      slug: `demo-page-${timestamp}`,
+      meta: {},
+      blocks,
+      publishedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    try {
+      const res = await fetch("/api/pages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(page),
+      });
+
+      const data = await res.json();
+      console.log("Saved page:", data);
+      alert("Page saved successfully (check console)!");
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Save failed! Check console.");
+    }
+  };
 
   useEffect(() => {
     setPageActions({
@@ -38,7 +64,7 @@ const BlockDemoPage = () => {
         onSave: undefined,
       });
     };
-  }, []);
+  }, [blocks]);
 
   const handleBlockContentChanged = (blockId: string, content: string) => {
     setBlocks((prevBlocks) =>

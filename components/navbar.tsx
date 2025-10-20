@@ -46,6 +46,7 @@ const NavBar = () => {
       </div>
       {/* RIGHT */}
       <div className="flex items-center gap-4">
+        {showSaveButton && <Button onClick={onSave}>Save</Button>}
         {showEditorSidebars && (
           <Button onClick={toggleRight} variant="ghost" size="icon">
             <PanelRight />
