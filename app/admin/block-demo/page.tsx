@@ -69,20 +69,11 @@ const BlockDemoPage = () => {
   };
 
   const handleBlockChange = (updatedBlock: Block) => {
-    setBlocks((prevBlocks) => {
-      const existing = prevBlocks.find((b) => b.id === updatedBlock.id);
-      if (existing && existing.type !== updatedBlock.type) {
-        console.warn(
-          "handleBlockChange: block type mismatch — preserving original type",
-          { id: updatedBlock.id, from: existing.type, attempted: updatedBlock.type }
-        );
-
-        const merged: Block = { ...updatedBlock, id: existing.id, type: existing.type } as Block;
-        return prevBlocks.map((b) => (b.id === updatedBlock.id ? merged : b));
-      }
-
-      return prevBlocks.map((b) => (b.id === updatedBlock.id ? updatedBlock : b));
-    });
+    setBlocks((prevBlocks) =>
+      prevBlocks.map((block) =>
+        block.id === updatedBlock.id ? updatedBlock : block
+      )
+    );
   };
 
   return (
