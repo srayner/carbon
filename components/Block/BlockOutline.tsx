@@ -35,7 +35,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
     const newBlock: Block = {
       id: crypto.randomUUID(),
       type: newType,
-      ...getDefaultProps(config),
+      properties: { ...getDefaultProps(config) },
     } as Block;
 
     const updatedBlocks = [...blocks, newBlock];

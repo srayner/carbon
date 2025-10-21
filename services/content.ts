@@ -123,9 +123,12 @@ export const deleteContent = async (id: string) => {
 };
 
 export const getContent = async (id: string) => {
-  return await prisma.content.findUnique({
+  const page = await prisma.page.findUnique({
     where: { id },
+    include: { blocks: true },
   });
+
+  return page;
 };
 
 export async function listContent(

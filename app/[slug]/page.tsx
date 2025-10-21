@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import Renderer from "@/components/Page/Renderer";
 
 export default async function Page({
   params,
@@ -7,18 +8,18 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await prisma.content.findUnique({
+  const page = await prisma.page.findUnique({
     where: { slug },
+    include: { blocks: true },
   });
 
-  if (!post) return notFound();
+  if (!page) return notFound();
+
+  console.log(page);
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>{post.title}</h1>
-      <div className="prose prose-lg">
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
-      </div>
+    <main className="prose prose-lg mx-auto p-8">
+      <Renderer page={page} />
     </main>
   );
 }

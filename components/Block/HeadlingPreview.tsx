@@ -14,7 +14,7 @@ interface HeadingPreviewProps {
 
 /** Component */
 const HeadingPreview: React.FC<HeadingPreviewProps> = ({ block }) => {
-  const { content, level } = block;
+  const { content, level } = block.properties;
 
   switch (level) {
     case "h1":

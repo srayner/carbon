@@ -6,15 +6,22 @@ import { RichTextBlockConfig } from "@/config/blocks/richText";
 /* ----- Helper types ----- */
 
 // Extract a union of property entries from a readonly array
-type PropEntry = {
+export type BlockProperty = {
   name: string;
   type: string;
   values?: readonly string[] | undefined;
+  default?: string;
   optional?: boolean | undefined;
 };
 
+/* ----- BlockConfig type ----- */
+export type BlockConfig<TName extends string = string> = {
+  name: TName;
+  properties: readonly BlockProperty[];
+};
+
 // Map single prop entry -> TS type
-type PropEntryToType<P extends PropEntry> = P extends { type: "string" }
+type BlockPropertyToType<P extends BlockProperty> = P extends { type: "string" }
   ? P extends { optional: true }
     ? string | undefined
     : string
@@ -36,11 +43,16 @@ type PropEntryToType<P extends PropEntry> = P extends { type: "string" }
     : V
   : unknown;
 
+/* ----- BlockData = object type derived from array of properties ----- */
+export type BlockData<TProps extends readonly BlockProperty[]> = {
+  [P in TProps[number] as P["name"]]: BlockPropertyToType<P>;
+};
+
 // Convert readonly array of props -> { propName: propType, ... }
 type PropsFromArray<TProps extends readonly any[]> = {
   [P in TProps[number] as P extends { name: infer N extends string }
     ? N
-    : never]: P extends PropEntry ? PropEntryToType<P> : never;
+    : never]: P extends BlockProperty ? BlockPropertyToType<P> : never;
 };
 
 /* ----- Infer types for specific block configs ----- */
@@ -58,16 +70,26 @@ type ParagraphType = (typeof ParagraphBlockConfig)["name"];
 type RichTextType = (typeof RichTextBlockConfig)["name"];
 
 /* ----- Concrete blocks ----- */
-export type HeadingBlock = { id: string; type: HeadingType } & HeadingProps;
-export type ImageBlock = { id: string; type: ImageType } & ImageProps;
+export type HeadingBlock = {
+  id: string;
+  type: HeadingType;
+  properties: HeadingProps;
+};
+export type ImageBlock = {
+  id: string;
+  type: ImageType;
+  properties: ImageProps;
+};
 export type ParagraphBlock = {
   id: string;
   type: ParagraphType;
-} & ParagraphProps;
+  properties: ParagraphProps;
+};
 export type RichTextBlock = {
   id: string;
   type: RichTextType;
-} & RichTextProps;
+  properties: RichTextProps;
+};
 
 /* ----- Union of all blocks ----- */
 export type Block = HeadingBlock | ImageBlock | ParagraphBlock | RichTextBlock;

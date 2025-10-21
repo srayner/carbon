@@ -1,10 +1,10 @@
 import React from "react";
-import { BlockConfig, BlockData, BlockProperty } from "./types";
+import { BlockConfig, BlockProperty } from "@/types/blocks";
 
 interface PropertyEditorProps {
   blockConfig: BlockConfig;
-  blockData: BlockData;
-  onChange: (newData: BlockData) => void;
+  blockData: Record<string, string>;
+  onChange: (newData: Record<string, string>) => void;
 }
 
 const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
@@ -12,7 +12,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
   blockData,
   onChange,
 }) => {
-  const handleChange = (propName: string, value: string | boolean) => {
+  const handleChange = (propName: string, value: string) => {
     onChange({ ...blockData, [propName]: value });
   };
 

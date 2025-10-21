@@ -36,9 +36,8 @@ const BlockDemoPage = () => {
         body: JSON.stringify(page),
       });
 
-      const data = await res.json();
-      console.log("Saved page:", data);
-      alert("Page saved successfully (check console)!");
+      await res.json();
+      alert("Page saved successfully!");
     } catch (err) {
       console.error("Save failed:", err);
       alert("Save failed! Check console.");
@@ -69,7 +68,12 @@ const BlockDemoPage = () => {
   const handleBlockContentChanged = (blockId: string, content: string) => {
     setBlocks((prevBlocks) =>
       prevBlocks.map((block) =>
-        block.id === blockId ? { ...block, content } : block
+        block.id === blockId
+          ? {
+              ...block,
+              properties: { ...block.properties, content },
+            }
+          : block
       )
     );
   };
@@ -94,13 +98,17 @@ const BlockDemoPage = () => {
     setSelectedBlockId(block.id);
   };
 
-  const handleBlockChange = (updatedBlock: Block) => {
+  const handleBlockChange = (updatedProperties: Record<string, string>) => {
     setBlocks((prevBlocks) =>
       prevBlocks.map((block) =>
-        block.id === updatedBlock.id ? updatedBlock : block
+        block.id === selectedBlockId
+          ? { ...block, properties: updatedProperties }
+          : block
       )
     );
   };
+
+  const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId);
 
   return (
     <div className="flex h-full w-full">
@@ -156,16 +164,10 @@ const BlockDemoPage = () => {
 
       {/* Right Sidebar */}
       <EditorSidebar side="right">
-        {selectedBlockId && (
+        {selectedBlock && (
           <BlockPropertyEditor
-            blockConfig={
-              ALL_BLOCKS.find(
-                (b) =>
-                  b.name ===
-                  blocks.find((bl) => bl.id === selectedBlockId)?.type
-              )!
-            }
-            blockData={blocks.find((bl) => bl.id === selectedBlockId)}
+            blockConfig={ALL_BLOCKS.find((b) => b.name === selectedBlock.type)!}
+            blockData={selectedBlock.properties}
             onChange={handleBlockChange}
           />
         )}
