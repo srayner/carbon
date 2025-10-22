@@ -142,9 +142,12 @@
     @apply border-border;
   }
   html {
-    overflow-y: scroll; /* always reserve vertical scrollbar */
+    scrollbar-gutter: stable !important;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
   }
 }
