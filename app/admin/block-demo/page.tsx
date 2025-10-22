@@ -1,15 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ALL_BLOCKS } from "@/config/blocks";
 import { Block } from "@/types/blocks";
 import { usePageActions } from "@/context/page-actions";
 import EditorSidebar from "@/components/EditorSidebar";
-import BlockPropertyEditor from "@/components/Block/BlockPropertyEditor";
 import { BlockOutline } from "@/components/Block/BlockOutline";
 import HeadingPreview from "@/components/Block/HeadlingPreview";
 import ParagraphEditable from "@/components/Block/ParagraphEditable";
 import RichTextEditable from "@/components/Block/RichTextEditable";
+import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 
 const BlockDemoPage = () => {
   const [blocks, setBlocks] = useState<Block[]>([]);
@@ -108,7 +107,7 @@ const BlockDemoPage = () => {
     );
   };
 
-  const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId);
+  const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId) || null;
 
   return (
     <div className="flex h-full w-full">
@@ -164,13 +163,10 @@ const BlockDemoPage = () => {
 
       {/* Right Sidebar */}
       <EditorSidebar side="right">
-        {selectedBlock && (
-          <BlockPropertyEditor
-            blockConfig={ALL_BLOCKS.find((b) => b.name === selectedBlock.type)!}
-            blockData={selectedBlock.properties}
-            onChange={handleBlockChange}
-          />
-        )}
+        <PagePropertiesTabs
+          selectedBlock={selectedBlock}
+          onBlockChange={handleBlockChange}
+        />
       </EditorSidebar>
     </div>
   );

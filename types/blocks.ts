@@ -1,3 +1,4 @@
+import { LucideIcon } from "lucide-react";
 import { HeadingBlockConfig } from "@/config/blocks/heading";
 import { ImageBlockConfig } from "@/config/blocks/image";
 import { ParagraphBlockConfig } from "@/config/blocks/paragraph";
@@ -17,6 +18,7 @@ export type BlockProperty = {
 /* ----- BlockConfig type ----- */
 export type BlockConfig<TName extends string = string> = {
   name: TName;
+  icon: LucideIcon;
   properties: readonly BlockProperty[];
 };
 

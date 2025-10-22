@@ -1,5 +1,8 @@
+import { Heading } from "lucide-react";
+
 export const HeadingBlockConfig = {
   name: "Heading",
+  icon: Heading,
   properties: [
     // Appearance group
     {

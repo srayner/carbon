@@ -1,5 +1,8 @@
+import { Image } from "lucide-react";
+
 export const ImageBlockConfig = {
   name: "Image",
+  icon: Image,
   properties: [
     // Content group
     {

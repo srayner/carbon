@@ -16,9 +16,15 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
     onChange({ ...blockData, [propName]: value });
   };
 
+  const Icon = blockConfig?.icon;
+
   return (
     <div className="space-y-3 p-3 bg-gray-50">
-      <h2 className="font-bold text-lg">{blockConfig.name} Properties</h2>
+      <div className="flex items-center gap-2">
+        {Icon && <Icon className="w-6 h-6" />}
+        <span className="font-semibold">{blockConfig.name} Properties</span>
+      </div>
+
       {blockConfig.properties.map((prop: BlockProperty) => {
         const value = blockData[prop.name] ?? prop.default;
 

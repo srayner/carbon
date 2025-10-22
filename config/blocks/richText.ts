@@ -1,5 +1,8 @@
+import { LayoutList } from "lucide-react";
+
 export const RichTextBlockConfig = {
   name: "RichText",
+  icon: LayoutList,
   properties: [
     // Appearance group
     {

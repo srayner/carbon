@@ -1,5 +1,8 @@
+import { Pilcrow } from "lucide-react";
+
 export const ParagraphBlockConfig = {
   name: "Paragraph",
+  icon: Pilcrow,
   properties: [
     // Appearance group
     {
