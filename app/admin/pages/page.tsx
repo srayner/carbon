@@ -45,7 +45,7 @@ export default function ContentPage() {
     async function fetchContent() {
       try {
         const res = await fetch(
-          `/api/content?search=${search}&limit=${limit}&skip=${skip}&orderBy=title&orderDir=asc`
+          `/api/pages?search=${search}&limit=${limit}&skip=${skip}&orderBy=title&orderDir=asc`
         );
         if (!res.ok) throw new Error("Failed to fetch content");
         const { content, totalCount } = await res.json();
@@ -63,7 +63,7 @@ export default function ContentPage() {
   return (
     <main className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Content</h1>
+        <h1 className="text-2xl font-semibold">Pages</h1>
         <div className="flex gap-2">
           <Input
             type="search"

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
-import { upsertPage, listContent } from "@/services/content";
+import { upsertPage, listPages } from "@/services/content";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);
   const { search, pagination, ordering } = parseQueryParams(url);
 
-  return await listContent(search, pagination, ordering);
+  return await listPages(search, pagination, ordering);
 });
 
 export async function POST(req: NextRequest) {

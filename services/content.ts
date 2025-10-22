@@ -131,7 +131,7 @@ export const getContent = async (id: string) => {
   return page;
 };
 
-export async function listContent(
+export async function listPages(
   search: string,
   pagination: { take: number; skip: number },
   ordering: { [key: string]: "asc" | "desc" }
@@ -141,13 +141,13 @@ export async function listContent(
   };
 
   const [content, totalCount] = await Promise.all([
-    prisma.content.findMany({
+    prisma.page.findMany({
       where,
       orderBy: ordering,
       take: pagination.take,
       skip: pagination.skip,
     }),
-    prisma.content.count({ where }),
+    prisma.page.count({ where }),
   ]);
 
   return { content, totalCount };
