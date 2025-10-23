@@ -36,7 +36,7 @@ CREATE TABLE `Block` (
     `id` VARCHAR(191) NOT NULL,
     `pageId` VARCHAR(191) NOT NULL,
     `type` VARCHAR(191) NOT NULL,
-    `data` JSON NOT NULL,
+    `properties` JSON NOT NULL,
     `parentId` VARCHAR(191) NULL,
     `order` INTEGER NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

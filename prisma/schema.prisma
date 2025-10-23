@@ -41,7 +41,7 @@ model Block {
   page               Page      @relation("PageBlocks", fields: [pageId], references: [id])
   pageId             String
   type               String
-  data               Json
+  properties         Json
   parentId           String?
   order              Int
   createdAt          DateTime  @default(now())

@@ -6,21 +6,7 @@ import PageEditor from "@/components/Page/PageEditor";
 
 export default function EditPostPage() {
   const params = useParams();
-  const { id } = params;
+  const id = params.id as string | undefined;
 
-  useEffect(() => {
-    if (!id) return;
-    async function fetchContent() {
-      try {
-        const res = await fetch(`/api/pages/${id}`);
-        if (!res.ok) throw new Error("Failed to fetch content");
-        const data = await res.json();
-      } catch (err: unknown) {
-        console.error(err);
-      }
-    }
-    fetchContent();
-  }, [id]);
-
-  return <PageEditor />;
+  return <PageEditor pageId={id} />;
 }

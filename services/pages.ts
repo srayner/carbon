@@ -94,7 +94,7 @@ export const upsertPage = async (
     const blocksToCreate = data.blocks.map((b, index) => ({
       id: b.id,
       type: b.type,
-      data: b, // store the entire block as JSON
+      properties: b.properties, // store the entire block as JSON
       order: index,
       pageId,
       parentId: null, // flat blocks, no parent
@@ -122,7 +122,7 @@ export const deleteContent = async (id: string) => {
   return deletedContent;
 };
 
-export const getContent = async (id: string) => {
+export const getPage = async (id: string) => {
   const page = await prisma.page.findUnique({
     where: { id },
     include: { blocks: true },

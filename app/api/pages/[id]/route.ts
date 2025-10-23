@@ -1,18 +1,18 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
-import { getContent, deleteContent, updateContent } from "@/services/content";
+import { getPage, deleteContent, upsertPage } from "@/services/pages";
 import { AppError } from "@/lib/api/error";
 
 export const GET = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-    const { id: contentId } = await params;
-    const content = await getContent(contentId);
+    const { id: pageId } = await params;
+    const page = await getPage(pageId);
 
-    if (!content) {
-      throw new AppError(`Content with id ${contentId} not found`, 404);
+    if (!page) {
+      throw new AppError(`Page with id ${pageId} not found`, 404);
     }
 
-    return { content };
+    return { page };
   }
 );
 

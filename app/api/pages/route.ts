@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { parseQueryParams } from "@/lib/api/query";
-import { upsertPage, listPages } from "@/services/content";
+import { upsertPage, listPages } from "@/services/pages";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
   const url = new URL(req.url);

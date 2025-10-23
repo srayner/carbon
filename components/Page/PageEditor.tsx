@@ -9,12 +9,15 @@ import HeadingPreview from "@/components/Block/HeadlingPreview";
 import ParagraphEditable from "@/components/Block/ParagraphEditable";
 import RichTextEditable from "@/components/Block/RichTextEditable";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
-
+import { fetchPage, savePage } from "@/lib/api/pages";
+import HeadingEditable from "../Block/HeadingEditable";
 type PageEditorProps = {
   pageId?: string; // undefined for add mode
+  afterSave?: (pageId: string) => void;
 };
 
-const PageEditor: React.FC<PageEditorProps> = ({ pageId }) => {
+const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
+  console.log("pageId:", pageId);
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const { setPageActions } = usePageActions();
@@ -33,19 +36,31 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId }) => {
     };
 
     try {
-      const res = await fetch("/api/pages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(page),
-      });
-
-      await res.json();
-      alert("Page saved successfully!");
+      const newPage = await savePage(page);
+      afterSave?.(newPage.id);
     } catch (err) {
       console.error("Save failed:", err);
       alert("Save failed! Check console.");
     }
   };
+
+  useEffect(() => {
+    if (!pageId) return; // nothing to load in add mode
+
+    console.log("Loading page from api...");
+    const loadPage = async () => {
+      try {
+        const pageData = await fetchPage(pageId);
+        console.log("Loaded blocks: ", pageData.blocks);
+        setBlocks(pageData.blocks || []);
+      } catch (err) {
+        console.error("Failed to load page:", err);
+        alert("Failed to load page content.");
+      }
+    };
+
+    loadPage();
+  }, [pageId]);
 
   useEffect(() => {
     setPageActions({
@@ -113,6 +128,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId }) => {
 
   const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId) || null;
 
+  console.log("Blocks in state: ", blocks);
   return (
     <div className="flex h-full w-full">
       {/* Left sidebar */}
@@ -131,7 +147,12 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId }) => {
             let content: React.ReactNode = null;
             switch (block.type) {
               case "Heading":
-                content = <HeadingPreview block={block} />;
+                content = (
+                  <HeadingEditable
+                    block={block}
+                    onUpdate={handleBlockContentChanged}
+                  />
+                );
                 break;
               case "Paragraph":
                 content = (
