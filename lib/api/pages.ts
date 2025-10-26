@@ -9,9 +9,7 @@ export const fetchPage = async (pageId: string): Promise<Page> => {
 };
 
 // Save a new page (POST) or update existing (PUT)
-export const savePage = async (
-  page: Partial<Page> & { id?: string }
-): Promise<Page> => {
+export const savePage = async (page: Page): Promise<Page> => {
   const method = page.id ? "PUT" : "POST";
   const url = page.id ? `/api/pages/${page.id}` : "/api/pages";
 

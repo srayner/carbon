@@ -11,33 +11,33 @@ import RichTextEditable from "@/components/Block/RichTextEditable";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 import { fetchPage, savePage } from "@/lib/api/pages";
 import HeadingEditable from "../Block/HeadingEditable";
+import { Page } from "@/types/entities";
+
 type PageEditorProps = {
   pageId?: string; // undefined for add mode
   afterSave?: (pageId: string) => void;
 };
 
 const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
-  console.log("pageId:", pageId);
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const timestamp = Date.now();
+  const [page, setPage] = useState<Page>({
+    id: "",
+    title: `Demo Page ${timestamp}`,
+    slug: `demo-page-${timestamp}`,
+    blocks: [],
+    meta: null,
+    publishedAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const { setPageActions } = usePageActions();
 
   const handleAdd = () => console.log("Add clicked");
   const handleSave = async () => {
-    const timestamp = Date.now();
-    const page = {
-      title: `Demo Page ${timestamp}`,
-      slug: `demo-page-${timestamp}`,
-      meta: {},
-      blocks,
-      publishedAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
     try {
       const newPage = await savePage(page);
-      afterSave?.(newPage.id);
+      afterSave?.(newPage.id!);
     } catch (err) {
       console.error("Save failed:", err);
       alert("Save failed! Check console.");
@@ -50,9 +50,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     console.log("Loading page from api...");
     const loadPage = async () => {
       try {
-        const pageData = await fetchPage(pageId);
-        console.log("Loaded blocks: ", pageData.blocks);
-        setBlocks(pageData.blocks || []);
+        const loadedPage = await fetchPage(pageId);
+        setPage(loadedPage);
       } catch (err) {
         console.error("Failed to load page:", err);
         alert("Failed to load page content.");
@@ -81,32 +80,42 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
         onSave: undefined,
       });
     };
-  }, [blocks]);
+  }, [page]);
 
   const handleBlockContentChanged = (blockId: string, content: string) => {
-    setBlocks((prevBlocks) =>
-      prevBlocks.map((block) =>
-        block.id === blockId
-          ? {
-              ...block,
-              properties: { ...block.properties, content },
-            }
-          : block
-      )
-    );
+    setPage((prevPage) => {
+      if (!prevPage) return prevPage; // safety check
+
+      return {
+        ...prevPage,
+        blocks: prevPage.blocks.map((block) =>
+          block.id === blockId
+            ? {
+                ...block,
+                properties: { ...block.properties, content },
+              }
+            : block
+        ),
+      };
+    });
   };
 
   const handleBlockAdded = (block: Block) => {
-    setBlocks((prev) => {
-      if (prev.some((b) => b.id === block.id)) {
+    setPage((prevPage) => {
+      if (!prevPage) return prevPage; // safety check
+
+      if (prevPage.blocks.some((b) => b.id === block.id)) {
         console.error(
           "handleBlockAdded: duplicate block id detected — not adding",
           block.id
         );
-        return prev;
+        return prevPage;
       }
 
-      return [...prev, block];
+      return {
+        ...prevPage,
+        blocks: [...prevPage.blocks, block],
+      };
     });
 
     setSelectedBlockId(block.id);
@@ -117,18 +126,24 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   };
 
   const handleBlockChange = (updatedProperties: Record<string, string>) => {
-    setBlocks((prevBlocks) =>
-      prevBlocks.map((block) =>
-        block.id === selectedBlockId
-          ? { ...block, properties: updatedProperties }
-          : block
-      )
-    );
+    if (!selectedBlockId) return; // nothing selected
+    setPage((prevPage) => {
+      if (!prevPage) return prevPage;
+
+      return {
+        ...prevPage,
+        blocks: prevPage.blocks.map((block) =>
+          block.id === selectedBlockId
+            ? { ...block, properties: updatedProperties }
+            : block
+        ),
+      };
+    });
   };
 
-  const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId) || null;
+  const selectedBlock =
+    page.blocks.find((bl) => bl.id === selectedBlockId) || null;
 
-  console.log("Blocks in state: ", blocks);
   return (
     <div className="flex h-full w-full">
       {/* Left sidebar */}
@@ -138,11 +153,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
 
       <div className="flex-1">
         <div className="p-5 prose max-w-none">
-          {blocks.map((block) => {
+          {page.blocks.map((block) => {
             const isSelected = block.id === selectedBlockId;
-            const wrapperClass = isSelected
-              ? "border-2 border-blue-500 p-2"
-              : "p-2";
 
             let content: React.ReactNode = null;
             switch (block.type) {
