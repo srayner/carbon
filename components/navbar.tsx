@@ -25,7 +25,7 @@ import { useTheme } from "next-themes";
 import { SidebarTrigger } from "./ui/sidebar";
 import { useSidebarManager } from "@/context/sidebar-manager";
 import { usePageActions } from "@/context/page-actions";
-//import { handleSignOut } from "@/actions/logout";
+import { handleSignOut } from "@/actions/logout";
 
 const NavBar = () => {
   const { setTheme } = useTheme();
@@ -96,7 +96,7 @@ const NavBar = () => {
                 Preferences
               </DropdownMenuItem>
             </Link>
-            <DropdownMenuItem onClick={undefined}>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut className="h-[1.2rem] w-[1.2rem] mr-2" />
               Logout
             </DropdownMenuItem>
