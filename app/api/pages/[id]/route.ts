@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
-import { getPage, deleteContent, upsertPage } from "@/services/pages";
+import { getPage, deleteContent } from "@/services/pages";
 import { AppError } from "@/lib/api/error";
 
 export const GET = withErrorHandling(
