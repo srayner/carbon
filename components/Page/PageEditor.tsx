@@ -5,7 +5,6 @@ import { Block } from "@/types/blocks";
 import { usePageActions } from "@/context/page-actions";
 import EditorSidebar from "@/components/EditorSidebar";
 import { BlockOutline } from "@/components/Block/BlockOutline";
-import HeadingPreview from "@/components/Block/HeadlingPreview";
 import ParagraphEditable from "@/components/Block/ParagraphEditable";
 import RichTextEditable from "@/components/Block/RichTextEditable";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
