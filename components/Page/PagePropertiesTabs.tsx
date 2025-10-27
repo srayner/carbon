@@ -5,14 +5,12 @@ import BlockPropertyEditor from "@/components/Block/BlockPropertyEditor";
 
 interface PagePropertiesTabsProps {
   selectedBlock: Block | null;
-  activeTab?: "page" | "block";
   onTabChange?: (tab: "page" | "block") => void;
   onBlockChange: (updatedProperties: Record<string, string>) => void;
 }
 
 export function PagePropertiesTabs({
   selectedBlock,
-  activeTab,
   onTabChange,
   onBlockChange,
 }: PagePropertiesTabsProps) {

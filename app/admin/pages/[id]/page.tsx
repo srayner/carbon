@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useParams } from "next/navigation";
 import PageEditor from "@/components/Page/PageEditor";
 
