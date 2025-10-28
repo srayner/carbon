@@ -10,7 +10,7 @@ export default async function Page({
   const { slug } = await params;
   const page = await prisma.page.findUnique({
     where: { slug },
-    include: { blocks: true },
+    include: { blocks: true, meta: true },
   });
 
   if (!page) return notFound();

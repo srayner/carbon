@@ -29,8 +29,7 @@ import { handleSignOut } from "@/actions/logout";
 
 const NavBar = () => {
   const { setTheme } = useTheme();
-  const { showEditorSidebars, showAddButton, showSaveButton, onAdd, onSave } =
-    usePageActions();
+  const { showEditorSidebars, showSaveButton, onSave } = usePageActions();
   const { toggleLeft, toggleRight } = useSidebarManager();
 
   return (

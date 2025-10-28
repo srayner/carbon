@@ -32,17 +32,6 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const { setPageActions } = usePageActions();
 
-  const handleAdd = () => console.log("Add clicked");
-  const handleSave = async () => {
-    try {
-      const newPage = await savePage(page);
-      afterSave?.(newPage.id!);
-    } catch (err) {
-      console.error("Save failed:", err);
-      alert("Save failed! Check console.");
-    }
-  };
-
   useEffect(() => {
     if (!pageId) return; // nothing to load in add mode
 
@@ -61,6 +50,17 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   }, [pageId]);
 
   useEffect(() => {
+    const handleAdd = () => console.log("Add clicked");
+    const handleSave = async () => {
+      try {
+        const newPage = await savePage(page);
+        afterSave?.(newPage.id!);
+      } catch (err) {
+        console.error("Save failed:", err);
+        alert("Save failed! Check console.");
+      }
+    };
+
     setPageActions({
       showEditorSidebars: true,
       showAddButton: true,
@@ -79,7 +79,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
         onSave: undefined,
       });
     };
-  }, [page]);
+  }, [page, setPageActions, afterSave]);
 
   const handleBlockContentChanged = (blockId: string, content: string) => {
     setPage((prevPage) => {

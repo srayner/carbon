@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { ALL_BLOCKS } from "@/config/blocks";
-import { Block, BlockName } from "@/types/blocks";
+import { Block, BlockName, BlockConfig } from "@/types/blocks";
 
-function getDefaultProps(blockConfig: any) {
-  const defaults: Record<string, any> = {};
+function getDefaultProps(blockConfig: BlockConfig) {
+  const defaults: Record<string, string> = {};
   for (const prop of blockConfig.properties) {
     defaults[prop.name] = prop.default ?? "";
   }
