@@ -15,10 +15,11 @@ export interface TiptapHandle {
 interface TiptapProps {
   showMenu?: boolean;
   onBlur?: (html: string) => void;
+  initialContent?: string;
 }
 
 const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
-  ({ showMenu = true, onBlur }, ref) => {
+  ({ showMenu = true, onBlur, initialContent }, ref) => {
     const editor = useEditor({
       extensions: [
         StarterKit.configure({
@@ -30,6 +31,7 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
           types: ["heading", "paragraph"],
         }),
       ],
+      content: initialContent || '<p></p>',
       immediatelyRender: false,
       editorProps: {
         attributes: {
@@ -44,7 +46,11 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
     useImperativeHandle(ref, () => ({
       getHTML: () => editor?.getHTML() || "",
       clearContent: () => editor?.commands.clearContent(),
-      setContent: (html: string) => editor?.commands.setContent(html),
+      setContent: (html: string) => {
+        if (editor) {
+          editor.commands.setContent(html);
+        }
+      },
     }));
 
     if (!editor) return null;

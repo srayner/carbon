@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Block } from "@/types/blocks";
+import { Block, BlockName, BlockPropsMap } from "@/types/blocks";
 import { usePageActions } from "@/context/page-actions";
 import EditorSidebar from "@/components/EditorSidebar";
 import { BlockOutline } from "@/components/Block/BlockOutline";
@@ -35,7 +35,6 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   useEffect(() => {
     if (!pageId) return; // nothing to load in add mode
 
-    console.log("Loading page from api...");
     const loadPage = async () => {
       try {
         const loadedPage = await fetchPage(pageId);
@@ -81,20 +80,95 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     };
   }, [page, setPageActions, afterSave]);
 
+  function updateBlockProps<K extends BlockName>(
+    page: Page,
+    blockId: string,
+    newProps: Partial<BlockPropsMap[K]>
+  ): Page {
+    return {
+      ...page,
+      blocks: page.blocks.map((block) => {
+        if (block.id !== blockId) return block;
+
+        switch (block.type) {
+          case "Heading":
+            return {
+              ...block,
+              properties: {
+                ...block.properties,
+                ...newProps,
+              } as BlockPropsMap["Heading"],
+            };
+          case "Paragraph":
+            return {
+              ...block,
+              properties: {
+                ...block.properties,
+                ...newProps,
+              } as BlockPropsMap["Paragraph"],
+            };
+          case "RichText":
+            return {
+              ...block,
+              properties: {
+                ...block.properties,
+                ...newProps,
+              } as BlockPropsMap["RichText"],
+            };
+          case "Image":
+            return {
+              ...block,
+              properties: {
+                ...block.properties,
+                ...newProps,
+              } as BlockPropsMap["Image"],
+            };
+          default:
+            return block;
+        }
+      }),
+    };
+  }
+
   const handleBlockContentChanged = (blockId: string, content: string) => {
     setPage((prevPage) => {
       if (!prevPage) return prevPage; // safety check
 
       return {
         ...prevPage,
-        blocks: prevPage.blocks.map((block) =>
-          block.id === blockId
-            ? {
+        blocks: prevPage.blocks.map((block) => {
+          if (block.id !== blockId) return block;
+
+          // explicit switch to give TS a single-literal narrowing
+          switch (block.type) {
+            case "Heading":
+              return {
                 ...block,
-                properties: { ...block.properties, content },
-              }
-            : block
-        ),
+                properties: {
+                  ...block.properties,
+                  content,
+                } as BlockPropsMap["Heading"],
+              };
+            case "Paragraph":
+              return {
+                ...block,
+                properties: {
+                  ...block.properties,
+                  content,
+                } as BlockPropsMap["Paragraph"],
+              };
+            case "RichText":
+              return {
+                ...block,
+                properties: {
+                  ...block.properties,
+                  content,
+                } as BlockPropsMap["RichText"],
+              };
+            default:
+              return block; // Image and other types remain unchanged
+          }
+        }),
       };
     });
   };
@@ -129,14 +203,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     setPage((prevPage) => {
       if (!prevPage) return prevPage;
 
-      return {
-        ...prevPage,
-        blocks: prevPage.blocks.map((block) =>
-          block.id === selectedBlockId
-            ? { ...block, properties: updatedProperties }
-            : block
-        ),
-      };
+      return updateBlockProps(prevPage, selectedBlockId, updatedProperties);
     });
   };
 
@@ -147,7 +214,11 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     <div className="flex h-full w-full">
       {/* Left sidebar */}
       <EditorSidebar side="left">
-        <BlockOutline onAdd={handleBlockAdded} onSelect={handleBlockSelected} />
+        <BlockOutline
+          blocks={page.blocks}
+          onAdd={handleBlockAdded}
+          onSelect={handleBlockSelected}
+        />
       </EditorSidebar>
 
       <div className="flex-1">
@@ -160,7 +231,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
               case "Heading":
                 content = (
                   <HeadingEditable
-                    block={block}
+                    heading={block}
                     onUpdate={handleBlockContentChanged}
                   />
                 );
@@ -184,6 +255,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
             }
 
             if (!content) return null;
+
 
             return (
               <div key={block.id} className="relative mr-10">

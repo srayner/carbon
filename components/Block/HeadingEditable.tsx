@@ -1,61 +1,36 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { HeadingBlock } from "@/types/blocks";
+import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
 
-interface HeadingEditableProps {
-  block: HeadingBlock;
+type ParagraphEditableProps = {
+  heading: HeadingBlock;
   onUpdate: (blockId: string, content: string) => void;
-}
+};
 
-const HeadingEditable: React.FC<HeadingEditableProps> = ({
-  block,
+const HeadingEditable: React.FC<ParagraphEditableProps> = ({
+  heading,
   onUpdate,
 }) => {
-  const { id, properties } = block;
-  const { content, level } = properties;
-  const ref = useRef<HTMLHeadingElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
+  const { content } = heading.properties;
+  const tiptapRef = useRef<TiptapHandle | null>(null);
 
-  // Sync external content only when not focused
-  useEffect(() => {
-    if (!isFocused && ref.current && ref.current.innerText !== content) {
-      ref.current.innerText = content;
-    }
-  }, [content, isFocused]);
-
-  // Periodically push updates while focused
-  useEffect(() => {
-    if (!isFocused) return;
-
-    const interval = setInterval(() => {
-      if (ref.current) {
-        onUpdate(id, ref.current.innerText);
-      }
-    }, 300); // adjust interval as needed
-
-    return () => clearInterval(interval);
-  }, [isFocused, id, onUpdate]);
-
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => {
-    setIsFocused(false);
-    if (ref.current) onUpdate(id, ref.current.innerText);
+  const handleBlur = (content: string) => {
+    const rawText = content.replace(/<[^>]*>/g, "");
+    onUpdate(heading.id, rawText);
   };
 
-  const HeadingTag = (level as keyof JSX.IntrinsicElements) || "h1";
+  // TipTap expects HTML, wrap plain text content in <p> tag
+  const htmlContent = `<p>${content || ''}</p>`;
 
   return (
-    <HeadingTag
-      ref={ref}
-      contentEditable
-      suppressContentEditableWarning
-      onFocus={handleFocus}
+    <Tiptap
+      ref={tiptapRef}
+      showMenu={false}
       onBlur={handleBlur}
-      className="outline-none"
-    >
-      {content}
-    </HeadingTag>
+      initialContent={htmlContent}
+    />
   );
 };
 

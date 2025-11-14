@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ALL_BLOCKS } from "@/config/blocks";
 import { Block, BlockName, BlockConfig } from "@/types/blocks";
 
@@ -19,14 +19,19 @@ interface BlockOutlineProps {
 }
 
 export const BlockOutline: React.FC<BlockOutlineProps> = ({
-  blocks: initialBlocks = [],
+  blocks: externalBlocks = [],
   onSelect,
   onAdd,
 }) => {
-  const [blocks, setBlocks] = useState<Block[]>(initialBlocks);
+  const [blocks, setBlocks] = useState<Block[]>(externalBlocks);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const [newType, setNewType] = useState(ALL_BLOCKS[0].name);
+
+  // Sync internal state with prop when it changes (e.g., after loading from API)
+  useEffect(() => {
+    setBlocks(externalBlocks);
+  }, [externalBlocks]);
 
   const handleAdd = () => {
     const config = ALL_BLOCKS.find((b) => b.name === newType);

@@ -50,11 +50,9 @@ export type BlockData<TProps extends readonly BlockProperty[]> = {
   [P in TProps[number] as P["name"]]: BlockPropertyToType<P>;
 };
 
-// Convert readonly array of props -> { propName: propType, ... }
-type PropsFromArray<TProps extends readonly any[]> = {
-  [P in TProps[number] as P extends { name: infer N extends string }
-    ? N
-    : never]: P extends BlockProperty ? BlockPropertyToType<P> : never;
+// Convert readonly array of BlockProperties -> { propName: propType, ... }
+type PropsFromArray<TProps extends readonly BlockProperty[]> = {
+  [P in TProps[number] as P["name"]]: BlockPropertyToType<P>;
 };
 
 /* ----- Infer types for specific block configs ----- */
@@ -71,27 +69,35 @@ type ImageType = (typeof ImageBlockConfig)["name"];
 type ParagraphType = (typeof ParagraphBlockConfig)["name"];
 type RichTextType = (typeof RichTextBlockConfig)["name"];
 
+type BaseBlock = {
+  order?: number;
+  pageId?: string;
+  parentId?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
 /* ----- Concrete blocks ----- */
 export type HeadingBlock = {
   id: string;
   type: HeadingType;
   properties: HeadingProps;
-};
+} & BaseBlock;
 export type ImageBlock = {
   id: string;
   type: ImageType;
   properties: ImageProps;
-};
+} & BaseBlock;
 export type ParagraphBlock = {
   id: string;
   type: ParagraphType;
   properties: ParagraphProps;
-};
+} & BaseBlock;
 export type RichTextBlock = {
   id: string;
   type: RichTextType;
   properties: RichTextProps;
-};
+} & BaseBlock;
 
 /* ----- Union of all blocks ----- */
 export type Block = HeadingBlock | ImageBlock | ParagraphBlock | RichTextBlock;
@@ -109,3 +115,7 @@ export type PropsForBlockName<T extends BlockName> = T extends HeadingType
   : T extends RichTextType
   ? RichTextProps
   : never;
+
+export type BlockPropsMap = {
+  [K in BlockName]: PropsForBlockName<K>;
+};
