@@ -13,7 +13,7 @@ const ParagraphEditable: React.FC<ParagraphEditableProps> = ({
   paragraph,
   onUpdate,
 }) => {
-  const { content } = paragraph;
+  const { content } = paragraph.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
   const handleBlur = (content: string) => {

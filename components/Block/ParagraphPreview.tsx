@@ -8,8 +8,7 @@ type ParagraphEditableProps = {
 };
 
 const ParagraphEditable: React.FC<ParagraphEditableProps> = ({ paragraph }) => {
-  console.log("Paragraph", paragraph);
-  const { content } = paragraph;
+  const { content } = paragraph.properties;
 
   return <p>{content}</p>;
 };

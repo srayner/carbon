@@ -5,19 +5,20 @@ import { Block } from "@/types/blocks";
  * Transform API response to properly typed Page object.
  * Converts date strings to Date objects and casts blocks to Block[].
  */
-function transformPageFromAPI(pageData: any): Page {
+function transformPageFromAPI(pageData: Record<string, unknown>): Page {
+  const { blocks = [], publishedAt, createdAt, updatedAt, ...rest } = pageData;
+
   return {
-    ...pageData,
-    publishedAt: pageData.publishedAt ? new Date(pageData.publishedAt) : null,
-    createdAt: pageData.createdAt ? new Date(pageData.createdAt) : new Date(),
-    updatedAt: pageData.updatedAt ? new Date(pageData.updatedAt) : new Date(),
-    blocks: (pageData.blocks || []).map((block: any) => ({
+    ...rest,
+    publishedAt: publishedAt ? new Date(publishedAt as string) : null,
+    createdAt: new Date(createdAt as string),
+    updatedAt: new Date(updatedAt as string),
+    blocks: (blocks as Array<Record<string, unknown>>).map((block) => ({
       ...block,
-      // Only transform dates if they exist (blocks from DB have them, new blocks don't)
-      ...(block.createdAt && { createdAt: new Date(block.createdAt) }),
-      ...(block.updatedAt && { updatedAt: new Date(block.updatedAt) }),
+      ...(block.createdAt && { createdAt: new Date(block.createdAt as string) }),
+      ...(block.updatedAt && { updatedAt: new Date(block.updatedAt as string) }),
     })) as Block[],
-  };
+  } as Page;
 }
 
 // Load a page by ID

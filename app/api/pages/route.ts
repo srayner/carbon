@@ -13,7 +13,7 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    const page = await upsertPage(data);
+    const page = await upsertPage(null, data);
     return NextResponse.json(page, { status: 201 });
   } catch (err: unknown) {
     console.error("POST /api/pages error:", err);

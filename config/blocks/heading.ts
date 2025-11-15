@@ -51,7 +51,7 @@ export const HeadingBlockConfig = {
       name: "level",
       displayName: "Heading Level",
       type: "enum",
-      values: ["h1", "h2", "h3", "h4"],
+      values: ["h1", "h2", "h3", "h4", "h5", "h6"],
       default: "h1",
       group: "Appearance",
       allowInherit: true,

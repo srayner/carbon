@@ -43,8 +43,10 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
             inputEl = (
               <input
                 type="checkbox"
-                checked={value as boolean}
-                onChange={(e) => handleChange(prop.name, e.target.checked)}
+                checked={Boolean(value)}
+                onChange={(e) =>
+                  handleChange(prop.name, String(e.target.checked))
+                }
               />
             );
             break;
@@ -87,7 +89,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
 
         return (
           <div key={prop.name} className="flex flex-col">
-            <label className="text-sm font-medium">{prop.displayName}</label>
+            <label className="text-sm font-medium">{prop.name}</label>
             {inputEl}
           </div>
         );

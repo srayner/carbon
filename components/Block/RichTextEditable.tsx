@@ -13,7 +13,7 @@ const RichTextEditable: React.FC<RichTextEditableProps> = ({
   richText,
   onUpdate,
 }) => {
-  const { content } = richText;
+  const { content } = richText.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
   const handleBlur = (content: string) => {

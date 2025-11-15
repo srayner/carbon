@@ -87,46 +87,11 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   ): Page {
     return {
       ...page,
-      blocks: page.blocks.map((block) => {
-        if (block.id !== blockId) return block;
-
-        switch (block.type) {
-          case "Heading":
-            return {
-              ...block,
-              properties: {
-                ...block.properties,
-                ...newProps,
-              } as BlockPropsMap["Heading"],
-            };
-          case "Paragraph":
-            return {
-              ...block,
-              properties: {
-                ...block.properties,
-                ...newProps,
-              } as BlockPropsMap["Paragraph"],
-            };
-          case "RichText":
-            return {
-              ...block,
-              properties: {
-                ...block.properties,
-                ...newProps,
-              } as BlockPropsMap["RichText"],
-            };
-          case "Image":
-            return {
-              ...block,
-              properties: {
-                ...block.properties,
-                ...newProps,
-              } as BlockPropsMap["Image"],
-            };
-          default:
-            return block;
-        }
-      }),
+      blocks: page.blocks.map((block) =>
+        block.id === blockId
+          ? ({ ...block, properties: { ...block.properties, ...newProps } } as Block)
+          : block
+      ),
     };
   }
 

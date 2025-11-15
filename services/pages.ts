@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Block } from "@/types/blocks";
 
 type PageInput = {
   id?: string;
@@ -6,60 +7,10 @@ type PageInput = {
   slug: string;
   meta?: object;
   publishedAt?: string | null;
-  blocks: Record<string, any>[];
+  blocks: Block[];
 };
 
-export const updatePage = async (
-  pageId: string,
-  data: PageInput
-): Promise<Page & { blocks: Block[] }> => {
-  // Update the Page row
-  const updatedPage = await prisma.page.update({
-    where: { id: pageId },
-    data: {
-      title: data.title,
-      slug: data.slug,
-      meta: data.meta || {},
-      publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
-    },
-  });
-
-  // Delete existing blocks for this page
-  await prisma.block.deleteMany({
-    where: { pageId },
-  });
-
-  // Insert all blocks as JSON
-  if (data.blocks.length > 0) {
-    const blocksToCreate = data.blocks.map((b, index) => ({
-      id: b.id,
-      type: b.type,
-      data: b, // store the entire block as JSON
-      order: index,
-      pageId,
-      parentId: null, // flat blocks, no parent
-    }));
-
-    console.log("Blocks to create", blocksToCreate);
-    //  await prisma.block.createMany({
-    //    data: blocksToCreate,
-    //  });
-  }
-
-  // Return the updated page with its blocks
-  const pageWithBlocks = await prisma.page.findUnique({
-    where: { id: updatedPage.id },
-    include: { blocks: true },
-  });
-
-  return pageWithBlocks!;
-};
-
-export const upsertPage = async (
-  data: PageInput
-): Promise<Page & { blocks: Block[] }> => {
-  let pageId = data.id;
-
+export const upsertPage = async (pageId: string | null, data: PageInput) => {
   // Create new page if no id
   if (!pageId) {
     const newPage = await prisma.page.create({
@@ -111,11 +62,11 @@ export const upsertPage = async (
     include: { blocks: true },
   });
 
-  return pageWithBlocks!;
+  return pageWithBlocks;
 };
 
-export const deleteContent = async (id: string) => {
-  const deletedContent = await prisma.content.delete({
+export const deletePage = async (id: string) => {
+  const deletedContent = await prisma.page.delete({
     where: { id },
   });
 

@@ -1,11 +1,11 @@
-import { string } from "zod";
+import { Block } from "./blocks";
 
 export type Page = {
   id: string | null;
   title: string;
   slug: string;
   meta: PageMeta | null;
-  blocks: Record<string, any>[];
+  blocks: Block[];
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -14,7 +14,6 @@ export type Page = {
 export type PageMeta = {
   id: string | null;
   pageId: string;
-  page: Page;
   metaTitle: string | null;
   metaDescription: string | null;
   metaKeywords: string | null;
@@ -26,15 +25,4 @@ export type PageMeta = {
   twitterDescription: string | null;
   twitterImage: string | null;
   robots: string | null;
-};
-
-export type Block = {
-  id: string;
-  type: string;
-  data: Record<string, any>;
-  order: number;
-  pageId: string;
-  parentId: string | null;
-  createdAt: Date;
-  updatedAt: Date;
 };
