@@ -12,16 +12,13 @@ export default async function PageComponent({
   const page = await prisma.page.findUnique({
     where: { slug },
     include: { blocks: true, meta: true },
-  });
+  }) as Page | null;
 
   if (!page) return notFound();
 
-  // Prisma returns proper Date objects; just need type assertion
-  const typedPage = page as Page;
-
   return (
     <main className="prose prose-lg mx-auto p-8">
-      <Renderer page={typedPage} />
+      <Renderer page={page} />
     </main>
   );
 }
