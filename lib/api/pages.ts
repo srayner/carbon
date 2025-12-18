@@ -15,8 +15,8 @@ function transformPageFromAPI(pageData: Record<string, unknown>): Page {
     updatedAt: new Date(updatedAt as string),
     blocks: (blocks as Array<Record<string, unknown>>).map((block) => ({
       ...block,
-      ...(block.createdAt && { createdAt: new Date(block.createdAt as string) }),
-      ...(block.updatedAt && { updatedAt: new Date(block.updatedAt as string) }),
+      ...(block.createdAt ? { createdAt: new Date(block.createdAt as string) } : {}),
+      ...(block.updatedAt ? { updatedAt: new Date(block.updatedAt as string) } : {}),
     })) as Block[],
   } as Page;
 }
