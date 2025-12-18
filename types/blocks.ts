@@ -9,6 +9,7 @@ import { RichTextBlockConfig } from "@/config/blocks/richText";
 // Extract a union of property entries from a readonly array
 export type BlockProperty = {
   name: string;
+  displayName: string;
   type: string;
   values?: readonly string[] | undefined;
   default?: string;
