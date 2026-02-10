@@ -76,7 +76,11 @@ export const deletePage = async (id: string) => {
 export const getPage = async (id: string) => {
   const page = await prisma.page.findUnique({
     where: { id },
-    include: { blocks: true },
+    include: {
+      blocks: {
+        orderBy: { order: "asc" },
+      },
+    },
   });
 
   return page;
