@@ -1,9 +1,9 @@
 /**
- * An array of routes that are accessible to the public
- * These routes do not require the user to be logged in
+ * Path prefixes that require the user to be logged in.
+ * Everything else (the home page and content pages) is public.
  * @type {string[]}
  */
-export const publicRoutes = ["/", "/[slug]"];
+export const protectedPrefixes = ["/admin", "/api"];
 
 /**
  * An array of routes that are used for authentication
