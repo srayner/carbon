@@ -11,6 +11,7 @@ import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 import { fetchPage, savePage } from "@/lib/api/pages";
 import HeadingEditable from "../Block/HeadingEditable";
 import ImageEditable from "@/components/Block/ImageEditable";
+import FileEditable from "@/components/Block/FileEditable";
 import { Page } from "@/types/entities";
 import { slugify } from "@/lib/slug";
 import { toast } from "sonner";
@@ -259,6 +260,9 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
                 break;
               case "Image":
                 content = <ImageEditable image={block} />;
+                break;
+              case "File":
+                content = <FileEditable file={block} />;
                 break;
               case "RichText":
                 content = (

@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { HeadingBlockConfig } from "@/config/blocks/heading";
+import { FileBlockConfig } from "@/config/blocks/file";
 import { ImageBlockConfig } from "@/config/blocks/image";
 import { ParagraphBlockConfig } from "@/config/blocks/paragraph";
 import { RichTextBlockConfig } from "@/config/blocks/richText";
@@ -60,6 +61,7 @@ type PropsFromArray<TProps extends readonly BlockProperty[]> = {
 
 /* ----- Infer types for specific block configs ----- */
 type HeadingProps = PropsFromArray<(typeof HeadingBlockConfig)["properties"]>;
+type FileProps = PropsFromArray<(typeof FileBlockConfig)["properties"]>;
 type ImageProps = PropsFromArray<(typeof ImageBlockConfig)["properties"]>;
 type ParagraphProps = PropsFromArray<
   (typeof ParagraphBlockConfig)["properties"]
@@ -68,6 +70,7 @@ type RichTextProps = PropsFromArray<(typeof RichTextBlockConfig)["properties"]>;
 
 /* ----- Block type literals ----- */
 type HeadingType = (typeof HeadingBlockConfig)["name"];
+type FileType = (typeof FileBlockConfig)["name"];
 type ImageType = (typeof ImageBlockConfig)["name"];
 type ParagraphType = (typeof ParagraphBlockConfig)["name"];
 type RichTextType = (typeof RichTextBlockConfig)["name"];
@@ -86,6 +89,11 @@ export type HeadingBlock = {
   type: HeadingType;
   properties: HeadingProps;
 } & BaseBlock;
+export type FileBlock = {
+  id: string;
+  type: FileType;
+  properties: FileProps;
+} & BaseBlock;
 export type ImageBlock = {
   id: string;
   type: ImageType;
@@ -103,16 +111,28 @@ export type RichTextBlock = {
 } & BaseBlock;
 
 /* ----- Union of all blocks ----- */
-export type Block = HeadingBlock | ImageBlock | ParagraphBlock | RichTextBlock;
+export type Block =
+  | HeadingBlock
+  | ImageBlock
+  | FileBlock
+  | ParagraphBlock
+  | RichTextBlock;
 
 /* ----- Union of block type strings ----- */
-export type BlockName = HeadingType | ImageType | ParagraphType | RichTextType;
+export type BlockName =
+  | HeadingType
+  | ImageType
+  | FileType
+  | ParagraphType
+  | RichTextType;
 
 /* ----- Helper to get props type by block name ----- */
 export type PropsForBlockName<T extends BlockName> = T extends HeadingType
   ? HeadingProps
   : T extends ImageType
   ? ImageProps
+  : T extends FileType
+  ? FileProps
   : T extends ParagraphType
   ? ParagraphProps
   : T extends RichTextType
