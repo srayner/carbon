@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { ParagraphBlock } from "@/types/blocks";
 import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
 
@@ -20,12 +20,6 @@ const ParagraphEditable: React.FC<ParagraphEditableProps> = ({
     const rawText = content.replace(/<[^>]*>/g, "");
     onUpdate(paragraph.id, rawText);
   };
-
-  useEffect(() => {
-    if (tiptapRef.current) {
-      tiptapRef.current.setContent(content);
-    }
-  }, [content]);
 
   // TipTap expects HTML, so wrap the plain text content in a <p> tag
   const escaped = (content || "")

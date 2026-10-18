@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { RichTextBlock } from "@/types/blocks";
 import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
 
@@ -19,12 +19,6 @@ const RichTextEditable: React.FC<RichTextEditableProps> = ({
   const handleBlur = (content: string) => {
     onUpdate(richText.id, content);
   };
-
-  useEffect(() => {
-    if (tiptapRef.current) {
-      tiptapRef.current.setContent(content);
-    }
-  }, [content]);
 
   return (
     <Tiptap

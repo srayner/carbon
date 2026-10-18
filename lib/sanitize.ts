@@ -10,6 +10,7 @@ export const sanitizeRichText = (html: string) =>
     allowedTags: [...sanitizeHtml.defaults.allowedTags, "img"],
     allowedAttributes: {
       ...sanitizeHtml.defaults.allowedAttributes,
+      a: ["href", "name", "target", "rel"],
       img: ["src", "alt", "width", "height"],
       "*": ["style"],
     },
@@ -17,4 +18,11 @@ export const sanitizeRichText = (html: string) =>
       "*": { "text-align": [/^(left|right|center|justify)$/] },
     },
     allowedSchemes: ["http", "https", "mailto"],
+    // Links that open in a new tab must not be able to reach back to the page
+    transformTags: {
+      a: (tagName, attribs) => ({
+        tagName,
+        attribs: { ...attribs, rel: "noopener noreferrer" },
+      }),
+    },
   });

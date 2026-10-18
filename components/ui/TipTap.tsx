@@ -4,6 +4,8 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TiptapMenu from "./TipTapMenu";
 import TextAlign from "@tiptap/extension-text-align";
+import Image from "@tiptap/extension-image";
+import { TableKit } from "@tiptap/extension-table";
 import { forwardRef, useImperativeHandle } from "react";
 
 export interface TiptapHandle {
@@ -26,7 +28,10 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
           heading: {
             levels: [1, 2, 3],
           },
+          link: { openOnClick: false },
         }),
+        Image,
+        TableKit,
         TextAlign.configure({
           types: ["heading", "paragraph"],
         }),
