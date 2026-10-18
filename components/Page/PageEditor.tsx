@@ -12,6 +12,7 @@ import { fetchPage, savePage } from "@/lib/api/pages";
 import HeadingEditable from "../Block/HeadingEditable";
 import ImageEditable from "@/components/Block/ImageEditable";
 import FileEditable from "@/components/Block/FileEditable";
+import CardView from "@/components/Block/CardView";
 import { Page } from "@/types/entities";
 import { slugify } from "@/lib/slug";
 import { toast } from "sonner";
@@ -263,6 +264,13 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
                 break;
               case "File":
                 content = <FileEditable file={block} />;
+                break;
+              case "Card":
+                content = (
+                  <div className="max-w-xs">
+                    <CardView card={block} />
+                  </div>
+                );
                 break;
               case "RichText":
                 content = (

@@ -1,5 +1,6 @@
 import { Page } from "@/types/entities";
-import { Block } from "@/types/blocks";
+import { Block, CardBlock } from "@/types/blocks";
+import CardView from "@/components/Block/CardView";
 import { getBlockStyle } from "@/lib/block-style";
 import { sanitizeRichText } from "@/lib/sanitize";
 
@@ -102,13 +103,43 @@ const RenderBlock: React.FC<{ block: Block }> = ({ block }) => {
   }
 };
 
+type RenderItem =
+  | { kind: "block"; block: Block }
+  | { kind: "cards"; cards: CardBlock[] };
+
+// Consecutive Card blocks are shown together in one grid
+const groupBlocks = (blocks: Block[]): RenderItem[] => {
+  const items: RenderItem[] = [];
+  for (const block of blocks) {
+    const last = items[items.length - 1];
+    if (block.type === "Card") {
+      if (last?.kind === "cards") last.cards.push(block);
+      else items.push({ kind: "cards", cards: [block] });
+    } else {
+      items.push({ kind: "block", block });
+    }
+  }
+  return items;
+};
+
 const Renderer: React.FC<RendererProps> = ({ page }) => {
   return (
     <>
       <h1>{page.title}</h1>
-      {page.blocks.map((block: Block) => (
-        <RenderBlock key={block.id} block={block} />
-      ))}
+      {groupBlocks(page.blocks).map((item) =>
+        item.kind === "cards" ? (
+          <div
+            key={item.cards[0].id}
+            className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {item.cards.map((card) => (
+              <CardView key={card.id} card={card} />
+            ))}
+          </div>
+        ) : (
+          <RenderBlock key={item.block.id} block={item.block} />
+        )
+      )}
     </>
   );
 };

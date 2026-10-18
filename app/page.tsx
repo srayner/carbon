@@ -2,8 +2,22 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { handleSignOut } from "@/actions/logout";
 import { Button } from "@/components/ui/button";
+import PublicPage from "@/components/Page/PublicPage";
+import { getPageMetadata, loadPublicPage } from "@/lib/public-page";
+
+// The home page is the page with the slug "home". Until one is published,
+// show a simple welcome screen.
+const HOME_SLUG = "home";
+
+export async function generateMetadata() {
+  const result = await loadPublicPage(HOME_SLUG);
+  return result ? getPageMetadata(result.page) : {};
+}
 
 export default async function Home() {
+  const result = await loadPublicPage(HOME_SLUG);
+  if (result) return <PublicPage {...result} />;
+
   const session = await auth();
   const user = session?.user;
 

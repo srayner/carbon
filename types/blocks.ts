@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { HeadingBlockConfig } from "@/config/blocks/heading";
+import { CardBlockConfig } from "@/config/blocks/card";
 import { FileBlockConfig } from "@/config/blocks/file";
 import { ImageBlockConfig } from "@/config/blocks/image";
 import { ParagraphBlockConfig } from "@/config/blocks/paragraph";
@@ -26,7 +27,7 @@ export type BlockConfig<TName extends string = string> = {
 
 // Map single prop entry -> TS type
 type BlockPropertyToType<P extends BlockProperty> = P extends {
-  type: "string" | "image" | "file";
+  type: "string" | "image" | "file" | "richtext";
 }
   ? P extends { optional: true }
     ? string | undefined
@@ -61,6 +62,7 @@ type PropsFromArray<TProps extends readonly BlockProperty[]> = {
 
 /* ----- Infer types for specific block configs ----- */
 type HeadingProps = PropsFromArray<(typeof HeadingBlockConfig)["properties"]>;
+type CardProps = PropsFromArray<(typeof CardBlockConfig)["properties"]>;
 type FileProps = PropsFromArray<(typeof FileBlockConfig)["properties"]>;
 type ImageProps = PropsFromArray<(typeof ImageBlockConfig)["properties"]>;
 type ParagraphProps = PropsFromArray<
@@ -70,6 +72,7 @@ type RichTextProps = PropsFromArray<(typeof RichTextBlockConfig)["properties"]>;
 
 /* ----- Block type literals ----- */
 type HeadingType = (typeof HeadingBlockConfig)["name"];
+type CardType = (typeof CardBlockConfig)["name"];
 type FileType = (typeof FileBlockConfig)["name"];
 type ImageType = (typeof ImageBlockConfig)["name"];
 type ParagraphType = (typeof ParagraphBlockConfig)["name"];
@@ -88,6 +91,11 @@ export type HeadingBlock = {
   id: string;
   type: HeadingType;
   properties: HeadingProps;
+} & BaseBlock;
+export type CardBlock = {
+  id: string;
+  type: CardType;
+  properties: CardProps;
 } & BaseBlock;
 export type FileBlock = {
   id: string;
@@ -115,6 +123,7 @@ export type Block =
   | HeadingBlock
   | ImageBlock
   | FileBlock
+  | CardBlock
   | ParagraphBlock
   | RichTextBlock;
 
@@ -123,6 +132,7 @@ export type BlockName =
   | HeadingType
   | ImageType
   | FileType
+  | CardType
   | ParagraphType
   | RichTextType;
 
@@ -133,6 +143,8 @@ export type PropsForBlockName<T extends BlockName> = T extends HeadingType
   ? ImageProps
   : T extends FileType
   ? FileProps
+  : T extends CardType
+  ? CardProps
   : T extends ParagraphType
   ? ParagraphProps
   : T extends RichTextType

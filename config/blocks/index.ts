@@ -1,3 +1,4 @@
+import { CardBlockConfig } from "./card";
 import { FileBlockConfig } from "./file";
 import { HeadingBlockConfig } from "./heading";
 import { ImageBlockConfig } from "./image";
@@ -8,6 +9,7 @@ export const ALL_BLOCKS = [
   HeadingBlockConfig,
   ImageBlockConfig,
   FileBlockConfig,
+  CardBlockConfig,
   ParagraphBlockConfig,
   RichTextBlockConfig,
 ];
