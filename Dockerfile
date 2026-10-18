@@ -21,6 +21,11 @@ RUN npm run build
 RUN npm prune --production
 RUN rm -rf /root/.cache/Cypress
 
+# Uploaded images and files are stored here. Mount a persistent volume at
+# this path, otherwise uploads are lost when the container is replaced.
+ENV UPLOAD_DIR=/data/uploads
+RUN mkdir -p /data/uploads
+
 # Expose port
 EXPOSE 3000
 

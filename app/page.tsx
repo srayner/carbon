@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import PublicPage from "@/components/Page/PublicPage";
 import { getPageMetadata, loadPublicPage } from "@/lib/public-page";
 
+// Always render per request: the content comes from the database and can
+// change when a page is published
+export const dynamic = "force-dynamic";
+
 // The home page is the page with the slug "home". Until one is published,
 // show a simple welcome screen.
 const HOME_SLUG = "home";
