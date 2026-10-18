@@ -30,6 +30,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     updatedAt: new Date(),
   });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
+  const [selectionCount, setSelectionCount] = useState(0);
   const { setPageActions } = usePageActions();
 
   useEffect(() => {
@@ -161,6 +162,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
 
   const handleBlockSelected = (block: Block) => {
     setSelectedBlockId(block.id);
+    // Counts every selection, even of the block that is already selected
+    setSelectionCount((count) => count + 1);
   };
 
   const handleBlockChange = (updatedProperties: Record<string, string>) => {
@@ -170,6 +173,10 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
 
       return updateBlockProps(prevPage, selectedBlockId, updatedProperties);
     });
+  };
+
+  const handlePublishedAtChange = (publishedAt: Date | null) => {
+    setPage((prevPage) => ({ ...prevPage, publishedAt }));
   };
 
   const selectedBlock =
@@ -223,7 +230,11 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
 
 
             return (
-              <div key={block.id} className="relative mr-10">
+              <div
+                key={block.id}
+                className="relative mr-10"
+                onClick={() => handleBlockSelected(block)}
+              >
                 {content}
                 {isSelected && (
                   <div className="absolute -inset-1 pointer-events-none border-2 border-blue-500"></div>
@@ -238,7 +249,10 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
       <EditorSidebar side="right">
         <PagePropertiesTabs
           selectedBlock={selectedBlock}
+          selectionCount={selectionCount}
+          publishedAt={page.publishedAt}
           onBlockChange={handleBlockChange}
+          onPublishedAtChange={handlePublishedAtChange}
         />
       </EditorSidebar>
     </div>
