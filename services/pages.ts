@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Block } from "@/types/blocks";
+import { AppError } from "@/lib/api/error";
+import { getSlugError } from "@/lib/slug";
 
 type PageInput = {
   id?: string;
@@ -11,6 +13,14 @@ type PageInput = {
 };
 
 export const upsertPage = async (pageId: string | null, data: PageInput) => {
+  if (!data.title?.trim()) {
+    throw new AppError("Title is required.", 400);
+  }
+  const slugError = getSlugError(data.slug);
+  if (slugError) {
+    throw new AppError(slugError, 400);
+  }
+
   // Create new page if no id
   if (!pageId) {
     const newPage = await prisma.page.create({

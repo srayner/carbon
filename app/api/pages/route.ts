@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
-import { AppError, handleAppError } from "@/lib/api/error";
+import { handleAppError } from "@/lib/api/error";
 import { requireAdmin } from "@/lib/api/require-admin";
 import { parseQueryParams } from "@/lib/api/query";
 import { upsertPage, listPages } from "@/services/pages";
@@ -19,9 +19,6 @@ export async function POST(req: NextRequest) {
     const page = await upsertPage(null, data);
     return NextResponse.json(page, { status: 201 });
   } catch (err: unknown) {
-    if (err instanceof AppError) return handleAppError(err);
-    console.error("POST /api/pages error:", err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return handleAppError(err);
   }
 }

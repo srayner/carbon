@@ -42,7 +42,10 @@ export const savePage = async (page: Page): Promise<Page> => {
     body: JSON.stringify(page),
   });
 
-  if (!res.ok) throw new Error("Failed to save page");
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error || "Failed to save page");
+  }
   const data = await res.json();
 
   // Transform API response: handle both { page: ... } and direct page response

@@ -10,7 +10,11 @@ import { getPageStatus, PageStatus } from "@/lib/page-status";
 interface PagePropertiesTabsProps {
   selectedBlock: Block | null;
   selectionCount: number;
+  title: string;
+  slug: string;
   publishedAt: Date | null;
+  onTitleChange: (title: string) => void;
+  onSlugChange: (slug: string) => void;
   onTabChange?: (tab: "page" | "block") => void;
   onBlockChange: (updatedProperties: Record<string, string>) => void;
   onPublishedAtChange: (publishedAt: Date | null) => void;
@@ -40,7 +44,11 @@ const formatDateTime = (date: Date) =>
 export function PagePropertiesTabs({
   selectedBlock,
   selectionCount,
+  title,
+  slug,
   publishedAt,
+  onTitleChange,
+  onSlugChange,
   onTabChange,
   onBlockChange,
   onPublishedAtChange,
@@ -162,20 +170,30 @@ export function PagePropertiesTabs({
               )}
             </section>
 
-            {/* Meta Data */}
+            {/* Title and slug */}
             <section className="p-3 border rounded-md bg-background">
-              <h2 className="text-sm font-semibold mb-2">Meta Data</h2>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-muted-foreground">Title:</span>
-                <span className="text-sm font-medium">My Cool Page</span>
+              <h2 className="text-sm font-semibold mb-2">Page</h2>
+              <label className="block text-sm text-muted-foreground mb-1">
+                Title
+              </label>
+              <input
+                className="w-full border rounded px-2 py-1 text-sm mb-3"
+                value={title}
+                placeholder="Page title"
+                onChange={(e) => onTitleChange(e.target.value)}
+              />
+              <label className="block text-sm text-muted-foreground mb-1">
+                Slug
+              </label>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground">/</span>
+                <input
+                  className="w-full border rounded px-2 py-1 text-sm"
+                  value={slug}
+                  placeholder="page-slug"
+                  onChange={(e) => onSlugChange(e.target.value)}
+                />
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Slug:</span>
-                <span className="text-sm font-medium">/my-cool-page</span>
-              </div>
-              <button className="mt-2 px-2 py-1 text-xs rounded bg-gray-300 text-gray-700 hover:bg-gray-400">
-                Edit Metadata
-              </button>
             </section>
           </div>
         </TabsContent>

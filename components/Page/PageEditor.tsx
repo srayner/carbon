@@ -11,6 +11,8 @@ import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 import { fetchPage, savePage } from "@/lib/api/pages";
 import HeadingEditable from "../Block/HeadingEditable";
 import { Page } from "@/types/entities";
+import { slugify } from "@/lib/slug";
+import { toast } from "sonner";
 
 type PageEditorProps = {
   pageId?: string; // undefined for add mode
@@ -18,11 +20,10 @@ type PageEditorProps = {
 };
 
 const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
-  const timestamp = Date.now();
   const [page, setPage] = useState<Page>({
     id: "",
-    title: `Demo Page ${timestamp}`,
-    slug: `demo-page-${timestamp}`,
+    title: "",
+    slug: "",
     blocks: [],
     meta: null,
     publishedAt: null,
@@ -31,6 +32,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   });
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [selectionCount, setSelectionCount] = useState(0);
+  // Until the slug is edited by hand, a new page's slug follows its title
+  const [slugEdited, setSlugEdited] = useState(!!pageId);
   const { setPageActions } = usePageActions();
 
   useEffect(() => {
@@ -57,7 +60,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
         afterSave?.(newPage.id!);
       } catch (err) {
         console.error("Save failed:", err);
-        alert("Save failed! Check console.");
+        toast.error(err instanceof Error ? err.message : "Save failed.");
       }
     };
 
@@ -175,6 +178,40 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     });
   };
 
+  const handleTitleChange = (title: string) => {
+    setPage((prevPage) => ({
+      ...prevPage,
+      title,
+      slug: slugEdited ? prevPage.slug : slugify(title),
+    }));
+  };
+
+  const handleSlugChange = (slug: string) => {
+    setSlugEdited(true);
+    setPage((prevPage) => ({ ...prevPage, slug }));
+  };
+
+  const handleBlockMoved = (blockId: string, direction: -1 | 1) => {
+    setPage((prevPage) => {
+      const index = prevPage.blocks.findIndex((b) => b.id === blockId);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= prevPage.blocks.length) {
+        return prevPage;
+      }
+      const blocks = [...prevPage.blocks];
+      [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
+      return { ...prevPage, blocks };
+    });
+  };
+
+  const handleBlockDeleted = (blockId: string) => {
+    setPage((prevPage) => ({
+      ...prevPage,
+      blocks: prevPage.blocks.filter((b) => b.id !== blockId),
+    }));
+    setSelectedBlockId((current) => (current === blockId ? null : current));
+  };
+
   const handlePublishedAtChange = (publishedAt: Date | null) => {
     setPage((prevPage) => ({ ...prevPage, publishedAt }));
   };
@@ -190,6 +227,9 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
           blocks={page.blocks}
           onAdd={handleBlockAdded}
           onSelect={handleBlockSelected}
+          onMove={handleBlockMoved}
+          onDelete={handleBlockDeleted}
+          selectedBlockId={selectedBlockId}
         />
       </EditorSidebar>
 
@@ -250,7 +290,11 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
         <PagePropertiesTabs
           selectedBlock={selectedBlock}
           selectionCount={selectionCount}
+          title={page.title}
+          slug={page.slug}
           publishedAt={page.publishedAt}
+          onTitleChange={handleTitleChange}
+          onSlugChange={handleSlugChange}
           onBlockChange={handleBlockChange}
           onPublishedAtChange={handlePublishedAtChange}
         />
