@@ -7,8 +7,8 @@ export const ImageBlockConfig = {
     // Content group
     {
       name: "src",
-      displayName: "Image Source",
-      type: "string",
+      displayName: "Image",
+      type: "image",
       default: "",
       group: "Content",
     },

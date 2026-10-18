@@ -24,7 +24,9 @@ export type BlockConfig<TName extends string = string> = {
 };
 
 // Map single prop entry -> TS type
-type BlockPropertyToType<P extends BlockProperty> = P extends { type: "string" }
+type BlockPropertyToType<P extends BlockProperty> = P extends {
+  type: "string" | "image" | "file";
+}
   ? P extends { optional: true }
     ? string | undefined
     : string

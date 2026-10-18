@@ -1,5 +1,6 @@
 import React from "react";
 import { BlockConfig, BlockProperty } from "@/types/blocks";
+import UploadField from "@/components/Block/UploadField";
 
 interface PropertyEditorProps {
   blockConfig: BlockConfig;
@@ -36,6 +37,16 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
                 value={value as string}
                 onChange={(e) => handleChange(prop.name, e.target.value)}
                 className="border p-1 w-full"
+              />
+            );
+            break;
+          case "image":
+          case "file":
+            inputEl = (
+              <UploadField
+                kind={prop.type}
+                value={(value as string) ?? ""}
+                onChange={(url) => handleChange(prop.name, url)}
               />
             );
             break;

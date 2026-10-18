@@ -9,3 +9,4 @@ Dockerfile
 *.log
 cypress
 README.md
+uploads

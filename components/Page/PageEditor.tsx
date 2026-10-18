@@ -10,6 +10,7 @@ import RichTextEditable from "@/components/Block/RichTextEditable";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 import { fetchPage, savePage } from "@/lib/api/pages";
 import HeadingEditable from "../Block/HeadingEditable";
+import ImageEditable from "@/components/Block/ImageEditable";
 import { Page } from "@/types/entities";
 import { slugify } from "@/lib/slug";
 import { toast } from "sonner";
@@ -255,6 +256,9 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
                     onUpdate={handleBlockContentChanged}
                   />
                 );
+                break;
+              case "Image":
+                content = <ImageEditable image={block} />;
                 break;
               case "RichText":
                 content = (
