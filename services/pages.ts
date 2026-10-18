@@ -59,7 +59,7 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
   // Return page with blocks
   const pageWithBlocks = await prisma.page.findUnique({
     where: { id: pageId },
-    include: { blocks: true },
+    include: { blocks: { orderBy: { order: "asc" } } },
   });
 
   return pageWithBlocks;
@@ -76,7 +76,7 @@ export const deletePage = async (id: string) => {
 export const getPage = async (id: string) => {
   const page = await prisma.page.findUnique({
     where: { id },
-    include: { blocks: true },
+    include: { blocks: { orderBy: { order: "asc" } } },
   });
 
   return page;

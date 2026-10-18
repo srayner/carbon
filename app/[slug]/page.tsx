@@ -14,7 +14,7 @@ export default async function PageComponent({
   const { slug } = await params;
   const page = await prisma.page.findUnique({
     where: { slug },
-    include: { blocks: true, meta: true },
+    include: { blocks: { orderBy: { order: "asc" } }, meta: true },
   }) as Page | null;
 
   if (!page) return notFound();

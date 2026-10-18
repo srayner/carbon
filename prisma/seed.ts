@@ -80,13 +80,25 @@ async function seedPages() {
             id: crypto.randomUUID(),
             type: "Heading",
             order: 0,
-            properties: { level: "h1", content: "Hello World" },
+            properties: { level: "h2", content: "Getting started" },
           },
           {
             id: crypto.randomUUID(),
             type: "Paragraph",
             order: 1,
             properties: { content: "This page was created by the seed script." },
+          },
+          {
+            id: crypto.randomUUID(),
+            type: "RichText",
+            order: 2,
+            properties: {
+              content:
+                "<p>Some <strong>rich</strong> text with a table:</p>" +
+                "<table><thead><tr><th>Part</th><th>Qty</th></tr></thead>" +
+                "<tbody><tr><td>Resistor</td><td>10</td></tr>" +
+                "<tr><td>Capacitor</td><td>4</td></tr></tbody></table>",
+            },
           },
         ],
       },

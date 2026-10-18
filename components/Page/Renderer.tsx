@@ -1,24 +1,90 @@
 import { Page } from "@/types/entities";
 import { Block } from "@/types/blocks";
+import { getBlockStyle } from "@/lib/block-style";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 interface RendererProps {
   page: Page;
 }
 
+const HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
+type HeadingLevel = (typeof HEADING_LEVELS)[number];
+
+const RenderBlock: React.FC<{ block: Block }> = ({ block }) => {
+  const properties = block.properties as Record<string, unknown>;
+  const style = getBlockStyle(block.type, properties);
+  const className = (properties.className as string) || undefined;
+  const id = (properties.cssId as string) || undefined;
+
+  switch (block.type) {
+    case "Heading": {
+      const level = block.properties.level;
+      const Tag: HeadingLevel = HEADING_LEVELS.includes(level as HeadingLevel)
+        ? (level as HeadingLevel)
+        : "h2";
+      return (
+        <Tag id={id} className={className} style={style}>
+          {block.properties.content}
+        </Tag>
+      );
+    }
+    case "Paragraph":
+      return (
+        <p id={id} className={className} style={style}>
+          {block.properties.content}
+        </p>
+      );
+    case "RichText":
+      return (
+        <div
+          id={id}
+          className={className}
+          style={style}
+          dangerouslySetInnerHTML={{
+            __html: sanitizeRichText(block.properties.content ?? ""),
+          }}
+        />
+      );
+    case "Image": {
+      const { src, alt, caption, width, height, objectFit, alignment } =
+        block.properties;
+      if (!src) return null;
+      return (
+        <figure
+          id={id}
+          className={className}
+          style={{ ...style, textAlign: alignment || "center" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={src}
+            alt={alt ?? ""}
+            style={{
+              display: "inline-block",
+              width: width || "100%",
+              height: height || "auto",
+              objectFit: objectFit || "cover",
+              borderRadius: block.properties.borderRadius || undefined,
+              filter: block.properties.filter || undefined,
+              margin: 0,
+            }}
+          />
+          {caption && <figcaption>{caption}</figcaption>}
+        </figure>
+      );
+    }
+    default:
+      return null;
+  }
+};
+
 const Renderer: React.FC<RendererProps> = ({ page }) => {
   return (
     <>
       <h1>{page.title}</h1>
-      {page.blocks.map((block: Block) => {
-        switch (block.type) {
-          case "Heading":
-            return <h2 key={block.id}>{block.properties.content}</h2>;
-          case "Paragraph":
-            return <p key={block.id}>{block.properties.content}</p>;
-          default:
-            return null;
-        }
-      })}
+      {page.blocks.map((block: Block) => (
+        <RenderBlock key={block.id} block={block} />
+      ))}
     </>
   );
 };

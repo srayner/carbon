@@ -1,6 +1,6 @@
 {
   "name": "carbon",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -37,6 +37,7 @@
     "react": "18.3",
     "react-dom": "18.3",
     "react-hook-form": "^7.65.0",
+    "sanitize-html": "^2.18.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
@@ -46,6 +47,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/sanitize-html": "^2.16.2",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "postcss": "^8",
