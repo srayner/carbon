@@ -26,7 +26,13 @@ const RichTextEditable: React.FC<RichTextEditableProps> = ({
     }
   }, [content]);
 
-  return <Tiptap ref={tiptapRef} onBlur={handleBlur} />;
+  return (
+    <Tiptap
+      ref={tiptapRef}
+      onBlur={handleBlur}
+      initialContent={content}
+    />
+  );
 };
 
 export default RichTextEditable;
