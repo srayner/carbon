@@ -16,7 +16,7 @@ const SidebarManagerContext = createContext<SidebarManagerContextType | null>(
 
 export function SidebarManagerProvider({ children }: { children: ReactNode }) {
   const [leftOpen, setLeftOpen] = useState(false);
-  const [rightOpen, setRightOpen] = useState(false);
+  const [rightOpen, setRightOpen] = useState(true);
 
   const toggleLeft = () => setLeftOpen((v) => !v);
   const toggleRight = () => setRightOpen((v) => !v);
