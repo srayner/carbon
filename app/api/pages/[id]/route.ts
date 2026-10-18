@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { withErrorHandling } from "@/lib/api/handler";
 import { getPage, deletePage, upsertPage } from "@/services/pages";
 import { AppError } from "@/lib/api/error";
+import { requireAdmin } from "@/lib/api/require-admin";
 
 export const GET = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
@@ -18,6 +19,7 @@ export const GET = withErrorHandling(
 
 export const DELETE = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    await requireAdmin();
     const { id: contentId } = await params;
     const deletedContent = await deletePage(contentId);
 
@@ -27,6 +29,7 @@ export const DELETE = withErrorHandling(
 
 export const PUT = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    await requireAdmin();
     const { id: pageId } = await params;
     const data = await req.json();
 
