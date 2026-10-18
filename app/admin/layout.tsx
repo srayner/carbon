@@ -4,6 +4,8 @@ import { SidebarManagerProvider } from "@/context/sidebar-manager";
 import SideBar from "@/components/sidebar";
 import NavBar from "@/components/navbar";
 import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { PageActionsProvider } from "@/context/page-actions";
 
@@ -12,6 +14,11 @@ export default async function ProtectedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+  if (!session?.user) redirect("/auth/login");
+  // 404 rather than redirect: the middleware sends logged-in users from "/" to "/admin"
+  if (session.user.role !== "ADMIN") notFound();
+
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
