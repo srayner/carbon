@@ -6,10 +6,11 @@ import { Block } from "@/types/blocks";
  * Converts date strings to Date objects and casts blocks to Block[].
  */
 function transformPageFromAPI(pageData: Record<string, unknown>): Page {
-  const { blocks = [], publishedAt, createdAt, updatedAt, ...rest } = pageData;
+  const { blocks = [], categoryIds = [], publishedAt, createdAt, updatedAt, ...rest } = pageData;
 
   return {
     ...rest,
+    categoryIds,
     publishedAt: publishedAt ? new Date(publishedAt as string) : null,
     createdAt: new Date(createdAt as string),
     updatedAt: new Date(updatedAt as string),

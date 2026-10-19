@@ -6,6 +6,7 @@ import { ALL_BLOCKS } from "@/config/blocks";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import BlockPropertyEditor from "@/components/Block/BlockPropertyEditor";
 import { getPageStatus, PageStatus } from "@/lib/page-status";
+import { CategoryRow } from "@/lib/category-tree";
 
 interface PagePropertiesTabsProps {
   selectedBlock: Block | null;
@@ -13,6 +14,9 @@ interface PagePropertiesTabsProps {
   title: string;
   slug: string;
   publishedAt: Date | null;
+  categories: CategoryRow[];
+  categoryIds: string[];
+  onCategoryIdsChange: (categoryIds: string[]) => void;
   onTitleChange: (title: string) => void;
   onSlugChange: (slug: string) => void;
   onTabChange?: (tab: "page" | "block") => void;
@@ -47,6 +51,9 @@ export function PagePropertiesTabs({
   title,
   slug,
   publishedAt,
+  categories,
+  categoryIds,
+  onCategoryIdsChange,
   onTitleChange,
   onSlugChange,
   onTabChange,
@@ -194,6 +201,44 @@ export function PagePropertiesTabs({
                   onChange={(e) => onSlugChange(e.target.value)}
                 />
               </div>
+            </section>
+
+            {/* Categories */}
+            <section className="p-3 border rounded-md bg-background">
+              <h2 className="text-sm font-semibold mb-2">Categories</h2>
+              {categories.length === 0 ? (
+                <p className="text-sm text-muted-foreground italic">
+                  No categories yet.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-1 max-h-64 overflow-auto">
+                  {categories.map((category) => (
+                    <label
+                      key={category.id}
+                      className={`flex items-center gap-2 text-sm ${
+                        category.isEffectivelyActive ? "" : "text-gray-400"
+                      }`}
+                      style={{ paddingLeft: `${(category.depth - 1) * 1}rem` }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={categoryIds.includes(category.id)}
+                        onChange={(e) =>
+                          onCategoryIdsChange(
+                            e.target.checked
+                              ? [...categoryIds, category.id]
+                              : categoryIds.filter((id) => id !== category.id)
+                          )
+                        }
+                      />
+                      {category.name}
+                      {!category.isEffectivelyActive && (
+                        <span className="text-xs">(inactive)</span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+              )}
             </section>
           </div>
         </TabsContent>

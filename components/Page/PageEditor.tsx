@@ -9,6 +9,8 @@ import ParagraphEditable from "@/components/Block/ParagraphEditable";
 import RichTextEditable from "@/components/Block/RichTextEditable";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 import { fetchPage, savePage } from "@/lib/api/pages";
+import { fetchCategories } from "@/lib/api/categories";
+import { CategoryRow, flattenCategories } from "@/lib/category-tree";
 import HeadingEditable from "../Block/HeadingEditable";
 import ImageEditable from "@/components/Block/ImageEditable";
 import FileEditable from "@/components/Block/FileEditable";
@@ -28,6 +30,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     title: "",
     slug: "",
     blocks: [],
+    categoryIds: [],
     meta: null,
     publishedAt: null,
     createdAt: new Date(),
@@ -37,7 +40,14 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   const [selectionCount, setSelectionCount] = useState(0);
   // Until the slug is edited by hand, a new page's slug follows its title
   const [slugEdited, setSlugEdited] = useState(!!pageId);
+  const [categories, setCategories] = useState<CategoryRow[]>([]);
   const { setPageActions } = usePageActions();
+
+  useEffect(() => {
+    fetchCategories()
+      .then((all) => setCategories(flattenCategories(all)))
+      .catch((err) => console.error("Failed to load categories:", err));
+  }, []);
 
   useEffect(() => {
     if (!pageId) return; // nothing to load in add mode
@@ -219,6 +229,10 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     setPage((prevPage) => ({ ...prevPage, publishedAt }));
   };
 
+  const handleCategoryIdsChange = (categoryIds: string[]) => {
+    setPage((prevPage) => ({ ...prevPage, categoryIds }));
+  };
+
   const selectedBlock =
     page.blocks.find((bl) => bl.id === selectedBlockId) || null;
 
@@ -309,6 +323,9 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
           title={page.title}
           slug={page.slug}
           publishedAt={page.publishedAt}
+          categories={categories}
+          categoryIds={page.categoryIds}
+          onCategoryIdsChange={handleCategoryIdsChange}
           onTitleChange={handleTitleChange}
           onSlugChange={handleSlugChange}
           onBlockChange={handleBlockChange}

@@ -6,6 +6,7 @@ export type Page = {
   slug: string;
   meta: PageMeta | null;
   blocks: Block[];
+  categoryIds: string[];
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -25,4 +26,15 @@ export type PageMeta = {
   twitterDescription: string | null;
   twitterImage: string | null;
   robots: string | null;
+};
+
+export type Category = {
+  id: string;
+  name: string;
+  description: string | null;
+  parentId: string | null;
+  order: number;
+  isActive: boolean;
+  pageCount: number;
+  childCount: number;
 };

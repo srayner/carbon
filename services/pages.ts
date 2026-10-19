@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Block } from "@/types/blocks";
 import { AppError } from "@/lib/api/error";
 import { getSlugError } from "@/lib/slug";
+import { setPageCategories } from "@/services/categories";
 
 type PageInput = {
   id?: string;
@@ -10,6 +11,7 @@ type PageInput = {
   meta?: object;
   publishedAt?: string | null;
   blocks: Block[];
+  categoryIds?: string[];
 };
 
 export const upsertPage = async (pageId: string | null, data: PageInput) => {
@@ -66,13 +68,13 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
     });
   }
 
-  // Return page with blocks
-  const pageWithBlocks = await prisma.page.findUnique({
-    where: { id: pageId },
-    include: { blocks: { orderBy: { order: "asc" } } },
-  });
+  // Left alone when the caller doesn't send categoryIds
+  if (data.categoryIds) {
+    await setPageCategories(pageId, data.categoryIds);
+  }
 
-  return pageWithBlocks;
+  // Return page with blocks
+  return getPage(pageId);
 };
 
 export const deletePage = async (id: string) => {
@@ -90,10 +92,13 @@ export const getPage = async (id: string) => {
       blocks: {
         orderBy: { order: "asc" },
       },
+      categories: { select: { categoryId: true } },
     },
   });
+  if (!page) return null;
 
-  return page;
+  const { categories, ...rest } = page;
+  return { ...rest, categoryIds: categories.map((c) => c.categoryId) };
 };
 
 export async function listPages(

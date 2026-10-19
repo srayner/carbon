@@ -57,6 +57,7 @@ model Page {
   slug               String   @unique
   blocks             Block[]   @relation("PageBlocks")
   meta               PageMeta?
+  categories         PageCategory[]
   publishedAt        DateTime?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
@@ -89,4 +90,32 @@ model Block {
   order              Int
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+}
+
+model Category {
+  id          String         @id @default(cuid())
+  name        String         @db.VarChar(100)
+  description String?        @db.VarChar(500)
+  parentId    String?
+  parent      Category?      @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children    Category[]     @relation("CategoryTree")
+  order       Int            @default(0)
+  isActive    Boolean        @default(true)
+  pages       PageCategory[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([parentId, name])
+  @@index([parentId])
+}
+
+model PageCategory {
+  pageId     String
+  categoryId String
+  page       Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  assignedAt DateTime @default(now())
+
+  @@id([pageId, categoryId])
+  @@index([categoryId])
 }

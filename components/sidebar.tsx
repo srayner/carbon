@@ -7,6 +7,7 @@ import {
   ArrowUp,
   ArrowDown,
   Menu,
+  FolderTree,
 } from "lucide-react";
 import React from "react";
 import {
@@ -34,6 +35,11 @@ const items = [
     title: "Pages",
     url: "/admin//pages",
     icon: FileText,
+  },
+  {
+    title: "Categories",
+    url: "/admin/categories",
+    icon: FolderTree,
   },
   {
     title: "Templates",
