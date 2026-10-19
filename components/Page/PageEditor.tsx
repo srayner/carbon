@@ -27,6 +27,8 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     blocks: [],
     categoryIds: [],
     templateId: DEFAULT_TEMPLATE_ID,
+    summary: null,
+    image: null,
     meta: null,
     publishedAt: null,
     createdAt: new Date(),
@@ -120,6 +122,14 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
     setPage((prevPage) => ({ ...prevPage, categoryIds }));
   };
 
+  const handleSummaryChange = (summary: string) => {
+    setPage((prevPage) => ({ ...prevPage, summary: summary || null }));
+  };
+
+  const handleImageChange = (image: string) => {
+    setPage((prevPage) => ({ ...prevPage, image: image || null }));
+  };
+
   const handleTemplateIdChange = (templateId: string) => {
     setPage((prevPage) => ({ ...prevPage, templateId }));
   };
@@ -138,6 +148,10 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
           templates={templates}
           categories={categories}
           categoryIds={page.categoryIds}
+          summary={page.summary ?? ""}
+          image={page.image ?? ""}
+          onSummaryChange={handleSummaryChange}
+          onImageChange={handleImageChange}
           onTitleChange={handleTitleChange}
           onSlugChange={handleSlugChange}
           onPublishedAtChange={handlePublishedAtChange}

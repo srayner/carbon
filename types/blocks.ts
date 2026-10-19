@@ -4,6 +4,7 @@ import { CardBlockConfig } from "@/config/blocks/card";
 import { FileBlockConfig } from "@/config/blocks/file";
 import { ImageBlockConfig } from "@/config/blocks/image";
 import { ParagraphBlockConfig } from "@/config/blocks/paragraph";
+import { QueryBlockConfig } from "@/config/blocks/query";
 import { RichTextBlockConfig } from "@/config/blocks/richText";
 
 /* ----- Helper types ----- */
@@ -27,7 +28,7 @@ export type BlockConfig<TName extends string = string> = {
 
 // Map single prop entry -> TS type
 type BlockPropertyToType<P extends BlockProperty> = P extends {
-  type: "string" | "image" | "file" | "richtext";
+  type: "string" | "image" | "file" | "richtext" | "category";
 }
   ? P extends { optional: true }
     ? string | undefined
@@ -41,9 +42,10 @@ type BlockPropertyToType<P extends BlockProperty> = P extends {
     ? number | undefined
     : number
   : P extends { type: "boolean" }
-  ? P extends { optional: true }
-    ? boolean | undefined
-    : boolean
+  ? // the property editor stores every value as a string
+    P extends { optional: true }
+    ? "true" | "false" | undefined
+    : "true" | "false"
   : P extends { type: "enum"; values: readonly (infer V)[] }
   ? P extends { optional: true }
     ? V | undefined
@@ -69,6 +71,7 @@ type ParagraphProps = PropsFromArray<
   (typeof ParagraphBlockConfig)["properties"]
 >;
 type RichTextProps = PropsFromArray<(typeof RichTextBlockConfig)["properties"]>;
+export type QueryProps = PropsFromArray<(typeof QueryBlockConfig)["properties"]>;
 
 /* ----- Block type literals ----- */
 type HeadingType = (typeof HeadingBlockConfig)["name"];
@@ -77,6 +80,7 @@ type FileType = (typeof FileBlockConfig)["name"];
 type ImageType = (typeof ImageBlockConfig)["name"];
 type ParagraphType = (typeof ParagraphBlockConfig)["name"];
 type RichTextType = (typeof RichTextBlockConfig)["name"];
+type QueryType = (typeof QueryBlockConfig)["name"];
 
 type BaseBlock = {
   order?: number;
@@ -119,6 +123,12 @@ export type RichTextBlock = {
   properties: RichTextProps;
 } & BaseBlock;
 
+export type QueryBlock = {
+  id: string;
+  type: QueryType;
+  properties: QueryProps;
+} & BaseBlock;
+
 /* ----- Union of all blocks ----- */
 export type Block =
   | HeadingBlock
@@ -126,7 +136,8 @@ export type Block =
   | FileBlock
   | CardBlock
   | ParagraphBlock
-  | RichTextBlock;
+  | RichTextBlock
+  | QueryBlock;
 
 /* ----- Union of block type strings ----- */
 export type BlockName =
@@ -135,7 +146,8 @@ export type BlockName =
   | FileType
   | CardType
   | ParagraphType
-  | RichTextType;
+  | RichTextType
+  | QueryType;
 
 /* ----- Helper to get props type by block name ----- */
 export type PropsForBlockName<T extends BlockName> = T extends HeadingType
@@ -150,6 +162,8 @@ export type PropsForBlockName<T extends BlockName> = T extends HeadingType
   ? ParagraphProps
   : T extends RichTextType
   ? RichTextProps
+  : T extends QueryType
+  ? QueryProps
   : never;
 
 export type BlockPropsMap = {

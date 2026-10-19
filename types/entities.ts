@@ -9,6 +9,8 @@ export type Page = {
   blocks: Block[];
   categoryIds: string[];
   templateId: string;
+  summary: string | null;
+  image: string | null;
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;

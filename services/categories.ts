@@ -267,3 +267,43 @@ export const setPageCategories = async (
     }),
   ]);
 };
+
+/**
+ * The category ids a query for `categoryId` should match: the category itself
+ * and, optionally, its sub-categories. A category that is inactive, or has an
+ * inactive ancestor, matches nothing, and neither does anything beneath it.
+ */
+export const getQueryCategoryIds = async (
+  categoryId: string,
+  includeSubcategories: boolean
+) => {
+  const all = await prisma.category.findMany({
+    select: { id: true, parentId: true, isActive: true },
+  });
+  const byId = new Map(all.map((c) => [c.id, c]));
+
+  const isLive = (id: string | null): boolean => {
+    for (let cur = id, hops = 0; cur; hops++) {
+      const category = byId.get(cur);
+      if (!category || !category.isActive || hops > all.length) return false;
+      cur = category.parentId;
+    }
+    return true;
+  };
+
+  if (!isLive(categoryId)) return [];
+  if (!includeSubcategories) return [categoryId];
+
+  return all
+    .filter((c) => c.id === categoryId || (isLive(c.id) && isDescendant(c.id)))
+    .map((c) => c.id);
+
+  function isDescendant(id: string) {
+    for (let cur = byId.get(id)?.parentId ?? null, hops = 0; cur; hops++) {
+      if (cur === categoryId) return true;
+      if (hops > all.length) return false;
+      cur = byId.get(cur)?.parentId ?? null;
+    }
+    return false;
+  }
+};

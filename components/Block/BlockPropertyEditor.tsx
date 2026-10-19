@@ -1,6 +1,7 @@
 import React from "react";
 import { BlockConfig, BlockProperty } from "@/types/blocks";
 import UploadField from "@/components/Block/UploadField";
+import CategoryField from "@/components/Block/CategoryField";
 
 interface PropertyEditorProps {
   blockConfig: BlockConfig;
@@ -50,11 +51,19 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
               />
             );
             break;
+          case "category":
+            inputEl = (
+              <CategoryField
+                value={(value as string) ?? ""}
+                onChange={(id) => handleChange(prop.name, id)}
+              />
+            );
+            break;
           case "boolean":
             inputEl = (
               <input
                 type="checkbox"
-                checked={Boolean(value)}
+                checked={String(value) === "true"}
                 onChange={(e) =>
                   handleChange(prop.name, String(e.target.checked))
                 }

@@ -10,6 +10,7 @@ import HeadingEditable from "@/components/Block/HeadingEditable";
 import ImageEditable from "@/components/Block/ImageEditable";
 import FileEditable from "@/components/Block/FileEditable";
 import CardView from "@/components/Block/CardView";
+import QueryEditable from "@/components/Block/QueryEditable";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 
 type BlockEditorProps = {
@@ -181,6 +182,9 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
                     <CardView card={block} />
                   </div>
                 );
+                break;
+              case "Query":
+                content = <QueryEditable query={block} />;
                 break;
               case "RichText":
                 content = (

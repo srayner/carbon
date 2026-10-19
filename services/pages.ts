@@ -14,7 +14,11 @@ type PageInput = {
   blocks: Block[];
   categoryIds?: string[];
   templateId: string;
+  summary?: string | null;
+  image?: string | null;
 };
+
+const SUMMARY_MAX = 300;
 
 export const upsertPage = async (pageId: string | null, data: PageInput) => {
   if (!data.title?.trim()) {
@@ -36,6 +40,15 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
     throw new AppError("Template not found.", 400);
   }
 
+  const summary = data.summary?.trim() || null;
+  if (summary && summary.length > SUMMARY_MAX) {
+    throw new AppError(
+      `Summary must be ${SUMMARY_MAX} characters or fewer.`,
+      400
+    );
+  }
+  const image = data.image || null;
+
   // Create new page if no id
   if (!pageId) {
     const newPage = await prisma.page.create({
@@ -43,6 +56,8 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
         title: data.title,
         slug: data.slug,
         templateId: data.templateId,
+        summary,
+        image,
         meta: data.meta || {},
         publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
       },
@@ -56,6 +71,8 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
         title: data.title,
         slug: data.slug,
         templateId: data.templateId,
+        summary,
+        image,
         meta: data.meta || {},
         publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
       },

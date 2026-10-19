@@ -3,6 +3,7 @@ import { FileBlockConfig } from "./file";
 import { HeadingBlockConfig } from "./heading";
 import { ImageBlockConfig } from "./image";
 import { ParagraphBlockConfig } from "./paragraph";
+import { QueryBlockConfig } from "./query";
 import { RichTextBlockConfig } from "./richText";
 
 export const ALL_BLOCKS = [
@@ -12,4 +13,5 @@ export const ALL_BLOCKS = [
   CardBlockConfig,
   ParagraphBlockConfig,
   RichTextBlockConfig,
+  QueryBlockConfig,
 ];

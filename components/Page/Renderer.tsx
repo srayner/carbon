@@ -1,6 +1,7 @@
 import { Page } from "@/types/entities";
 import { Block, CardBlock } from "@/types/blocks";
 import CardView from "@/components/Block/CardView";
+import QueryView from "@/components/Block/QueryView";
 import { getBlockStyle } from "@/lib/block-style";
 import { sanitizeRichText } from "@/lib/sanitize";
 
@@ -11,7 +12,10 @@ interface RendererProps {
 const HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
 type HeadingLevel = (typeof HEADING_LEVELS)[number];
 
-const RenderBlock: React.FC<{ block: Block }> = ({ block }) => {
+const RenderBlock: React.FC<{ block: Block; currentPageId?: string | null }> = ({
+  block,
+  currentPageId,
+}) => {
   const properties = block.properties as Record<string, unknown>;
   const style = getBlockStyle(block.type, properties);
   const className = (properties.className as string) || undefined;
@@ -98,6 +102,13 @@ const RenderBlock: React.FC<{ block: Block }> = ({ block }) => {
         </p>
       );
     }
+    case "Query":
+      return (
+        <QueryView
+          properties={block.properties}
+          currentPageId={currentPageId}
+        />
+      );
     default:
       return null;
   }
@@ -122,7 +133,10 @@ const groupBlocks = (blocks: Block[]): RenderItem[] => {
   return items;
 };
 
-export const BlocksView: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
+export const BlocksView: React.FC<{
+  blocks: Block[];
+  currentPageId?: string | null;
+}> = ({ blocks, currentPageId }) => (
   <>
     {groupBlocks(blocks).map((item) =>
       item.kind === "cards" ? (
@@ -135,7 +149,11 @@ export const BlocksView: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
           ))}
         </div>
       ) : (
-        <RenderBlock key={item.block.id} block={item.block} />
+        <RenderBlock
+          key={item.block.id}
+          block={item.block}
+          currentPageId={currentPageId}
+        />
       )
     )}
   </>
@@ -145,7 +163,7 @@ const Renderer: React.FC<RendererProps> = ({ page }) => {
   return (
     <>
       <h1>{page.title}</h1>
-      <BlocksView blocks={page.blocks} />
+      <BlocksView blocks={page.blocks} currentPageId={page.id} />
     </>
   );
 };

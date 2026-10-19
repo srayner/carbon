@@ -4,6 +4,7 @@ import { useState } from "react";
 import { getPageStatus, PageStatus } from "@/lib/page-status";
 import { CategoryRow } from "@/lib/category-tree";
 import type { Template } from "@/types/entities";
+import UploadField from "@/components/Block/UploadField";
 
 interface PageSettingsProps {
   title: string;
@@ -13,6 +14,10 @@ interface PageSettingsProps {
   templates: Template[];
   categories: CategoryRow[];
   categoryIds: string[];
+  summary: string;
+  image: string;
+  onSummaryChange: (summary: string) => void;
+  onImageChange: (image: string) => void;
   onTitleChange: (title: string) => void;
   onSlugChange: (slug: string) => void;
   onPublishedAtChange: (publishedAt: Date | null) => void;
@@ -49,6 +54,10 @@ export function PageSettings({
   templates,
   categories,
   categoryIds,
+  summary,
+  image,
+  onSummaryChange,
+  onImageChange,
   onTitleChange,
   onSlugChange,
   onPublishedAtChange,
@@ -168,6 +177,26 @@ export function PageSettings({
           onChange={(e) => onSlugChange(e.target.value)}
         />
       </div>
+    </section>
+
+    {/* Summary and image, shown when this page is listed on a card */}
+    <section className="p-3 border rounded-md bg-background">
+      <h2 className="text-sm font-semibold mb-2">Card</h2>
+      <p className="text-xs text-muted-foreground mb-2">
+        Shown when this page appears in a list of pages.
+      </p>
+      <label className="block text-sm text-muted-foreground mb-1">
+        Summary
+      </label>
+      <textarea
+        className="w-full border rounded px-2 py-1 text-sm mb-3 h-20"
+        value={summary}
+        maxLength={300}
+        placeholder="A one or two sentence description"
+        onChange={(e) => onSummaryChange(e.target.value)}
+      />
+      <label className="block text-sm text-muted-foreground mb-1">Image</label>
+      <UploadField kind="image" value={image} onChange={onImageChange} />
     </section>
 
     {/* Template */}

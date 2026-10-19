@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `Page` ADD COLUMN `image` VARCHAR(500) NULL,
+    ADD COLUMN `summary` VARCHAR(300) NULL;

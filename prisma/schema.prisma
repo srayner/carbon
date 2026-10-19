@@ -60,6 +60,8 @@ model Page {
   categories         PageCategory[]
   templateId         String
   template           Template @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  summary            String?  @db.VarChar(300)
+  image              String?  @db.VarChar(500)
   publishedAt        DateTime?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
