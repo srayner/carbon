@@ -151,3 +151,20 @@
     margin-right: 0 !important;
   }
 }
+
+/* A template's grid: stacked on small screens, the real layout from md up.
+   The variables are set inline from the template (see lib/template-layout.ts) */
+.template-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: var(--grid-rows-stacked);
+  grid-template-areas: var(--grid-areas-stacked);
+}
+
+@media (min-width: 768px) {
+  .template-grid {
+    grid-template-columns: var(--grid-columns);
+    grid-template-rows: var(--grid-rows);
+    grid-template-areas: var(--grid-areas);
+  }
+}

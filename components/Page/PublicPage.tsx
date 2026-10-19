@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Renderer from "@/components/Page/Renderer";
+import TemplateLayout from "@/components/Template/TemplateLayout";
 import { PublicPageResult } from "@/lib/public-page";
 
-const PublicPage = ({ page, isPreview }: PublicPageResult) => (
+const PublicPage = ({ page, template, isPreview }: PublicPageResult) => (
   <>
     {isPreview && (
       <div className="flex items-center justify-between gap-4 border-b border-amber-300 bg-amber-100 px-4 py-2 text-sm text-amber-900">
@@ -25,9 +26,9 @@ const PublicPage = ({ page, isPreview }: PublicPageResult) => (
         </Link>
       </div>
     )}
-    <main className="prose prose-lg mx-auto max-w-4xl p-8">
+    <TemplateLayout layout={template.layout} slots={template.slots}>
       <Renderer page={page} />
-    </main>
+    </TemplateLayout>
   </>
 );
 

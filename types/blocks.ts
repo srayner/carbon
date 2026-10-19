@@ -81,6 +81,7 @@ type RichTextType = (typeof RichTextBlockConfig)["name"];
 type BaseBlock = {
   order?: number;
   pageId?: string;
+  fragmentId?: string;
   parentId?: string | null;
   createdAt?: Date;
   updatedAt?: Date;

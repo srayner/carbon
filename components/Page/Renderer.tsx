@@ -122,24 +122,30 @@ const groupBlocks = (blocks: Block[]): RenderItem[] => {
   return items;
 };
 
+export const BlocksView: React.FC<{ blocks: Block[] }> = ({ blocks }) => (
+  <>
+    {groupBlocks(blocks).map((item) =>
+      item.kind === "cards" ? (
+        <div
+          key={item.cards[0].id}
+          className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {item.cards.map((card) => (
+            <CardView key={card.id} card={card} />
+          ))}
+        </div>
+      ) : (
+        <RenderBlock key={item.block.id} block={item.block} />
+      )
+    )}
+  </>
+);
+
 const Renderer: React.FC<RendererProps> = ({ page }) => {
   return (
     <>
       <h1>{page.title}</h1>
-      {groupBlocks(page.blocks).map((item) =>
-        item.kind === "cards" ? (
-          <div
-            key={item.cards[0].id}
-            className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {item.cards.map((card) => (
-              <CardView key={card.id} card={card} />
-            ))}
-          </div>
-        ) : (
-          <RenderBlock key={item.block.id} block={item.block} />
-        )
-      )}
+      <BlocksView blocks={page.blocks} />
     </>
   );
 };

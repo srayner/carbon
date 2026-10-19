@@ -8,6 +8,7 @@ import {
   ArrowDown,
   Menu,
   FolderTree,
+  PanelLeft,
 } from "lucide-react";
 import React from "react";
 import {
@@ -48,13 +49,18 @@ const items = [
   },
   {
     title: "Headers",
-    url: "/admin/headers",
+    url: "/admin/fragments/headers",
     icon: ArrowUp,
   },
   {
     title: "Footers",
-    url: "/admin/footers",
+    url: "/admin/fragments/footers",
     icon: ArrowDown,
+  },
+  {
+    title: "General content",
+    url: "/admin/fragments/general",
+    icon: PanelLeft,
   },
   {
     title: "Menus",

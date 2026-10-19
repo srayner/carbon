@@ -3,6 +3,7 @@ import { Block } from "@/types/blocks";
 import { AppError } from "@/lib/api/error";
 import { getSlugError } from "@/lib/slug";
 import { setPageCategories } from "@/services/categories";
+import { replaceBlocks } from "@/services/blocks";
 
 type PageInput = {
   id?: string;
@@ -12,6 +13,7 @@ type PageInput = {
   publishedAt?: string | null;
   blocks: Block[];
   categoryIds?: string[];
+  templateId: string;
 };
 
 export const upsertPage = async (pageId: string | null, data: PageInput) => {
@@ -23,12 +25,24 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
     throw new AppError(slugError, 400);
   }
 
+  if (!data.templateId) {
+    throw new AppError("Template is required.", 400);
+  }
+  const template = await prisma.template.findUnique({
+    where: { id: data.templateId },
+    select: { id: true },
+  });
+  if (!template) {
+    throw new AppError("Template not found.", 400);
+  }
+
   // Create new page if no id
   if (!pageId) {
     const newPage = await prisma.page.create({
       data: {
         title: data.title,
         slug: data.slug,
+        templateId: data.templateId,
         meta: data.meta || {},
         publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
       },
@@ -41,32 +55,14 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
       data: {
         title: data.title,
         slug: data.slug,
+        templateId: data.templateId,
         meta: data.meta || {},
         publishedAt: data.publishedAt ? new Date(data.publishedAt) : null,
       },
     });
-
-    // Delete existing blocks
-    await prisma.block.deleteMany({
-      where: { pageId },
-    });
   }
 
-  // Insert all blocks as JSON
-  if (data.blocks.length > 0) {
-    const blocksToCreate = data.blocks.map((b, index) => ({
-      id: b.id,
-      type: b.type,
-      properties: b.properties, // store the entire block as JSON
-      order: index,
-      pageId,
-      parentId: null, // flat blocks, no parent
-    }));
-
-    await prisma.block.createMany({
-      data: blocksToCreate,
-    });
-  }
+  await replaceBlocks({ pageId }, data.blocks);
 
   // Left alone when the caller doesn't send categoryIds
   if (data.categoryIds) {

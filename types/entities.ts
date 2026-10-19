@@ -1,4 +1,5 @@
 import { Block } from "./blocks";
+import type { FragmentKind, TemplateLayout } from "./templates";
 
 export type Page = {
   id: string | null;
@@ -7,6 +8,7 @@ export type Page = {
   meta: PageMeta | null;
   blocks: Block[];
   categoryIds: string[];
+  templateId: string;
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -37,4 +39,29 @@ export type Category = {
   isActive: boolean;
   pageCount: number;
   childCount: number;
+};
+
+export type Fragment = {
+  id: string | null;
+  name: string;
+  kind: FragmentKind;
+  blocks: Block[];
+};
+
+export type FragmentSummary = {
+  id: string;
+  name: string;
+  kind: FragmentKind;
+  templateCount: number;
+};
+
+export type Template = {
+  id: string;
+  name: string;
+  description: string | null;
+  layout: TemplateLayout;
+  isSystem: boolean;
+  pageCount: number;
+  // slot name -> id of the fragment filling it
+  slots: Record<string, string>;
 };
