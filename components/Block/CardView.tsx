@@ -9,7 +9,7 @@ const CardView = ({ block }: Pick<ViewProps<"Card">, "block">) => {
   return (
     <div
       id={cssId || undefined}
-      className={`not-prose flex flex-col overflow-hidden rounded-lg border bg-background ${
+      className={`not-prose flex flex-col overflow-hidden rounded-site-l border bg-site-background ${
         className ?? ""
       }`}
     >
@@ -24,7 +24,7 @@ const CardView = ({ block }: Pick<ViewProps<"Card">, "block">) => {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="text-lg font-semibold">{title}</h3>
         {description && (
-          <p className="text-sm text-muted-foreground">{description}</p>
+          <p className="text-sm text-site-muted">{description}</p>
         )}
         {linkUrl && (
           <a href={linkUrl} className="mt-auto pt-2 text-sm font-medium underline">

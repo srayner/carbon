@@ -9,6 +9,7 @@ import {
   Menu,
   FolderTree,
   PanelLeft,
+  Palette,
 } from "lucide-react";
 import React from "react";
 import {
@@ -46,6 +47,11 @@ const items = [
     title: "Templates",
     url: "/admin/templates",
     icon: Layout,
+  },
+  {
+    title: "Theme",
+    url: "/admin/theme",
+    icon: Palette,
   },
   {
     title: "Headers",

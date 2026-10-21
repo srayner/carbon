@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Renderer from "@/components/Page/Renderer";
 import TemplateLayout from "@/components/Template/TemplateLayout";
+import SiteTheme from "@/components/Theme/SiteTheme";
 import { PublicPageResult } from "@/lib/public-page";
 
 const PublicPage = ({ page, template, isPreview }: PublicPageResult) => (
@@ -26,9 +27,11 @@ const PublicPage = ({ page, template, isPreview }: PublicPageResult) => (
         </Link>
       </div>
     )}
-    <TemplateLayout layout={template.layout} slots={template.slots}>
-      <Renderer page={page} />
-    </TemplateLayout>
+    <SiteTheme>
+      <TemplateLayout layout={template.layout} slots={template.slots}>
+        <Renderer page={page} />
+      </TemplateLayout>
+    </SiteTheme>
   </>
 );
 
