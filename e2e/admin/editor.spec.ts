@@ -33,7 +33,55 @@ test.describe("the page editor", () => {
   test("selecting a block shows its properties", async ({ page }) => {
     await openShowcase(page);
     await page.getByText("Showcase card one").click();
-    await expect(page.getByText(/CSS Class/i).first()).toBeVisible();
+    await expect(page.getByText("Card Properties")).toBeVisible();
+    await expect(page.locator("label", { hasText: /^Title$/ })).toBeVisible();
+  });
+
+  test("the block panel groups the properties", async ({ page }) => {
+    await openShowcase(page);
+    await page.getByText("Showcase card one").click();
+    for (const group of ["Content", "Spacing", "Box", "Colour and font", "Advanced"]) {
+      await expect(
+        page.locator("summary", { hasText: new RegExp(`^${group}$`) })
+      ).toBeVisible();
+    }
+    // Only the content group starts open
+    await expect(page.locator("label", { hasText: /^Title$/ })).toBeVisible();
+    await expect(page.getByText("Corner radius")).toBeHidden();
+    await page.locator("summary", { hasText: /^Box$/ }).click();
+    await expect(page.getByText("Corner radius")).toBeVisible();
+  });
+
+  test("a token chosen in the panel is saved and published", async ({ page }) => {
+    const setShadow = async (value: string) => {
+      await openShowcase(page);
+      await page.getByText("Showcase card one").click();
+      await page.locator("summary", { hasText: /^Box$/ }).click();
+      await page
+        .locator("label", { hasText: "Shadow" })
+        .locator("..")
+        .locator("select")
+        .selectOption(value);
+      const saved = page.waitForResponse(
+        (r) => r.url().includes("/api/pages/") && r.request().method() === "PUT"
+      );
+      await page.getByRole("button", { name: "Save" }).click();
+      expect((await saved).ok()).toBe(true);
+    };
+    const cardShadow = async () => {
+      await page.goto("/block-showcase");
+      return page
+        .locator("div.grid", { hasText: "Showcase card one" })
+        .locator("> div")
+        .first();
+    };
+
+    await setShadow("m");
+    await expect(await cardShadow()).toHaveCSS("box-shadow", /rgba\(0, 0, 0, 0\.12\)/);
+
+    // Back to the theme default so the run can be repeated
+    await setShadow("");
+    await expect(await cardShadow()).toHaveCSS("box-shadow", "none");
   });
 
   test("an edit to a heading is saved and published", async ({ page }) => {

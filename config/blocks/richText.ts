@@ -1,4 +1,5 @@
 import { LayoutList } from "lucide-react";
+import { SHARED_PROPERTIES } from "./shared";
 
 export const RichTextBlockConfig = {
   name: "RichText",
@@ -65,5 +66,8 @@ export const RichTextBlockConfig = {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus luctus urna sed urna ultricies ac tempor dui sagittis.",
       group: "Content",
     },
+
+    // Theme tokens, the same for every block
+    ...SHARED_PROPERTIES,
   ],
 } as const;

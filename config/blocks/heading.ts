@@ -1,4 +1,5 @@
 import { Heading } from "lucide-react";
+import { SHARED_PROPERTIES } from "./shared";
 
 export const HeadingBlockConfig = {
   name: "Heading",
@@ -124,5 +125,8 @@ export const HeadingBlockConfig = {
       default: "My Fancy Heading",
       group: "Content",
     },
+
+    // Theme tokens, the same for every block
+    ...SHARED_PROPERTIES,
   ],
 } as const;

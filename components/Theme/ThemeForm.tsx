@@ -10,7 +10,9 @@ import {
   COLOR_ROLES,
   CUSTOM_CSS_MAX,
   DEFAULT_THEME,
+  BORDER_STEPS,
   FONT_ROLES,
+  SHADOW_STEPS,
   FontKey,
   RADIUS_STEPS,
   SPACING_STEPS,
@@ -50,7 +52,13 @@ const Section = ({
 );
 
 // Sets one value inside a group of the theme (colors, fonts, ...)
-type Group = "colors" | "fonts" | "spacing" | "radius";
+type Group =
+  | "colors"
+  | "fonts"
+  | "spacing"
+  | "radius"
+  | "borderWidth"
+  | "shadow";
 
 export default function ThemeForm() {
   const [theme, setTheme] = useState<Theme | null>(null);
@@ -166,6 +174,34 @@ export default function ThemeForm() {
           </div>
         </Section>
 
+        <Section title="Border widths">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {BORDER_STEPS.map((step) => (
+              <label key={step} className="block text-sm">
+                <span className="mb-1 block">{step}</span>
+                <Input
+                  value={theme.borderWidth[step]}
+                  onChange={(e) => setValue("borderWidth", step, e.target.value)}
+                />
+              </label>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="Shadows">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {SHADOW_STEPS.map((step) => (
+              <label key={step} className="block text-sm">
+                <span className="mb-1 block">{step}</span>
+                <Input
+                  value={theme.shadow[step]}
+                  onChange={(e) => setValue("shadow", step, e.target.value)}
+                />
+              </label>
+            ))}
+          </div>
+        </Section>
+
         <Section title="Layout">
           <label className="block max-w-xs text-sm">
             <span className="mb-1 block">
@@ -222,7 +258,7 @@ export default function ThemeForm() {
               }}
             />
           )}
-          <div className="border-b bg-site-surface px-6 py-[var(--space-m)] text-sm">
+          <div className="border-b bg-site-background px-6 py-[var(--space-m)] text-sm">
             Header area
           </div>
           <div className="prose prose-lg max-w-none p-[var(--space-l)]">
@@ -236,7 +272,7 @@ export default function ThemeForm() {
               {["First card", "Second card"].map((title) => (
                 <div
                   key={title}
-                  className="rounded-site-l border bg-site-background p-4"
+                  className="rounded-site-l border bg-site-surface p-4"
                 >
                   <h3 className="text-lg font-semibold">{title}</h3>
                   <p className="text-sm text-site-muted">Muted description.</p>
@@ -244,7 +280,7 @@ export default function ThemeForm() {
               ))}
             </div>
           </div>
-          <div className="border-t bg-site-surface px-6 py-6 text-sm">
+          <div className="border-t bg-site-background px-6 py-6 text-sm">
             Footer area
           </div>
         </div>

@@ -17,11 +17,15 @@ export const COLOR_ROLES = [
 export const FONT_ROLES = ["heading", "body", "mono"] as const;
 export const SPACING_STEPS = ["none", "xs", "s", "m", "l", "xl"] as const;
 export const RADIUS_STEPS = ["none", "s", "m", "l", "full"] as const;
+export const BORDER_STEPS = ["none", "thin", "medium", "thick"] as const;
+export const SHADOW_STEPS = ["none", "s", "m", "l"] as const;
 
 export type ColorRole = (typeof COLOR_ROLES)[number];
 export type FontRole = (typeof FONT_ROLES)[number];
 export type SpacingStep = (typeof SPACING_STEPS)[number];
 export type RadiusStep = (typeof RADIUS_STEPS)[number];
+export type BorderStep = (typeof BORDER_STEPS)[number];
+export type ShadowStep = (typeof SHADOW_STEPS)[number];
 
 /* ----- Fonts ----- */
 
@@ -147,7 +151,12 @@ export const fontOptions = (): [FontKey, FontOption][] =>
 const LENGTH = /^(0|\d{1,4}(\.\d{1,3})?(px|rem|em|%|vw|ch))$/;
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
+// A box-shadow: "none", or a list of offsets, blurs and colours. No quotes,
+// semicolons or braces, so it cannot break out of the style it is placed in.
+const SHADOW = /^[0-9a-zA-Z#(),.\s%-]{1,100}$/;
+
 const length = z.string().regex(LENGTH, "Use a length such as 1rem or 16px.");
+const shadow = z.string().regex(SHADOW, "Use a shadow such as 0 4px 12px rgba(0,0,0,0.12).");
 const color = z.string().regex(HEX, "Use a hex colour such as #1a2b3c.");
 const font = z.string().refine((key) => key in FONTS, "Unknown font.");
 
@@ -178,6 +187,18 @@ export const themeSchema = z.object({
       typeof length
     >
   ),
+  borderWidth: z.object(
+    Object.fromEntries(BORDER_STEPS.map((step) => [step, length])) as Record<
+      BorderStep,
+      typeof length
+    >
+  ),
+  shadow: z.object(
+    Object.fromEntries(SHADOW_STEPS.map((step) => [step, shadow])) as Record<
+      ShadowStep,
+      typeof shadow
+    >
+  ),
   // The widest the content column gets on a "narrow" template
   contentWidth: length,
   customCss: z.string().max(CUSTOM_CSS_MAX, "Custom CSS is too long."),
@@ -188,23 +209,36 @@ export type Theme = {
   fonts: Record<FontRole, FontKey>;
   spacing: Record<SpacingStep, string>;
   radius: Record<RadiusStep, string>;
+  borderWidth: Record<BorderStep, string>;
+  shadow: Record<ShadowStep, string>;
   contentWidth: string;
   customCss: string;
 };
 
-/** Matches how the public site looked before there was a theme. */
+/** The look of the "Maker Showcase" design: warm paper, ink and an orange accent. */
 export const DEFAULT_THEME: Theme = {
   colors: {
-    background: "#ffffff",
-    surface: "#fafafa",
-    text: "#1f2937",
-    muted: "#6b7280",
-    accent: "#111827",
-    border: "#e5e5e5",
+    background: "#f4f2ec",
+    surface: "#ffffff",
+    text: "#141413",
+    muted: "#5a5a55",
+    accent: "#c2410c",
+    border: "#d6d1c4",
   },
-  fonts: { heading: "system", body: "system", mono: "system-mono" },
+  fonts: {
+    heading: "space-grotesk",
+    body: "space-grotesk",
+    mono: "ibm-plex-mono",
+  },
   spacing: { none: "0", xs: "0.25rem", s: "0.5rem", m: "1rem", l: "2rem", xl: "4rem" },
   radius: { none: "0", s: "0.25rem", m: "0.5rem", l: "0.75rem", full: "9999px" },
+  borderWidth: { none: "0", thin: "1px", medium: "2px", thick: "4px" },
+  shadow: {
+    none: "none",
+    s: "0 1px 2px rgba(0, 0, 0, 0.08)",
+    m: "0 4px 12px rgba(0, 0, 0, 0.12)",
+    l: "0 12px 32px rgba(0, 0, 0, 0.16)",
+  },
   contentWidth: "56rem",
   customCss: "",
 };
@@ -235,6 +269,8 @@ export const themeVariables = (theme: Theme): Record<string, string> => {
   }
   for (const step of SPACING_STEPS) vars[`--space-${step}`] = theme.spacing[step];
   for (const step of RADIUS_STEPS) vars[`--radius-${step}`] = theme.radius[step];
+  for (const step of BORDER_STEPS) vars[`--border-${step}`] = theme.borderWidth[step];
+  for (const step of SHADOW_STEPS) vars[`--shadow-${step}`] = theme.shadow[step];
   vars["--content-width"] = theme.contentWidth;
   return vars;
 };

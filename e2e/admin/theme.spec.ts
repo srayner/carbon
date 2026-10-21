@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { COLORS } from "../helpers";
 
 // These change the one saved theme, so they run in order and put it back
 
@@ -46,6 +47,19 @@ test.describe("the theme screen", () => {
     expect(await publicAccent(page)).toBe("#ff0000");
   });
 
+  test("token values follow the theme", async ({ page }) => {
+    await page.goto("/admin/theme");
+    const spacing = page.locator("section", {
+      has: page.getByRole("heading", { name: "Spacing" }),
+    });
+    await spacing.locator("label", { hasText: /^l$/ }).locator("input").fill("3rem");
+    await page.getByRole("button", { name: "Save theme" }).click();
+    await expect(page.getByText("Theme saved.")).toBeVisible();
+
+    await page.goto("/block-showcase");
+    await expect(page.locator("#styled-paragraph")).toHaveCSS("padding", "48px");
+  });
+
   test("resetting to the defaults and saving restores the site", async ({
     page,
   }) => {
@@ -54,6 +68,8 @@ test.describe("the theme screen", () => {
     await page.getByRole("button", { name: "Save theme" }).click();
     await expect(page.getByText("Theme saved.")).toBeVisible();
 
-    expect(await publicAccent(page)).toBe("#111827");
+    expect(await publicAccent(page)).toBe(COLORS.accent);
+    await page.goto("/block-showcase");
+    await expect(page.locator("#styled-paragraph")).toHaveCSS("padding", "32px");
   });
 });

@@ -10,6 +10,7 @@ export type BlockProperty = {
   values?: readonly string[] | undefined;
   default?: string;
   optional?: boolean | undefined;
+  group?: string;
 };
 
 export type BlockConfig<TName extends string = string> = {

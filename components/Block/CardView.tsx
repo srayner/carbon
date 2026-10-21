@@ -1,15 +1,20 @@
 import React from "react";
+import type { CSSProperties } from "react";
 import { ViewProps } from "@/types/blocks";
 
 // A single card, used by both the editing area and the public renderer
-const CardView = ({ block }: Pick<ViewProps<"Card">, "block">) => {
+const CardView = ({
+  block,
+  style,
+}: Pick<ViewProps<"Card">, "block"> & { style?: CSSProperties }) => {
   const { title, image, alt, description, linkUrl, linkLabel, className, cssId } =
     block.properties;
 
   return (
     <div
       id={cssId || undefined}
-      className={`not-prose flex flex-col overflow-hidden rounded-site-l border bg-site-background ${
+      style={style}
+      className={`not-prose flex flex-col overflow-hidden rounded-site-l border bg-site-surface ${
         className ?? ""
       }`}
     >

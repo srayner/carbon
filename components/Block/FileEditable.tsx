@@ -16,7 +16,7 @@ const FileEditable = ({ block }: EditableProps<"File">) => {
   }
 
   return (
-    <div className="not-prose my-2 flex items-center gap-3 rounded border p-3">
+    <div className="not-prose my-2 flex items-center gap-3 rounded-site-m border bg-site-surface p-3">
       <FileDown className="h-5 w-5 shrink-0" />
       <div>
         <div className="font-medium">{label || "Download"}</div>

@@ -299,6 +299,32 @@ async function seedPages() {
             limit: "12",
             display: "list",
             cssId: "showcase-list",
+            paddingSize: "m",
+            background: "surface",
+          }),
+          // Theme tokens, and a raw value that overrides one of them
+          block(9, "Paragraph", {
+            content: "Styled with tokens",
+            cssId: "styled-paragraph",
+            paddingSize: "l",
+            radius: "m",
+            border: "thin",
+            shadow: "m",
+            background: "surface",
+            textColor: "accent",
+          }),
+          // A download with a background token: only the link is filled
+          block(11, "File", {
+            file: "/files/example.pdf",
+            label: "Tinted download",
+            background: "border",
+            radius: "l",
+          }),
+          block(10, "Paragraph", {
+            content: "Raw padding wins",
+            cssId: "override-paragraph",
+            paddingSize: "l",
+            padding: "5px",
           }),
         ],
       },

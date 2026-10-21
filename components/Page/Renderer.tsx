@@ -3,6 +3,7 @@ import { Block, SharedBlockProps } from "@/types/blocks";
 import CardView from "@/components/Block/CardView";
 import { loadViews } from "@/components/Block/views";
 import { getBlockStyle } from "@/lib/block-style";
+import { getTokenStyle } from "@/lib/block-tokens";
 
 interface RendererProps {
   page: Page;
@@ -14,7 +15,11 @@ const getSharedProps = (block: Block): SharedBlockProps => {
   return {
     id: (properties.cssId as string) || undefined,
     className: (properties.className as string) || undefined,
-    style: getBlockStyle(block.type, properties),
+    // Theme tokens first; a raw value changed from its default overrides them
+    style: {
+      ...getTokenStyle(properties),
+      ...getBlockStyle(block.type, properties),
+    },
   };
 };
 
@@ -56,7 +61,11 @@ export const BlocksView = async ({
               className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
             >
               {item.cards.map((card) => (
-                <CardView key={card.id} block={card} />
+                <CardView
+                  key={card.id}
+                  block={card}
+                  style={getSharedProps(card).style}
+                />
               ))}
             </div>
           );

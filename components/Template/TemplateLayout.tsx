@@ -48,9 +48,9 @@ const TemplateLayout = ({ layout, slots, children }: Props) => (
       // the content by a border; prose spacing is trimmed at their ends
       const frame =
         kind === "HEADER"
-          ? "border-b bg-site-surface py-[var(--space-m)]"
+          ? "border-b bg-site-background py-[var(--space-m)]"
           : kind === "FOOTER"
-          ? "border-t bg-site-surface py-6"
+          ? "border-t bg-site-background py-6"
           : "border-b py-8 md:border-b-0 md:border-r";
       return (
         <Tag

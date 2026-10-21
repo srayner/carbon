@@ -1,4 +1,5 @@
 import { Image } from "lucide-react";
+import { SHARED_PROPERTIES } from "./shared";
 
 export const ImageBlockConfig = {
   name: "Image",
@@ -129,5 +130,8 @@ export const ImageBlockConfig = {
       default: "",
       group: "Advanced",
     },
+
+    // Theme tokens, the same for every block
+    ...SHARED_PROPERTIES,
   ],
 } as const;
