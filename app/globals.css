@@ -168,3 +168,39 @@
     grid-template-areas: var(--grid-areas);
   }
 }
+
+/* The site theme. The variables are set on .site-theme from the saved theme
+   (see components/Theme/SiteTheme.tsx), so none of this reaches the admin UI. */
+.site-theme {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+.site-theme *,
+.site-theme ::before,
+.site-theme ::after {
+  border-color: var(--color-border);
+}
+.site-theme :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-heading);
+}
+.site-theme :where(code, kbd, samp, pre) {
+  font-family: var(--font-mono);
+}
+/* Content typography follows the theme colours */
+.site-theme .prose {
+  --tw-prose-body: var(--color-text);
+  --tw-prose-headings: var(--color-text);
+  --tw-prose-lead: var(--color-muted);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-bold: var(--color-text);
+  --tw-prose-counters: var(--color-muted);
+  --tw-prose-bullets: var(--color-muted);
+  --tw-prose-hr: var(--color-border);
+  --tw-prose-quotes: var(--color-text);
+  --tw-prose-quote-borders: var(--color-border);
+  --tw-prose-captions: var(--color-muted);
+  --tw-prose-code: var(--color-text);
+  --tw-prose-th-borders: var(--color-border);
+  --tw-prose-td-borders: var(--color-border);
+}

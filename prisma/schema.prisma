@@ -168,3 +168,10 @@ model TemplateSlot {
   @@id([templateId, slot])
   @@index([fragmentId])
 }
+
+// The public site's look. One row (id "site"); no row means the defaults.
+model SiteTheme {
+  id        String   @id
+  values    Json
+  updatedAt DateTime @updatedAt
+}

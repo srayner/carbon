@@ -8,11 +8,11 @@ const FileView = ({ block, shared }: ViewProps<"File">) => {
       <a
         href={file}
         download
-        className="not-prose inline-flex flex-col rounded border px-4 py-3 no-underline hover:bg-muted"
+        className="not-prose inline-flex flex-col rounded-site-m border px-4 py-3 no-underline hover:bg-site-surface"
       >
         <span className="font-medium">⬇ {label || "Download"}</span>
         {description && (
-          <span className="text-sm text-muted-foreground">{description}</span>
+          <span className="text-sm text-site-muted">{description}</span>
         )}
       </a>
     </p>

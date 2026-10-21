@@ -10,8 +10,9 @@ type Props = {
 };
 
 const CONTENT_CLASS: Record<Layout["contentWidth"], string> = {
-  narrow: "prose prose-lg mx-auto max-w-4xl p-8",
-  full: "prose prose-lg max-w-none p-8",
+  narrow:
+    "prose prose-lg mx-auto max-w-[var(--content-width)] p-[var(--space-l)]",
+  full: "prose prose-lg max-w-none p-[var(--space-l)]",
 };
 
 /** Lays the page out on the template's grid and fills each area. */
@@ -47,9 +48,9 @@ const TemplateLayout = ({ layout, slots, children }: Props) => (
       // the content by a border; prose spacing is trimmed at their ends
       const frame =
         kind === "HEADER"
-          ? "border-b bg-muted/50 py-4"
+          ? "border-b bg-site-surface py-[var(--space-m)]"
           : kind === "FOOTER"
-          ? "border-t bg-muted/50 py-6"
+          ? "border-t bg-site-surface py-6"
           : "border-b py-8 md:border-b-0 md:border-r";
       return (
         <Tag
