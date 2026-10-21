@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "../lib/generated/prisma";
+import { Prisma, PrismaClient } from "../lib/generated/prisma";
 import { DEFAULT_TEMPLATE_ID, PRESET_TEMPLATES } from "../config/templates";
 
 const prisma = new PrismaClient();
@@ -22,12 +22,14 @@ function assertLocalDatabase() {
 async function clearData() {
   // Models should be cleared in the correct order, dependencies first.
   const models: (keyof PrismaClient)[] = [
+    "pageCategory",
     "templateSlot",
     "block",
-    "fragment",
     "pageMeta",
     "page",
+    "fragment",
     "template",
+    "siteTheme",
     "account",
     "user",
   ];
@@ -35,6 +37,10 @@ async function clearData() {
   for (const model of models) {
     await (prisma[model] as any).deleteMany({});
   }
+
+  // Categories point at their parents (restricted), so detach them first
+  await prisma.category.updateMany({ data: { parentId: null } });
+  await prisma.category.deleteMany({});
 
   console.log("Data has been cleared!");
 }
@@ -146,39 +152,154 @@ async function seedTemplates() {
   console.log("Templates have been seeded!");
 }
 
+// Fixed ids and slugs, so the tests can rely on them
+export const SEED = {
+  categories: {
+    projects: "seed-cat-projects",
+    electronics: "seed-cat-electronics",
+    guides: "seed-cat-guides",
+  },
+} as const;
+
+async function seedCategories() {
+  await prisma.category.create({
+    data: { id: SEED.categories.projects, name: "Projects", order: 0 },
+  });
+  await prisma.category.create({
+    data: {
+      id: SEED.categories.electronics,
+      name: "Electronics",
+      parentId: SEED.categories.projects,
+      order: 0,
+    },
+  });
+  await prisma.category.create({
+    data: { id: SEED.categories.guides, name: "Guides", order: 1 },
+  });
+
+  console.log("Categories have been seeded!");
+}
+
+const block = (
+  order: number,
+  type: string,
+  properties: Prisma.InputJsonObject
+) => ({ id: crypto.randomUUID(), type, order, properties });
+
+const YESTERDAY = new Date(Date.now() - 24 * 60 * 60 * 1000);
+const NEXT_YEAR = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
 async function seedPages() {
   await prisma.page.create({
     data: {
       title: "Hello World",
       templateId: DEFAULT_TEMPLATE_ID,
       slug: "hello-world",
-      publishedAt: new Date(),
+      publishedAt: YESTERDAY,
       blocks: {
         create: [
-          {
-            id: crypto.randomUUID(),
-            type: "Heading",
-            order: 0,
-            properties: { level: "h2", content: "Getting started" },
-          },
-          {
-            id: crypto.randomUUID(),
-            type: "Paragraph",
-            order: 1,
-            properties: { content: "This page was created by the seed script." },
-          },
-          {
-            id: crypto.randomUUID(),
-            type: "RichText",
-            order: 2,
-            properties: {
-              content:
-                "<p>Some <strong>rich</strong> text with a table:</p>" +
-                "<table><thead><tr><th>Part</th><th>Qty</th></tr></thead>" +
-                "<tbody><tr><td>Resistor</td><td>10</td></tr>" +
-                "<tr><td>Capacitor</td><td>4</td></tr></tbody></table>",
-            },
-          },
+          block(0, "Heading", { level: "h2", content: "Getting started" }),
+          block(1, "Paragraph", {
+            content: "This page was created by the seed script.",
+          }),
+          block(2, "RichText", {
+            content:
+              "<p>Some <strong>rich</strong> text with a table:</p>" +
+              "<table><thead><tr><th>Part</th><th>Qty</th></tr></thead>" +
+              "<tbody><tr><td>Resistor</td><td>10</td></tr>" +
+              "<tr><td>Capacitor</td><td>4</td></tr></tbody></table>",
+          }),
+        ],
+      },
+    },
+  });
+
+  // Pages that the query blocks list, in a category and its sub-category
+  const projects: [string, string, string, string][] = [
+    ["Desk Lamp", "desk-lamp", SEED.categories.projects, "A lamp for the bench."],
+    ["Robot Arm", "robot-arm", SEED.categories.electronics, "A six axis arm."],
+  ];
+  for (const [title, slug, categoryId, summary] of projects) {
+    await prisma.page.create({
+      data: {
+        title,
+        slug,
+        summary,
+        image: "/favicon.ico",
+        templateId: DEFAULT_TEMPLATE_ID,
+        publishedAt: YESTERDAY,
+        categories: { create: [{ categoryId }] },
+        blocks: {
+          create: [block(0, "Paragraph", { content: `About the ${title}.` })],
+        },
+      },
+    });
+  }
+
+  // Not visible to guests: a draft, and a page scheduled for the future
+  await prisma.page.create({
+    data: {
+      title: "Secret Draft",
+      slug: "secret-draft",
+      templateId: DEFAULT_TEMPLATE_ID,
+      publishedAt: null,
+      blocks: { create: [block(0, "Paragraph", { content: "A draft." })] },
+    },
+  });
+  await prisma.page.create({
+    data: {
+      title: "Coming Soon",
+      slug: "coming-soon",
+      templateId: DEFAULT_TEMPLATE_ID,
+      publishedAt: NEXT_YEAR,
+      blocks: { create: [block(0, "Paragraph", { content: "Scheduled." })] },
+    },
+  });
+
+  // One of every block type, with consecutive Cards and both query displays
+  await prisma.page.create({
+    data: {
+      title: "Block Showcase",
+      slug: "block-showcase",
+      templateId: DEFAULT_TEMPLATE_ID,
+      publishedAt: YESTERDAY,
+      blocks: {
+        create: [
+          block(0, "Heading", {
+            level: "h2",
+            content: "Showcase heading",
+            cssId: "showcase-heading",
+          }),
+          block(1, "Paragraph", { content: "Showcase paragraph" }),
+          block(2, "RichText", { content: "<p>Showcase <em>rich</em> text</p>" }),
+          block(3, "Image", {
+            src: "/favicon.ico",
+            alt: "Showcase image",
+            caption: "Showcase caption",
+          }),
+          block(4, "File", {
+            file: "/files/example.pdf",
+            label: "Showcase download",
+            description: "A file",
+          }),
+          block(5, "Card", { title: "Showcase card one", description: "One" }),
+          block(6, "Card", { title: "Showcase card two", description: "Two" }),
+          block(7, "Query", {
+            category: SEED.categories.projects,
+            includeSubcategories: "true",
+            orderBy: "title",
+            limit: "12",
+            display: "cards",
+            columns: "2",
+          }),
+          block(8, "Query", {
+            category: SEED.categories.projects,
+            includeSubcategories: "true",
+            orderBy: "title",
+            limit: "12",
+            display: "list",
+            cssId: "showcase-list",
+          }),
         ],
       },
     },
@@ -192,6 +313,7 @@ async function main() {
   await clearData();
   await seedUsers();
   await seedTemplates();
+  await seedCategories();
   await seedPages();
 
   console.log("All data has been seeded!");

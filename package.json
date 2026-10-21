@@ -1,6 +1,6 @@
 {
   "name": "carbon",
-  "version": "0.1.22",
+  "version": "0.1.23",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint && npm run check:blocks",
     "check:blocks": "tsx scripts/check-blocks.ts",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:seeded": "npm run seed && npm run test:e2e"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -47,16 +51,19 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/sanitize-html": "^2.16.2",
+    "dotenv": "^16.6.1",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "postcss": "^8",
     "prisma": "^6.17.1",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }

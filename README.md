@@ -17,6 +17,33 @@ Open [http://localhost:3000](http://localhost:3000). The seed creates
 `USER_PASSWORD_ADMIN` and `USER_PASSWORD_USER` in `.env`. It refuses to run
 unless `DATABASE_URL` points at localhost.
 
+### Testing
+
+```bash
+npm run test:unit        # Vitest: the pure logic in lib/
+npm run test:e2e:seeded  # reset the database with the seed, then run Playwright
+npm run test:e2e         # Playwright against the database as it is
+```
+
+`npm run seed` **wipes the database** and rebuilds a known state: the two
+accounts, the preset templates, categories, and pages used by the tests
+(`block-showcase` has one of every block type; `secret-draft` and
+`coming-soon` are unpublished). Playwright reuses the dev server on port 3000
+or starts one. Run `npx playwright install chromium` once for the browser.
+
+Specs are grouped by who is using the site, and each group runs as a
+Playwright project:
+
+- `e2e/guest/` not logged in. The public site, and being kept out of `/admin`
+  and `/api`.
+- `e2e/user/` logged in as `user@example.com` (role USER).
+- `e2e/admin/` logged in as `admin@example.com`: the editor and the theme
+  screen.
+
+`e2e/auth.setup.ts` logs in once per role and saves the session under
+`playwright/.auth/`. Specs that change data put it back, so they can be run
+again without reseeding.
+
 ### Content
 
 - **Home page:** the published page with the slug `home` is shown at `/`.
