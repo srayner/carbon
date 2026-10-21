@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { COLORS, rgb } from "../helpers";
 
 test.describe("public pages", () => {
   test("the home page offers a login when there is no home page", async ({
@@ -71,6 +72,26 @@ test.describe("every block type", () => {
     await expect(link).toHaveAttribute("download", "");
   });
 
+  test("File has its own contrasting background, not the page's", async ({
+    page,
+  }) => {
+    const link = page.getByRole("link", { name: /Showcase download/ });
+    await expect(link).toHaveCSS("background-color", rgb(COLORS.surface));
+  });
+
+  test("a background token on File fills the link, not the whole row", async ({
+    page,
+  }) => {
+    const link = page.getByRole("link", { name: /Tinted download/ });
+    await expect(link).toHaveCSS("background-color", rgb(COLORS.border));
+    await expect(link).toHaveCSS("border-radius", "12px"); // radius l
+    const row = link.locator("..");
+    await expect(row).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    // The link is only as wide as its content
+    const [rowBox, linkBox] = await Promise.all([row.boundingBox(), link.boundingBox()]);
+    expect(linkBox!.width).toBeLessThan(rowBox!.width / 2);
+  });
+
   test("consecutive Cards share one grid", async ({ page }) => {
     const grid = page.locator("div.grid", { hasText: "Showcase card one" });
     await expect(grid.getByText("Showcase card two")).toBeVisible();
@@ -86,6 +107,29 @@ test.describe("every block type", () => {
       "Desk Lamp",
       "Robot Arm",
     ]);
+  });
+
+  test("theme tokens become the theme's values", async ({ page }) => {
+    const styled = page.locator("#styled-paragraph");
+    await expect(styled).toHaveCSS("padding", "32px"); // space l = 2rem
+    await expect(styled).toHaveCSS("border-radius", "8px"); // radius m
+    await expect(styled).toHaveCSS("border-top-width", "1px"); // border thin
+    await expect(styled).toHaveCSS("box-shadow", /rgba\(0, 0, 0, 0\.12\)/);
+    await expect(styled).toHaveCSS("background-color", rgb(COLORS.surface));
+    await expect(styled).toHaveCSS("color", rgb(COLORS.accent));
+  });
+
+  test("a raw value changed from its default overrides the token", async ({
+    page,
+  }) => {
+    await expect(page.locator("#override-paragraph")).toHaveCSS("padding", "5px");
+  });
+
+  test("Query takes the tokens on its wrapper", async ({ page }) => {
+    await expect(page.locator("#showcase-list")).toHaveCSS(
+      "background-color",
+      rgb(COLORS.surface)
+    );
   });
 
   test("Query links go to the pages", async ({ page }) => {

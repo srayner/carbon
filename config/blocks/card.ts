@@ -1,4 +1,5 @@
 import { LayoutGrid } from "lucide-react";
+import { SHARED_PROPERTIES } from "./shared";
 
 // Cards placed one after another are shown side by side in a grid
 export const CardBlockConfig = {
@@ -64,5 +65,8 @@ export const CardBlockConfig = {
       default: "",
       group: "Advanced",
     },
+
+    // Theme tokens, the same for every block
+    ...SHARED_PROPERTIES,
   ],
 } as const;

@@ -29,7 +29,7 @@ const QueryView = async ({
 }: ViewProps<"Query">) => {
   const { properties } = block;
   const { category, includeSubcategories, display, columns } = properties;
-  const { id, className } = shared;
+  const { id, className, style } = shared;
   const orderBy = QUERY_ORDERS.includes(properties.orderBy as QueryOrder)
     ? (properties.orderBy as QueryOrder)
     : "newest";
@@ -48,6 +48,7 @@ const QueryView = async ({
     return (
       <ul
         id={id}
+        style={style}
         className={`not-prose my-4 flex list-none flex-col gap-1 p-0 ${
           className ?? ""
         }`}
@@ -66,6 +67,7 @@ const QueryView = async ({
   return (
     <div
       id={id}
+      style={style}
       className={`not-prose my-8 grid gap-6 ${
         GRID_COLUMNS[columns] ?? GRID_COLUMNS["3"]
       } ${className ?? ""}`}

@@ -35,6 +35,12 @@ describe("themeSchema", () => {
     expect(themeSchema.safeParse(theme).success).toBe(true);
   });
 
+  it("rejects a shadow that could break out of its style", () => {
+    const theme = clone();
+    theme.shadow.m = "0 0 4px red; } body { display: none";
+    expect(themeSchema.safeParse(theme).success).toBe(false);
+  });
+
   it("rejects a font that is not in the list", () => {
     const theme = clone();
     theme.fonts.body = "comic-sans" as never;
@@ -67,6 +73,8 @@ describe("themeVariables", () => {
     expect(vars["--color-accent"]).toBe(DEFAULT_THEME.colors.accent);
     expect(vars["--space-m"]).toBe("1rem");
     expect(vars["--radius-full"]).toBe("9999px");
+    expect(vars["--border-thin"]).toBe("1px");
+    expect(vars["--shadow-none"]).toBe("none");
     expect(vars["--content-width"]).toBe(DEFAULT_THEME.contentWidth);
     expect(vars["--font-mono"]).toContain("monospace");
   });
@@ -74,7 +82,15 @@ describe("themeVariables", () => {
 
 describe("googleFontsUrl", () => {
   it("is null when only system fonts are used", () => {
-    expect(googleFontsUrl(DEFAULT_THEME)).toBeNull();
+    const theme = clone();
+    theme.fonts = { heading: "system", body: "system", mono: "system-mono" };
+    expect(googleFontsUrl(theme)).toBeNull();
+  });
+
+  it("loads the default theme's fonts", () => {
+    const url = googleFontsUrl(DEFAULT_THEME)!;
+    expect(url).toContain("family=Space+Grotesk");
+    expect(url).toContain("family=IBM+Plex+Mono");
   });
 
   it("lists each Google font once", () => {

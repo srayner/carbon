@@ -1,4 +1,5 @@
 import { FileDown } from "lucide-react";
+import { SHARED_PROPERTIES } from "./shared";
 
 export const FileBlockConfig = {
   name: "File",
@@ -60,5 +61,8 @@ export const FileBlockConfig = {
       default: "",
       group: "Advanced",
     },
+
+    // Theme tokens, the same for every block
+    ...SHARED_PROPERTIES,
   ],
 } as const;

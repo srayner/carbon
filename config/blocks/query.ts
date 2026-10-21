@@ -1,4 +1,5 @@
 import { ListFilter } from "lucide-react";
+import { SHARED_PROPERTIES } from "./shared";
 
 // Lists the published pages in a category, as cards or as plain links
 export const QueryBlockConfig = {
@@ -69,5 +70,8 @@ export const QueryBlockConfig = {
       default: "",
       group: "Advanced",
     },
+
+    // Theme tokens, the same for every block
+    ...SHARED_PROPERTIES,
   ],
 } as const;

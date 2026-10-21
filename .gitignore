@@ -48,3 +48,6 @@ next-env.d.ts
 /playwright/.auth
 /playwright-report
 /test-results
+
+# Private local space (never committed)
+/local
