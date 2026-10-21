@@ -1,5 +1,5 @@
 import CardView from "@/components/Block/CardView";
-import { QueryProps } from "@/types/blocks";
+import { ViewProps } from "@/types/blocks";
 import { QUERY_ORDERS, QueryOrder, queryPages } from "@/services/page-query";
 
 const DEFAULT_LIMIT = 12;
@@ -20,15 +20,16 @@ const parseLimit = (value: string | undefined) => {
     : DEFAULT_LIMIT;
 };
 
-type Props = {
-  properties: QueryProps;
-  currentPageId?: string | null; // never listed in its own query
-};
-
-// The public rendering of a Query block: the pages found, as cards or links
-const QueryView = async ({ properties, currentPageId }: Props) => {
-  const { category, includeSubcategories, display, columns, className, cssId } =
-    properties;
+// The public rendering of a Query block: the pages found, as cards or links.
+// The current page is never listed in its own query.
+const QueryView = async ({
+  block,
+  shared,
+  currentPageId,
+}: ViewProps<"Query">) => {
+  const { properties } = block;
+  const { category, includeSubcategories, display, columns } = properties;
+  const { id, className } = shared;
   const orderBy = QUERY_ORDERS.includes(properties.orderBy as QueryOrder)
     ? (properties.orderBy as QueryOrder)
     : "newest";
@@ -46,7 +47,7 @@ const QueryView = async ({ properties, currentPageId }: Props) => {
   if (display === "list") {
     return (
       <ul
-        id={cssId || undefined}
+        id={id}
         className={`not-prose my-4 flex list-none flex-col gap-1 p-0 ${
           className ?? ""
         }`}
@@ -64,7 +65,7 @@ const QueryView = async ({ properties, currentPageId }: Props) => {
 
   return (
     <div
-      id={cssId || undefined}
+      id={id}
       className={`not-prose my-8 grid gap-6 ${
         GRID_COLUMNS[columns] ?? GRID_COLUMNS["3"]
       } ${className ?? ""}`}
@@ -72,7 +73,7 @@ const QueryView = async ({ properties, currentPageId }: Props) => {
       {pages.map((page) => (
         <CardView
           key={page.id}
-          card={{
+          block={{
             id: page.id,
             type: "Card",
             properties: {

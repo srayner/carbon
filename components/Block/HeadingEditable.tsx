@@ -1,24 +1,16 @@
 "use client";
 
 import React, { useRef } from "react";
-import { HeadingBlock } from "@/types/blocks";
+import { EditableProps } from "@/types/blocks";
 import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
 
-type ParagraphEditableProps = {
-  heading: HeadingBlock;
-  onUpdate: (blockId: string, content: string) => void;
-};
-
-const HeadingEditable: React.FC<ParagraphEditableProps> = ({
-  heading,
-  onUpdate,
-}) => {
-  const { content } = heading.properties;
+const HeadingEditable = ({ block, onChange }: EditableProps<"Heading">) => {
+  const { content } = block.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
   const handleBlur = (content: string) => {
     const rawText = content.replace(/<[^>]*>/g, "");
-    onUpdate(heading.id, rawText);
+    onChange({ content: rawText });
   };
 
   // TipTap expects HTML, wrap plain text content in <p> tag

@@ -1,15 +1,11 @@
 import React from "react";
 import { FileDown } from "lucide-react";
-import { FileBlock } from "@/types/blocks";
-
-type FileEditableProps = {
-  file: FileBlock;
-};
+import { EditableProps } from "@/types/blocks";
 
 // Preview of a file block in the editing area. The file is chosen in the
 // block's properties panel, so this is display only.
-const FileEditable: React.FC<FileEditableProps> = ({ file }) => {
-  const { file: url, label, description } = file.properties;
+const FileEditable = ({ block }: EditableProps<"File">) => {
+  const { file: url, label, description } = block.properties;
 
   if (!url) {
     return (

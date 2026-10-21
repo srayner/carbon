@@ -1,10 +1,10 @@
 import React from "react";
-import { CardBlock } from "@/types/blocks";
+import { ViewProps } from "@/types/blocks";
 
 // A single card, used by both the editing area and the public renderer
-const CardView: React.FC<{ card: CardBlock }> = ({ card }) => {
+const CardView = ({ block }: Pick<ViewProps<"Card">, "block">) => {
   const { title, image, alt, description, linkUrl, linkLabel, className, cssId } =
-    card.properties;
+    block.properties;
 
   return (
     <div

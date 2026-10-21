@@ -1,23 +1,15 @@
 "use client";
 
 import React, { useRef } from "react";
-import { RichTextBlock } from "@/types/blocks";
+import { EditableProps } from "@/types/blocks";
 import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
 
-type RichTextEditableProps = {
-  richText: RichTextBlock;
-  onUpdate: (blockId: string, content: string) => void;
-};
-
-const RichTextEditable: React.FC<RichTextEditableProps> = ({
-  richText,
-  onUpdate,
-}) => {
-  const { content } = richText.properties;
+const RichTextEditable = ({ block, onChange }: EditableProps<"RichText">) => {
+  const { content } = block.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
   const handleBlur = (content: string) => {
-    onUpdate(richText.id, content);
+    onChange({ content });
   };
 
   return (

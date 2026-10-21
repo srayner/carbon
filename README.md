@@ -23,7 +23,23 @@ unless `DATABASE_URL` points at localhost.
 - **Pages:** published when their publish date has passed. Pages with no date
   or a future date are drafts, visible only to admins as a preview.
 - **Blocks:** Heading, Paragraph, RichText (links, tables, images), Image,
-  File (download) and Card. Consecutive Card blocks display as a grid.
+  File (download), Card and Query. Consecutive Card blocks display as a grid.
+
+### Adding a block
+
+A block is three files, found by the block's name (`Foo` below):
+
+1. `config/blocks/foo.ts`: the block's `name`, `icon` and `properties`, added
+   to `ALL_BLOCKS` in `config/blocks/index.ts`.
+2. `components/Block/FooEditable.tsx`: how it looks and edits in the editor
+   (client side). Receives `{ block, onChange(patch) }`.
+3. `components/Block/FooView.tsx`: how it renders on the public site (server
+   side, may use the database). Receives `{ block, shared, currentPageId }`;
+   `shared` is the id, class and style every block gets.
+
+Types come from the config, and renderers load only when a page uses them.
+`npm run lint` also runs `npm run check:blocks`, which fails if a block is
+missing either renderer file.
 
 ### Deploying
 
