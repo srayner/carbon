@@ -1,15 +1,11 @@
 import React from "react";
-import { ImageBlock } from "@/types/blocks";
-
-type ImageEditableProps = {
-  image: ImageBlock;
-};
+import { EditableProps } from "@/types/blocks";
 
 // Preview of an image block in the editing area. Images are set from the
 // block's properties panel, so this is display only.
-const ImageEditable: React.FC<ImageEditableProps> = ({ image }) => {
+const ImageEditable = ({ block }: EditableProps<"Image">) => {
   const { src, alt, caption, width, height, objectFit, alignment } =
-    image.properties;
+    block.properties;
 
   if (!src) {
     return (

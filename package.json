@@ -1,12 +1,13 @@
 {
   "name": "carbon",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint && npm run check:blocks",
+    "check:blocks": "tsx scripts/check-blocks.ts",
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {

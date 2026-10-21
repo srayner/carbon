@@ -1,15 +1,8 @@
 import { LucideIcon } from "lucide-react";
-import { HeadingBlockConfig } from "@/config/blocks/heading";
-import { CardBlockConfig } from "@/config/blocks/card";
-import { FileBlockConfig } from "@/config/blocks/file";
-import { ImageBlockConfig } from "@/config/blocks/image";
-import { ParagraphBlockConfig } from "@/config/blocks/paragraph";
-import { QueryBlockConfig } from "@/config/blocks/query";
-import { RichTextBlockConfig } from "@/config/blocks/richText";
+import { ALL_BLOCKS } from "@/config/blocks";
 
-/* ----- Helper types ----- */
+/* ----- Config types ----- */
 
-// Extract a union of property entries from a readonly array
 export type BlockProperty = {
   name: string;
   displayName: string;
@@ -19,153 +12,76 @@ export type BlockProperty = {
   optional?: boolean | undefined;
 };
 
-/* ----- BlockConfig type ----- */
 export type BlockConfig<TName extends string = string> = {
   name: TName;
   icon: LucideIcon;
   properties: readonly BlockProperty[];
 };
 
-// Map single prop entry -> TS type
-type BlockPropertyToType<P extends BlockProperty> = P extends {
-  type: "string" | "image" | "file" | "richtext" | "category";
-}
-  ? P extends { optional: true }
-    ? string | undefined
-    : string
-  : P extends { type: "color" }
-  ? P extends { optional: true }
-    ? string | undefined
-    : string
-  : P extends { type: "number" }
-  ? P extends { optional: true }
-    ? number | undefined
-    : number
+/* ----- Types derived from the configs in config/blocks ----- */
+
+type AnyBlockConfig = (typeof ALL_BLOCKS)[number];
+
+// Map one property entry -> TS type
+type PropertyType<P extends BlockProperty> = P extends { type: "number" }
+  ? number
   : P extends { type: "boolean" }
   ? // the property editor stores every value as a string
-    P extends { optional: true }
-    ? "true" | "false" | undefined
-    : "true" | "false"
+    "true" | "false"
   : P extends { type: "enum"; values: readonly (infer V)[] }
-  ? P extends { optional: true }
-    ? V | undefined
-    : V
-  : unknown;
+  ? V
+  : string;
 
-/* ----- BlockData = object type derived from array of properties ----- */
-export type BlockData<TProps extends readonly BlockProperty[]> = {
-  [P in TProps[number] as P["name"]]: BlockPropertyToType<P>;
+type WithOptional<P extends BlockProperty> = P extends { optional: true }
+  ? PropertyType<P> | undefined
+  : PropertyType<P>;
+
+type PropertiesOf<TProps extends readonly BlockProperty[]> = {
+  [P in TProps[number] as P["name"]]: WithOptional<P>;
 };
 
-// Convert readonly array of BlockProperties -> { propName: propType, ... }
-type PropsFromArray<TProps extends readonly BlockProperty[]> = {
-  [P in TProps[number] as P["name"]]: BlockPropertyToType<P>;
-};
+/** The name of every block type, e.g. "Heading" | "Image" | ... */
+export type BlockName = AnyBlockConfig["name"];
 
-/* ----- Infer types for specific block configs ----- */
-type HeadingProps = PropsFromArray<(typeof HeadingBlockConfig)["properties"]>;
-type CardProps = PropsFromArray<(typeof CardBlockConfig)["properties"]>;
-type FileProps = PropsFromArray<(typeof FileBlockConfig)["properties"]>;
-type ImageProps = PropsFromArray<(typeof ImageBlockConfig)["properties"]>;
-type ParagraphProps = PropsFromArray<
-  (typeof ParagraphBlockConfig)["properties"]
->;
-type RichTextProps = PropsFromArray<(typeof RichTextBlockConfig)["properties"]>;
-export type QueryProps = PropsFromArray<(typeof QueryBlockConfig)["properties"]>;
-
-/* ----- Block type literals ----- */
-type HeadingType = (typeof HeadingBlockConfig)["name"];
-type CardType = (typeof CardBlockConfig)["name"];
-type FileType = (typeof FileBlockConfig)["name"];
-type ImageType = (typeof ImageBlockConfig)["name"];
-type ParagraphType = (typeof ParagraphBlockConfig)["name"];
-type RichTextType = (typeof RichTextBlockConfig)["name"];
-type QueryType = (typeof QueryBlockConfig)["name"];
-
-type BaseBlock = {
-  order?: number;
-  pageId?: string;
-  fragmentId?: string;
-  parentId?: string | null;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
-
-/* ----- Concrete blocks ----- */
-export type HeadingBlock = {
-  id: string;
-  type: HeadingType;
-  properties: HeadingProps;
-} & BaseBlock;
-export type CardBlock = {
-  id: string;
-  type: CardType;
-  properties: CardProps;
-} & BaseBlock;
-export type FileBlock = {
-  id: string;
-  type: FileType;
-  properties: FileProps;
-} & BaseBlock;
-export type ImageBlock = {
-  id: string;
-  type: ImageType;
-  properties: ImageProps;
-} & BaseBlock;
-export type ParagraphBlock = {
-  id: string;
-  type: ParagraphType;
-  properties: ParagraphProps;
-} & BaseBlock;
-export type RichTextBlock = {
-  id: string;
-  type: RichTextType;
-  properties: RichTextProps;
-} & BaseBlock;
-
-export type QueryBlock = {
-  id: string;
-  type: QueryType;
-  properties: QueryProps;
-} & BaseBlock;
-
-/* ----- Union of all blocks ----- */
-export type Block =
-  | HeadingBlock
-  | ImageBlock
-  | FileBlock
-  | CardBlock
-  | ParagraphBlock
-  | RichTextBlock
-  | QueryBlock;
-
-/* ----- Union of block type strings ----- */
-export type BlockName =
-  | HeadingType
-  | ImageType
-  | FileType
-  | CardType
-  | ParagraphType
-  | RichTextType
-  | QueryType;
-
-/* ----- Helper to get props type by block name ----- */
-export type PropsForBlockName<T extends BlockName> = T extends HeadingType
-  ? HeadingProps
-  : T extends ImageType
-  ? ImageProps
-  : T extends FileType
-  ? FileProps
-  : T extends CardType
-  ? CardProps
-  : T extends ParagraphType
-  ? ParagraphProps
-  : T extends RichTextType
-  ? RichTextProps
-  : T extends QueryType
-  ? QueryProps
+/** The properties of one block type, from its config. */
+export type BlockProps<N extends BlockName = BlockName> = N extends BlockName
+  ? PropertiesOf<Extract<AnyBlockConfig, { name: N }>["properties"]>
   : never;
 
-export type BlockPropsMap = {
-  [K in BlockName]: PropsForBlockName<K>;
+/** A block of one type (or, with no argument, of any type). */
+export type Block<N extends BlockName = BlockName> = N extends BlockName
+  ? {
+      id: string;
+      type: N;
+      properties: BlockProps<N>;
+      order?: number;
+      pageId?: string;
+      fragmentId?: string;
+      parentId?: string | null;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }
+  : never;
+
+/* ----- Renderer props ----- */
+
+/** Props for a block's edit renderer, `components/Block/<Name>Editable.tsx`. */
+export type EditableProps<N extends BlockName> = {
+  block: Block<N>;
+  // Merge changes into the block's properties
+  onChange: (patch: Partial<BlockProps<N>>) => void;
+};
+
+/** The id, class and inline style every block gets, worked out in one place. */
+export type SharedBlockProps = {
+  id: string | undefined;
+  className: string | undefined;
+  style: React.CSSProperties;
+};
+
+/** Props for a block's published renderer, `components/Block/<Name>View.tsx`. */
+export type ViewProps<N extends BlockName> = {
+  block: Block<N>;
+  shared: SharedBlockProps;
+  currentPageId?: string | null;
 };

@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { QueryBlock } from "@/types/blocks";
+import { EditableProps } from "@/types/blocks";
 import { fetchCategories } from "@/lib/api/categories";
 import { CategoryRow, flattenCategories } from "@/lib/category-tree";
 
 // Stands in for the query's results while editing
-const QueryEditable: React.FC<{ query: QueryBlock }> = ({ query }) => {
+const QueryEditable = ({ block }: EditableProps<"Query">) => {
   const [rows, setRows] = useState<CategoryRow[]>([]);
   const { category, display, columns, orderBy, limit, includeSubcategories } =
-    query.properties;
+    block.properties;
 
   useEffect(() => {
     fetchCategories()

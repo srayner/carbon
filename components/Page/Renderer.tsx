@@ -1,122 +1,26 @@
 import { Page } from "@/types/entities";
-import { Block, CardBlock } from "@/types/blocks";
+import { Block, SharedBlockProps } from "@/types/blocks";
 import CardView from "@/components/Block/CardView";
-import QueryView from "@/components/Block/QueryView";
+import { loadViews } from "@/components/Block/views";
 import { getBlockStyle } from "@/lib/block-style";
-import { sanitizeRichText } from "@/lib/sanitize";
 
 interface RendererProps {
   page: Page;
 }
 
-const HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
-type HeadingLevel = (typeof HEADING_LEVELS)[number];
-
-const RenderBlock: React.FC<{ block: Block; currentPageId?: string | null }> = ({
-  block,
-  currentPageId,
-}) => {
+// The id, class and inline style every block gets, worked out once here
+const getSharedProps = (block: Block): SharedBlockProps => {
   const properties = block.properties as Record<string, unknown>;
-  const style = getBlockStyle(block.type, properties);
-  const className = (properties.className as string) || undefined;
-  const id = (properties.cssId as string) || undefined;
-
-  switch (block.type) {
-    case "Heading": {
-      const level = block.properties.level;
-      const Tag: HeadingLevel = HEADING_LEVELS.includes(level as HeadingLevel)
-        ? (level as HeadingLevel)
-        : "h2";
-      return (
-        <Tag id={id} className={className} style={style}>
-          {block.properties.content}
-        </Tag>
-      );
-    }
-    case "Paragraph":
-      return (
-        <p id={id} className={className} style={style}>
-          {block.properties.content}
-        </p>
-      );
-    case "RichText":
-      return (
-        <div
-          id={id}
-          className={className}
-          style={style}
-          dangerouslySetInnerHTML={{
-            __html: sanitizeRichText(block.properties.content ?? ""),
-          }}
-        />
-      );
-    case "Image": {
-      const { src, alt, caption, width, height, objectFit, alignment } =
-        block.properties;
-      if (!src) return null;
-      return (
-        <figure
-          id={id}
-          className={className}
-          style={{ ...style, textAlign: alignment || "center" }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={src}
-            alt={alt ?? ""}
-            style={{
-              display: "inline-block",
-              width: width || "100%",
-              height: height || "auto",
-              objectFit: objectFit || "cover",
-              borderRadius: block.properties.borderRadius || undefined,
-              filter: block.properties.filter || undefined,
-              margin: 0,
-            }}
-          />
-          {caption && <figcaption>{caption}</figcaption>}
-        </figure>
-      );
-    }
-    case "File": {
-      const { file, label, description } = block.properties;
-      if (!file) return null;
-      return (
-        <p
-          id={id}
-          className={className}
-          style={style}
-        >
-          <a
-            href={file}
-            download
-            className="not-prose inline-flex flex-col rounded border px-4 py-3 no-underline hover:bg-muted"
-          >
-            <span className="font-medium">⬇ {label || "Download"}</span>
-            {description && (
-              <span className="text-sm text-muted-foreground">
-                {description}
-              </span>
-            )}
-          </a>
-        </p>
-      );
-    }
-    case "Query":
-      return (
-        <QueryView
-          properties={block.properties}
-          currentPageId={currentPageId}
-        />
-      );
-    default:
-      return null;
-  }
+  return {
+    id: (properties.cssId as string) || undefined,
+    className: (properties.className as string) || undefined,
+    style: getBlockStyle(block.type, properties),
+  };
 };
 
 type RenderItem =
   | { kind: "block"; block: Block }
-  | { kind: "cards"; cards: CardBlock[] };
+  | { kind: "cards"; cards: Block<"Card">[] };
 
 // Consecutive Card blocks are shown together in one grid
 const groupBlocks = (blocks: Block[]): RenderItem[] => {
@@ -133,31 +37,45 @@ const groupBlocks = (blocks: Block[]): RenderItem[] => {
   return items;
 };
 
-export const BlocksView: React.FC<{
+export const BlocksView = async ({
+  blocks,
+  currentPageId,
+}: {
   blocks: Block[];
   currentPageId?: string | null;
-}> = ({ blocks, currentPageId }) => (
-  <>
-    {groupBlocks(blocks).map((item) =>
-      item.kind === "cards" ? (
-        <div
-          key={item.cards[0].id}
-          className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {item.cards.map((card) => (
-            <CardView key={card.id} card={card} />
-          ))}
-        </div>
-      ) : (
-        <RenderBlock
-          key={item.block.id}
-          block={item.block}
-          currentPageId={currentPageId}
-        />
-      )
-    )}
-  </>
-);
+}) => {
+  const views = await loadViews(blocks.map((block) => block.type));
+
+  return (
+    <>
+      {groupBlocks(blocks).map((item) => {
+        if (item.kind === "cards") {
+          return (
+            <div
+              key={item.cards[0].id}
+              className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {item.cards.map((card) => (
+                <CardView key={card.id} block={card} />
+              ))}
+            </div>
+          );
+        }
+
+        const View = views.get(item.block.type);
+        if (!View) return null;
+        return (
+          <View
+            key={item.block.id}
+            block={item.block}
+            shared={getSharedProps(item.block)}
+            currentPageId={currentPageId}
+          />
+        );
+      })}
+    </>
+  );
+};
 
 const Renderer: React.FC<RendererProps> = ({ page }) => {
   return (
