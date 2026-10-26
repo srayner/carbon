@@ -9,7 +9,7 @@ const FileEditable = ({ block }: EditableProps<"File">) => {
 
   if (!url) {
     return (
-      <div className="my-2 rounded border-2 border-dashed p-6 text-center text-sm text-muted-foreground">
+      <div className="my-2 rounded-sm border-2 border-dashed p-6 text-center text-sm text-muted-foreground">
         No file yet. Select this block and upload one in the Block tab.
       </div>
     );

@@ -3,18 +3,18 @@ import { SHARED_PROPERTIES } from "@/config/blocks/shared";
 
 // Each shared property -> the CSS it sets, given a token name
 const CSS: Record<string, (token: string) => CSSProperties> = {
-  paddingSize: (t) => ({ padding: `var(--space-${t})` }),
-  marginTopSize: (t) => ({ marginTop: `var(--space-${t})` }),
-  marginBottomSize: (t) => ({ marginBottom: `var(--space-${t})` }),
-  radius: (t) => ({ borderRadius: `var(--radius-${t})` }),
+  paddingSize: (t) => ({ padding: `var(--site-space-${t})` }),
+  marginTopSize: (t) => ({ marginTop: `var(--site-space-${t})` }),
+  marginBottomSize: (t) => ({ marginBottom: `var(--site-space-${t})` }),
+  radius: (t) => ({ borderRadius: `var(--site-radius-${t})` }),
   border: (t) => ({
-    borderWidth: `var(--border-${t})`,
+    borderWidth: `var(--site-border-${t})`,
     borderStyle: t === "none" ? "none" : "solid",
   }),
-  shadow: (t) => ({ boxShadow: `var(--shadow-${t})` }),
-  background: (t) => ({ backgroundColor: `var(--color-${t})` }),
-  textColor: (t) => ({ color: `var(--color-${t})` }),
-  fontRole: (t) => ({ fontFamily: `var(--font-${t})` }),
+  shadow: (t) => ({ boxShadow: `var(--site-shadow-${t})` }),
+  background: (t) => ({ backgroundColor: `var(--site-color-${t})` }),
+  textColor: (t) => ({ color: `var(--site-color-${t})` }),
+  fontRole: (t) => ({ fontFamily: `var(--site-font-${t})` }),
 };
 
 /**

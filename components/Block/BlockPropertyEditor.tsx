@@ -138,7 +138,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
   };
 
   return (
-    <div className="space-y-3 p-3 bg-gray-50">
+    <div className="space-y-3 p-3 bg-muted">
       <div className="flex items-center gap-2">
         {Icon && <Icon className="w-6 h-6" />}
         <span className="font-semibold">{blockConfig.name} Properties</span>
@@ -148,7 +148,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
         <details
           key={`${blockConfig.name}-${group}`}
           open={group === DEFAULT_GROUP || groups.length === 1}
-          className="rounded border bg-white"
+          className="rounded-sm border bg-card"
         >
           <summary className="cursor-pointer select-none px-2 py-1 text-sm font-semibold">
             {group}

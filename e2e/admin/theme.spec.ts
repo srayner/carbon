@@ -11,7 +11,7 @@ const field = (page: Page, label: string) =>
 const publicAccent = async (page: Page) => {
   await page.goto("/hello-world");
   const style = await page.locator(".site-theme").first().getAttribute("style");
-  return /--color-accent:\s*([^;]+)/.exec(style ?? "")?.[1];
+  return /--site-color-accent:\s*([^;]+)/.exec(style ?? "")?.[1];
 };
 
 test.describe.configure({ mode: "serial" });

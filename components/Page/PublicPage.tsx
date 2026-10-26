@@ -7,7 +7,7 @@ import { PublicPageResult } from "@/lib/public-page";
 const PublicPage = ({ page, template, isPreview }: PublicPageResult) => (
   <>
     {isPreview && (
-      <div className="flex items-center justify-between gap-4 border-b border-amber-300 bg-amber-100 px-4 py-2 text-sm text-amber-900">
+      <div className="flex items-center justify-between gap-4 border-b border-amber-500/40 bg-amber-500/15 px-4 py-2 text-sm text-amber-900 dark:text-amber-200">
         <span>
           <strong>Preview</strong>
           {" — "}

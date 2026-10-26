@@ -1,10 +1,6 @@
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div
-      className="h-screen flex items-center justify-center
-    bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] 
-    from-slate-700 to-slate-900"
-    >
+    <div className="flex h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,var(--color-accent),var(--color-background)_70%)]">
       {children}
     </div>
   );

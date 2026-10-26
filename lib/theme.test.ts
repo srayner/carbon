@@ -70,13 +70,13 @@ describe("withDefaults", () => {
 describe("themeVariables", () => {
   it("has a variable for every token", () => {
     const vars = themeVariables(DEFAULT_THEME);
-    expect(vars["--color-accent"]).toBe(DEFAULT_THEME.colors.accent);
-    expect(vars["--space-m"]).toBe("1rem");
-    expect(vars["--radius-full"]).toBe("9999px");
-    expect(vars["--border-thin"]).toBe("1px");
-    expect(vars["--shadow-none"]).toBe("none");
-    expect(vars["--content-width"]).toBe(DEFAULT_THEME.contentWidth);
-    expect(vars["--font-mono"]).toContain("monospace");
+    expect(vars["--site-color-accent"]).toBe(DEFAULT_THEME.colors.accent);
+    expect(vars["--site-space-m"]).toBe("1rem");
+    expect(vars["--site-radius-full"]).toBe("9999px");
+    expect(vars["--site-border-thin"]).toBe("1px");
+    expect(vars["--site-shadow-none"]).toBe("none");
+    expect(vars["--site-content-width"]).toBe(DEFAULT_THEME.contentWidth);
+    expect(vars["--site-font-mono"]).toContain("monospace");
   });
 });
 

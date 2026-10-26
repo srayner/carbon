@@ -69,9 +69,9 @@ export default function FragmentList({ kind }: { kind: FragmentKind }) {
       ) : fragments.length === 0 ? (
         <p className="text-muted-foreground">No {KIND_PLURALS[kind].toLowerCase()} yet.</p>
       ) : (
-        <table className="w-full border border-gray-200 text-left">
+        <table className="w-full border border-border text-left">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-muted">
               <th className="p-2 border-b">Name</th>
               <th className="p-2 border-b">Used by templates</th>
               <th className="p-2 border-b text-right">Actions</th>
@@ -79,11 +79,11 @@ export default function FragmentList({ kind }: { kind: FragmentKind }) {
           </thead>
           <tbody>
             {fragments.map((fragment) => (
-              <tr key={fragment.id}>
+              <tr key={fragment.id} className="h-14">
                 <td className="p-2 border-b">
                   <Link
                     href={`/admin/fragments/${segment}/${fragment.id}`}
-                    className="text-blue-600 hover:underline"
+                    className="text-primary hover:underline"
                   >
                     {fragment.name}
                   </Link>

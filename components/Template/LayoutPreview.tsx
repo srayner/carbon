@@ -17,8 +17,8 @@ export default function LayoutPreview({ layout }: { layout: TemplateLayout }) {
       {areaNames(layout).map((name) => (
         <div
           key={name}
-          className={`flex items-center justify-center rounded border ${
-            name === MAIN_AREA ? "bg-background" : "bg-blue-50 border-blue-200"
+          className={`flex items-center justify-center rounded-sm border ${
+            name === MAIN_AREA ? "bg-background" : "bg-primary/10 border-primary/30"
           }`}
           style={{
             gridArea: name,

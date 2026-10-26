@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { DEFAULT_THEME, themeVariables } from "@/lib/theme";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -18,17 +20,31 @@ export const metadata: Metadata = {
   description: "Content Management System created with Next.js",
 };
 
+// The <html> style holds the default site theme, so site-* utilities also work
+// outside the public site (the editor canvas). A saved theme overrides it on
+// .site-theme.
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      style={themeVariables(DEFAULT_THEME) as React.CSSProperties}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

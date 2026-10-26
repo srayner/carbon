@@ -35,7 +35,7 @@ const UploadField: React.FC<UploadFieldProps> = ({ kind, value, onChange }) => {
         <img
           src={value}
           alt=""
-          className="max-h-32 w-full rounded border object-contain bg-white"
+          className="max-h-32 w-full rounded-sm border object-contain bg-card"
         />
       )}
       <input
@@ -55,7 +55,7 @@ const UploadField: React.FC<UploadFieldProps> = ({ kind, value, onChange }) => {
         type="button"
         disabled={uploading}
         onClick={() => inputRef.current?.click()}
-        className="px-2 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
+        className="px-2 py-1 text-xs rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
       >
         {uploading
           ? "Uploading…"

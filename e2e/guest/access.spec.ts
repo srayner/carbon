@@ -1,15 +1,17 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("guests are kept out of the admin area", () => {
-  test("/admin goes to the login page", async ({ page }) => {
-    await page.goto("/admin");
-    await expect(page).toHaveURL(/\/auth\/login/);
-  });
-
-  test("an admin screen goes to the login page", async ({ page }) => {
-    await page.goto("/admin/theme");
-    await expect(page).toHaveURL(/\/auth\/login/);
-  });
+  // The admin area does not exist as far as a guest can tell
+  for (const path of ["/admin", "/admin/theme", "/admin/no/such/page"]) {
+    test(`${path} is a plain 404`, async ({ page }) => {
+      const response = await page.goto(path);
+      expect(response?.status()).toBe(404);
+      await expect(page).toHaveURL(path);
+      await expect(
+        page.getByRole("heading", { name: "Page not found" })
+      ).toBeVisible();
+    });
+  }
 
   for (const path of ["/api/pages", "/api/templates", "/api/theme"]) {
     test(`${path} is not available`, async ({ request }) => {
@@ -21,8 +23,10 @@ test.describe("guests are kept out of the admin area", () => {
 });
 
 test.describe("logging in", () => {
-  test("the form is shown", async ({ page }) => {
+  test("the form is shown, under the logo", async ({ page }) => {
     await page.goto("/auth/login");
+    await expect(page.getByRole("heading", { name: "Carbon" })).toBeVisible();
+    await expect(page.locator("svg polygon")).toBeVisible();
     await expect(page.locator('input[name="email"]')).toBeVisible();
     await expect(page.getByRole("button", { name: "Login" })).toBeVisible();
   });

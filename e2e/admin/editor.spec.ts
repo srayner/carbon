@@ -30,6 +30,26 @@ test.describe("the page editor", () => {
     await expect(page.getByText(/^Pages in/).first()).toBeVisible();
   });
 
+  test("the block outline is open, and the main navigation can still be toggled", async ({
+    page,
+  }) => {
+    await openShowcase(page);
+
+    await expect(
+      page.getByRole("button", { name: "Toggle block outline" })
+    ).toHaveAttribute("aria-pressed", "true");
+
+    // The navigation folds to its rail while editing, and opens on request
+    const nav = page.locator('[data-sidebar="sidebar"]').first();
+    const sidebar = page.locator('[data-collapsible]').first();
+    await expect(sidebar).toHaveAttribute("data-state", "collapsed");
+    await page.getByRole("button", { name: "Toggle navigation" }).click();
+    await expect(sidebar).toHaveAttribute("data-state", "expanded");
+    await expect(nav).toBeVisible();
+    await page.getByRole("button", { name: "Toggle navigation" }).click();
+    await expect(sidebar).toHaveAttribute("data-state", "collapsed");
+  });
+
   test("selecting a block shows its properties", async ({ page }) => {
     await openShowcase(page);
     await page.getByText("Showcase card one").click();

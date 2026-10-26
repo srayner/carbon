@@ -107,7 +107,7 @@ export default function ThemeForm() {
               <label key={role} className="flex items-center gap-2 text-sm">
                 <input
                   type="color"
-                  className="h-9 w-10 shrink-0 cursor-pointer rounded border"
+                  className="h-9 w-10 shrink-0 cursor-pointer rounded-sm border"
                   value={theme.colors[role]}
                   onChange={(e) => setValue("colors", role, e.target.value)}
                 />
@@ -258,10 +258,10 @@ export default function ThemeForm() {
               }}
             />
           )}
-          <div className="border-b bg-site-background px-6 py-[var(--space-m)] text-sm">
+          <div className="border-b bg-site-background px-6 py-[var(--site-space-m)] text-sm">
             Header area
           </div>
-          <div className="prose prose-lg max-w-none p-[var(--space-l)]">
+          <div className="prose prose-lg max-w-none p-[var(--site-space-l)]">
             <h1>A heading</h1>
             <p>
               Body text with a <a href="#">link</a>, some <strong>bold</strong>{" "}

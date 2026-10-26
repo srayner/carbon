@@ -62,7 +62,7 @@ export default function EditTemplatePage() {
       <div className="mb-6">
         <Link
           href="/admin/templates"
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-primary hover:underline"
         >
           ← Templates
         </Link>

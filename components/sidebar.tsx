@@ -22,7 +22,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarSeparator,
 } from "./ui/sidebar";
 import Link from "next/link";
 import LogoMark from "./logo-mark";
@@ -78,13 +77,13 @@ const items = [
 const SideBar = () => {
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="h-16 justify-center px-3 py-0">
+      <SidebarHeader className="h-16 justify-center border-b px-3 py-0">
         {/* Not a menu button: that squashes its icon to 16px when collapsed.
             The mark keeps its size and only the wordmark fades out. */}
         <Link
           href="/admin"
           aria-label="Carbon"
-          className="flex items-center gap-2 overflow-hidden rounded-md text-sidebar-foreground outline-none ring-sidebar-ring focus-visible:ring-2"
+          className="flex items-center gap-2 overflow-hidden rounded-md text-sidebar-foreground outline-hidden ring-sidebar-ring focus-visible:ring-2"
         >
           <LogoMark className="size-6 shrink-0" />
           <span className="text-lg font-semibold tracking-tight transition-opacity duration-200 group-data-[collapsible=icon]:opacity-0">
@@ -92,7 +91,6 @@ const SideBar = () => {
           </span>
         </Link>
       </SidebarHeader>
-      <SidebarSeparator className="mx-0" />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Content</SidebarGroupLabel>

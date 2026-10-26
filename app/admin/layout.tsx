@@ -4,7 +4,7 @@ import { SidebarManagerProvider } from "@/context/sidebar-manager";
 import SideBar from "@/components/sidebar";
 import NavBar from "@/components/navbar";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { Toaster } from "@/components/ui/sonner";
 import { PageActionsProvider } from "@/context/page-actions";
@@ -15,8 +15,9 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  if (!session?.user) redirect("/auth/login");
-  if (session.user.role !== "ADMIN") redirect("/");
+  // Only an admin should know the admin area exists: everyone else gets the
+  // same 404 as for any other URL that is not there
+  if (session?.user?.role !== "ADMIN") notFound();
 
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
