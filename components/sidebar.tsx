@@ -25,7 +25,6 @@ import {
   SidebarSeparator,
 } from "./ui/sidebar";
 import Link from "next/link";
-import Image from "next/image";
 
 const items = [
   {
@@ -83,7 +82,7 @@ const SideBar = () => {
           <SidebarMenuItem className="h-[28px]">
             <SidebarMenuButton asChild>
               <Link href="/dashboard">
-                <Image alt="logo" src="/boron.png" width={102} height={40} />
+                <span className="text-lg font-semibold">Carbon</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
