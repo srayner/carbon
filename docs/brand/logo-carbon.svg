@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -56 112 112" role="img" aria-label="Carbon">
+  <style>
+    .s { fill: none; stroke: #26262B; stroke-width: 12; stroke-linejoin: round; }
+    .d { fill: #26262B; }
+    @media (prefers-color-scheme: dark) {
+      .s { stroke: #ECECEF; }
+      .d { fill: #ECECEF; }
+    }
+  </style>
+  <polygon class="s" points="0,-42 36.4,-21 36.4,21 0,42 -36.4,21 -36.4,-21"/>
+  <circle class="d" r="7"/>
+</svg>

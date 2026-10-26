@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-56 -56 112 112" role="img" aria-label="Argon">
+  <style>
+    .s { fill: none; stroke: #6D4AE0; stroke-width: 12; }
+    .d { fill: #6D4AE0; }
+    @media (prefers-color-scheme: dark) {
+      .s { stroke: #A58BFF; }
+      .d { fill: #A58BFF; }
+    }
+  </style>
+  <circle class="s" r="40"/>
+  <circle class="d" r="7"/>
+</svg>
