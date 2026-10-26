@@ -12,7 +12,7 @@ npm run seed                # sample users and page (local database only)
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). The seed creates
+Open [http://localhost:3003](http://localhost:3003). The seed creates
 `admin@example.com` and `user@example.com`, using the passwords in
 `USER_PASSWORD_ADMIN` and `USER_PASSWORD_USER` in `.env`. It refuses to run
 unless `DATABASE_URL` points at localhost.
@@ -28,7 +28,7 @@ npm run test:e2e         # Playwright against the database as it is
 `npm run seed` **wipes the database** and rebuilds a known state: the two
 accounts, the preset templates, categories, and pages used by the tests
 (`block-showcase` has one of every block type; `secret-draft` and
-`coming-soon` are unpublished). Playwright reuses the dev server on port 3000
+`coming-soon` are unpublished). Playwright reuses the dev server on port 3003
 or starts one. Run `npx playwright install chromium` once for the browser.
 
 Specs are grouped by who is using the site, and each group runs as a

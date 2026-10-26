@@ -1,7 +1,10 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import SiteTheme from "@/components/Theme/SiteTheme";
 
-export default function NotFound() {
+// The theme comes from the database, so render per request, not at build time
+export default async function NotFound() {
+  await connection();
   return (
     <SiteTheme>
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
