@@ -10,3 +10,10 @@ Dockerfile
 cypress
 README.md
 uploads
+coverage
+test-results
+playwright-report
+.swc
+*.tsbuildinfo
+local
+docs
