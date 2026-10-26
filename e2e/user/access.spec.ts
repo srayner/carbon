@@ -47,9 +47,12 @@ test.describe("API access for a user who is not an admin", () => {
     expect(response.status()).toBe(403);
   });
 
-  // Known gap: the page read endpoints don't call requireAdmin, so any
-  // logged in user can read every page, drafts included
-  test.fixme("the page list is forbidden", async ({ request }) => {
+  test("the page list is forbidden", async ({ request }) => {
     expect((await request.get("/api/pages")).status()).toBe(403);
+  });
+
+  // The guard runs before the lookup, so the id does not need to exist
+  test("a single page is forbidden", async ({ request }) => {
+    expect((await request.get("/api/pages/any-id")).status()).toBe(403);
   });
 });

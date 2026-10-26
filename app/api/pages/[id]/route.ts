@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/api/require-admin";
 
 export const GET = withErrorHandling(
   async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    await requireAdmin();
     const { id: pageId } = await params;
     const page = await getPage(pageId);
 

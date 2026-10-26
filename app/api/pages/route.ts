@@ -6,6 +6,7 @@ import { parseQueryParams } from "@/lib/api/query";
 import { upsertPage, listPages } from "@/services/pages";
 
 export const GET = withErrorHandling(async (req: NextRequest) => {
+  await requireAdmin();
   const url = new URL(req.url);
   const { search, pagination, ordering } = parseQueryParams(url);
 
