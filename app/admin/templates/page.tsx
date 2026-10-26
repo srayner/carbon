@@ -86,9 +86,9 @@ export default function TemplatesPage() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <table className="w-full border border-gray-200 text-left">
+        <table className="w-full border border-border text-left">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-muted">
               <th className="p-2 border-b">Name</th>
               <th className="p-2 border-b">Description</th>
               <th className="p-2 border-b">Pages</th>
@@ -97,11 +97,11 @@ export default function TemplatesPage() {
           </thead>
           <tbody>
             {templates.map((template) => (
-              <tr key={template.id}>
+              <tr key={template.id} className="h-14">
                 <td className="p-2 border-b">
                   <Link
                     href={`/admin/templates/${template.id}`}
-                    className="text-blue-600 hover:underline"
+                    className="text-primary hover:underline"
                   >
                     {template.name}
                   </Link>
@@ -173,7 +173,7 @@ export default function TemplatesPage() {
                 ))}
               </select>
             </div>
-            {createError && <p className="text-sm text-red-600">{createError}</p>}
+            {createError && <p className="text-sm text-destructive">{createError}</p>}
             <DialogFooter>
               <Button
                 type="button"

@@ -1,145 +1,149 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-
-    --foreground: 0 0% 3.9%;
-
-    --card: 0 0% 100%;
-
-    --card-foreground: 0 0% 3.9%;
-
-    --popover: 0 0% 100%;
-
-    --popover-foreground: 0 0% 3.9%;
-
-    --primary: 0 0% 9%;
-
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 0 0% 96.1%;
-
-    --secondary-foreground: 0 0% 9%;
-
-    --muted: 0 0% 96.1%;
-
-    --muted-foreground: 0 0% 45.1%;
-
-    --accent: 0 0% 96.1%;
-
-    --accent-foreground: 0 0% 9%;
-
-    --destructive: 0 84.2% 60.2%;
-
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 89.8%;
-
-    --input: 0 0% 89.8%;
-
-    --ring: 0 0% 3.9%;
-
-    --chart-1: 12 76% 61%;
-
-    --chart-2: 173 58% 39%;
-
-    --chart-3: 197 37% 24%;
-
-    --chart-4: 43 74% 66%;
-
-    --chart-5: 27 87% 67%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --background: 0 0% 3.9%;
-
-    --foreground: 0 0% 98%;
-
-    --card: 0 0% 3.9%;
-
-    --card-foreground: 0 0% 98%;
-
-    --popover: 0 0% 3.9%;
-
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 98%;
-
-    --primary-foreground: 0 0% 9%;
-
-    --secondary: 0 0% 14.9%;
-
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 0 0% 14.9%;
-
-    --muted-foreground: 0 0% 63.9%;
-
-    --accent: 0 0% 14.9%;
-
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 14.9%;
-
-    --input: 0 0% 14.9%;
-
-    --ring: 0 0% 83.1%;
-
-    --chart-1: 220 70% 50%;
-
-    --chart-2: 160 60% 45%;
-
-    --chart-3: 30 80% 55%;
-
-    --chart-4: 280 65% 60%;
-
-    --chart-5: 340 75% 55%;
-
-    --sidebar-background: 240 5.9% 10%;
-
-    --sidebar-foreground: 240 4.8% 95.9%;
-
-    --sidebar-primary: 224.3 76.3% 48%;
-
-    --sidebar-primary-foreground: 0 0% 100%;
-
-    --sidebar-accent: 240 3.7% 15.9%;
-
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-
-    --sidebar-border: 240 3.7% 15.9%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Admin UI tokens (shadcn). The public site has its own set, prefixed
+   --site-*, which is set per site (see components/Theme/SiteTheme.tsx) and
+   given defaults on <html> (see app/layout.tsx), so the two never collide. */
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Site theme roles, for blocks and the editor canvas */
+  --color-site-background: var(--site-color-background);
+  --color-site-surface: var(--site-color-surface);
+  --color-site-text: var(--site-color-text);
+  --color-site-muted: var(--site-color-muted);
+  --color-site-accent: var(--site-color-accent);
+  --color-site-border: var(--site-color-border);
+  --radius-site-s: var(--site-radius-s);
+  --radius-site-m: var(--site-radius-m);
+  --radius-site-l: var(--site-radius-l);
+  --radius-site-full: var(--site-radius-full);
 }
 
+/* Light: cool neutrals with a graphite-blue primary */
+:root,
+.light {
+  --radius: 0.5rem;
+  --background: oklch(0.985 0.002 255);
+  --foreground: oklch(0.21 0.02 258);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.02 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.02 258);
+  --primary: oklch(0.32 0.04 258);
+  --primary-foreground: oklch(0.985 0.002 255);
+  --secondary: oklch(0.955 0.006 255);
+  --secondary-foreground: oklch(0.28 0.03 258);
+  --muted: oklch(0.955 0.006 255);
+  --muted-foreground: oklch(0.52 0.02 258);
+  --accent: oklch(0.945 0.012 255);
+  --accent-foreground: oklch(0.28 0.03 258);
+  --destructive: oklch(0.577 0.22 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.91 0.008 255);
+  --input: oklch(0.91 0.008 255);
+  --ring: oklch(0.55 0.12 258);
+  --chart-1: oklch(0.55 0.12 258);
+  --chart-2: oklch(0.62 0.12 175);
+  --chart-3: oklch(0.75 0.14 85);
+  --chart-4: oklch(0.62 0.18 305);
+  --chart-5: oklch(0.65 0.18 25);
+  --sidebar-background: oklch(0.97 0.004 255);
+  --sidebar-foreground: oklch(0.32 0.02 258);
+  --sidebar-primary: oklch(0.32 0.04 258);
+  --sidebar-primary-foreground: oklch(0.985 0.002 255);
+  --sidebar-accent: oklch(0.93 0.012 255);
+  --sidebar-accent-foreground: oklch(0.21 0.02 258);
+  --sidebar-border: oklch(0.91 0.008 255);
+  --sidebar-ring: oklch(0.55 0.12 258);
+}
+
+/* Dark: deep graphite, not pure black */
+.dark {
+  --background: oklch(0.17 0.012 258);
+  --foreground: oklch(0.96 0.004 255);
+  --card: oklch(0.2 0.014 258);
+  --card-foreground: oklch(0.96 0.004 255);
+  --popover: oklch(0.22 0.015 258);
+  --popover-foreground: oklch(0.96 0.004 255);
+  --primary: oklch(0.9 0.02 255);
+  --primary-foreground: oklch(0.2 0.02 258);
+  --secondary: oklch(0.26 0.016 258);
+  --secondary-foreground: oklch(0.96 0.004 255);
+  --muted: oklch(0.26 0.016 258);
+  --muted-foreground: oklch(0.7 0.02 258);
+  --accent: oklch(0.29 0.02 258);
+  --accent-foreground: oklch(0.96 0.004 255);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 15%);
+  --input: oklch(1 0 0 / 28%);
+  --ring: oklch(0.65 0.12 258);
+  --chart-1: oklch(0.65 0.14 258);
+  --chart-2: oklch(0.7 0.12 175);
+  --chart-3: oklch(0.8 0.14 85);
+  --chart-4: oklch(0.68 0.18 305);
+  --chart-5: oklch(0.7 0.18 25);
+  --sidebar-background: oklch(0.2 0.014 258);
+  --sidebar-foreground: oklch(0.9 0.006 255);
+  --sidebar-primary: oklch(0.65 0.14 258);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.28 0.02 258);
+  --sidebar-accent-foreground: oklch(0.96 0.004 255);
+  --sidebar-border: oklch(1 0 0 / 15%);
+  --sidebar-ring: oklch(0.65 0.12 258);
+}
+
+/* v4 no longer defaults borders to the theme colour */
 @layer base {
-  * {
-    @apply border-border;
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
   }
   html {
     scrollbar-gutter: stable !important;
@@ -172,35 +176,35 @@
 /* The site theme. The variables are set on .site-theme from the saved theme
    (see components/Theme/SiteTheme.tsx), so none of this reaches the admin UI. */
 .site-theme {
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-body);
+  background-color: var(--site-color-background);
+  color: var(--site-color-text);
+  font-family: var(--site-font-body);
 }
 .site-theme *,
 .site-theme ::before,
 .site-theme ::after {
-  border-color: var(--color-border);
+  border-color: var(--site-color-border);
 }
 .site-theme :where(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-heading);
+  font-family: var(--site-font-heading);
 }
 .site-theme :where(code, kbd, samp, pre) {
-  font-family: var(--font-mono);
+  font-family: var(--site-font-mono);
 }
 /* Content typography follows the theme colours */
 .site-theme .prose {
-  --tw-prose-body: var(--color-text);
-  --tw-prose-headings: var(--color-text);
-  --tw-prose-lead: var(--color-muted);
-  --tw-prose-links: var(--color-accent);
-  --tw-prose-bold: var(--color-text);
-  --tw-prose-counters: var(--color-muted);
-  --tw-prose-bullets: var(--color-muted);
-  --tw-prose-hr: var(--color-border);
-  --tw-prose-quotes: var(--color-text);
-  --tw-prose-quote-borders: var(--color-border);
-  --tw-prose-captions: var(--color-muted);
-  --tw-prose-code: var(--color-text);
-  --tw-prose-th-borders: var(--color-border);
-  --tw-prose-td-borders: var(--color-border);
+  --tw-prose-body: var(--site-color-text);
+  --tw-prose-headings: var(--site-color-text);
+  --tw-prose-lead: var(--site-color-muted);
+  --tw-prose-links: var(--site-color-accent);
+  --tw-prose-bold: var(--site-color-text);
+  --tw-prose-counters: var(--site-color-muted);
+  --tw-prose-bullets: var(--site-color-muted);
+  --tw-prose-hr: var(--site-color-border);
+  --tw-prose-quotes: var(--site-color-text);
+  --tw-prose-quote-borders: var(--site-color-border);
+  --tw-prose-captions: var(--site-color-muted);
+  --tw-prose-code: var(--site-color-text);
+  --tw-prose-th-borders: var(--site-color-border);
+  --tw-prose-td-borders: var(--site-color-border);
 }

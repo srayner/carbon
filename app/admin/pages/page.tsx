@@ -28,7 +28,7 @@ export default function ContentPage() {
   const initialSearch = searchParams.get("search") ?? "";
   const [search, setSearch] = useState(initialSearch);
 
-  const limit = 5;
+  const limit = 10;
   const skip = (page - 1) * limit;
   const [totalCount, setTotalCount] = useState<number | null>(null);
 
@@ -82,9 +82,9 @@ export default function ContentPage() {
         <p>Loading...</p>
       ) : (
         <>
-          <table className="w-full border border-gray-200 text-left">
+          <table className="w-full border border-border text-left">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-muted">
                 <th className="p-2 border-b">Title</th>
                 <th className="p-2 border-b">Slug</th>
                 <th className="p-2 border-b">Status</th>
@@ -92,11 +92,11 @@ export default function ContentPage() {
             </thead>
             <tbody>
               {content.map((item) => (
-                <tr key={item.slug}>
+                <tr key={item.slug} className="h-14">
                   <td className="p-2 border-b">
                     <Link
                       href={`/admin/pages/${item.id}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       {item.title}
                     </Link>
@@ -104,7 +104,7 @@ export default function ContentPage() {
                   <td className="p-2 border-b">
                     <Link
                       href={`/${item.slug}?preview=1`}
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       {item.slug}
                     </Link>
@@ -113,18 +113,18 @@ export default function ContentPage() {
                   <td className="p-2 border-b">
                     {item.publishedAt ? (
                       new Date(item.publishedAt) <= new Date() ? (
-                        <span className="text-green-600 font-semibold">
+                        <span className="text-green-600 font-medium">
                           Published (
                           {new Date(item.publishedAt).toLocaleDateString()})
                         </span>
                       ) : (
-                        <span className="text-orange-600 font-semibold">
+                        <span className="text-orange-600 font-medium">
                           Scheduled (
                           {new Date(item.publishedAt).toLocaleDateString()})
                         </span>
                       )
                     ) : (
-                      <span className="text-gray-500 font-semibold">Draft</span>
+                      <span className="text-muted-foreground font-medium">Draft</span>
                     )}
                   </td>
                 </tr>

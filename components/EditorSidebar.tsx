@@ -12,7 +12,7 @@ export default function EditorSidebar({ side, children }: Props) {
   const isOpen = side === "left" ? leftOpen : rightOpen;
   if (!isOpen) return null;
 
-  const classes = side === "left" ? "w-72 border-r" : "w-72 border-l";
+  const classes = side === "left" ? "w-72 shrink-0 overflow-y-auto border-r bg-card" : "w-72 shrink-0 overflow-y-auto border-l bg-card";
 
   return (
     <aside className={classes}>

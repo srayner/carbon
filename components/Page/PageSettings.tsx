@@ -32,7 +32,7 @@ const STATUS_LABELS: Record<PageStatus, string> = {
 };
 
 const STATUS_STYLES: Record<PageStatus, string> = {
-  draft: "text-gray-600",
+  draft: "text-muted-foreground",
   scheduled: "text-amber-600",
   live: "text-green-600",
 };
@@ -95,14 +95,14 @@ export function PageSettings({
         <div>
           <input
             type="datetime-local"
-            className="w-full border rounded px-2 py-1 text-sm"
+            className="w-full border rounded-sm px-2 py-1 text-sm"
             value={draftDate}
             onChange={(e) => setDraftDate(e.target.value)}
           />
           <div className="flex gap-2 mt-2">
             <button
               type="button"
-              className="px-2 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50"
+              className="px-2 py-1 text-xs rounded-sm bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               disabled={!draftDate}
               onClick={() => {
                 onPublishedAtChange(new Date(draftDate));
@@ -113,7 +113,7 @@ export function PageSettings({
             </button>
             <button
               type="button"
-              className="px-2 py-1 text-xs rounded bg-gray-300 text-gray-700 hover:bg-gray-400"
+              className="px-2 py-1 text-xs rounded-sm bg-secondary text-foreground hover:bg-accent"
               onClick={() => setScheduling(false)}
             >
               Cancel
@@ -124,14 +124,14 @@ export function PageSettings({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            className="px-2 py-1 text-xs rounded bg-blue-500 text-white hover:bg-blue-600"
+            className="px-2 py-1 text-xs rounded-sm bg-primary text-primary-foreground hover:bg-primary/90"
             onClick={() => onPublishedAtChange(new Date())}
           >
             Publish now
           </button>
           <button
             type="button"
-            className="px-2 py-1 text-xs rounded bg-gray-300 text-gray-700 hover:bg-gray-400"
+            className="px-2 py-1 text-xs rounded-sm bg-secondary text-foreground hover:bg-accent"
             onClick={() => {
               setDraftDate(
                 publishedAt ? toLocalInputValue(publishedAt) : ""
@@ -143,7 +143,7 @@ export function PageSettings({
           </button>
           <button
             type="button"
-            className="px-2 py-1 text-xs rounded bg-gray-300 text-gray-700 hover:bg-gray-400 disabled:opacity-50"
+            className="px-2 py-1 text-xs rounded-sm bg-secondary text-foreground hover:bg-accent disabled:opacity-50"
             disabled={!publishedAt}
             onClick={() => onPublishedAtChange(null)}
           >
@@ -160,7 +160,7 @@ export function PageSettings({
         Title
       </label>
       <input
-        className="w-full border rounded px-2 py-1 text-sm mb-3"
+        className="w-full border rounded-sm px-2 py-1 text-sm mb-3"
         value={title}
         placeholder="Page title"
         onChange={(e) => onTitleChange(e.target.value)}
@@ -171,7 +171,7 @@ export function PageSettings({
       <div className="flex items-center gap-1">
         <span className="text-sm text-muted-foreground">/</span>
         <input
-          className="w-full border rounded px-2 py-1 text-sm"
+          className="w-full border rounded-sm px-2 py-1 text-sm"
           value={slug}
           placeholder="page-slug"
           onChange={(e) => onSlugChange(e.target.value)}
@@ -189,7 +189,7 @@ export function PageSettings({
         Summary
       </label>
       <textarea
-        className="w-full border rounded px-2 py-1 text-sm mb-3 h-20"
+        className="w-full border rounded-sm px-2 py-1 text-sm mb-3 h-20"
         value={summary}
         maxLength={300}
         placeholder="A one or two sentence description"
@@ -203,7 +203,7 @@ export function PageSettings({
     <section className="p-3 border rounded-md bg-background">
       <h2 className="text-sm font-semibold mb-2">Template</h2>
       <select
-        className="w-full border rounded px-2 py-1 text-sm bg-background"
+        className="w-full border rounded-sm px-2 py-1 text-sm bg-background"
         value={templateId}
         onChange={(e) => onTemplateIdChange(e.target.value)}
       >
@@ -233,7 +233,7 @@ export function PageSettings({
             <label
               key={category.id}
               className={`flex items-center gap-2 text-sm ${
-                category.isEffectivelyActive ? "" : "text-gray-400"
+                category.isEffectivelyActive ? "" : "text-muted-foreground"
               }`}
               style={{ paddingLeft: `${(category.depth - 1) * 1}rem` }}
             >

@@ -65,7 +65,7 @@ export function PagePropertiesTabs({
               onChange={onBlockChange}
             />
           ) : (
-            <div className="text-gray-500 text-sm italic">
+            <div className="text-muted-foreground text-sm italic">
               No block selected
             </div>
           )}

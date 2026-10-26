@@ -263,15 +263,15 @@ export const withDefaults = (stored: unknown): Theme => {
 /** The theme as CSS variables, for the wrapper around the public site. */
 export const themeVariables = (theme: Theme): Record<string, string> => {
   const vars: Record<string, string> = {};
-  for (const role of COLOR_ROLES) vars[`--color-${role}`] = theme.colors[role];
+  for (const role of COLOR_ROLES) vars[`--site-color-${role}`] = theme.colors[role];
   for (const role of FONT_ROLES) {
-    vars[`--font-${role}`] = FONTS[theme.fonts[role]].stack;
+    vars[`--site-font-${role}`] = FONTS[theme.fonts[role]].stack;
   }
-  for (const step of SPACING_STEPS) vars[`--space-${step}`] = theme.spacing[step];
-  for (const step of RADIUS_STEPS) vars[`--radius-${step}`] = theme.radius[step];
-  for (const step of BORDER_STEPS) vars[`--border-${step}`] = theme.borderWidth[step];
-  for (const step of SHADOW_STEPS) vars[`--shadow-${step}`] = theme.shadow[step];
-  vars["--content-width"] = theme.contentWidth;
+  for (const step of SPACING_STEPS) vars[`--site-space-${step}`] = theme.spacing[step];
+  for (const step of RADIUS_STEPS) vars[`--site-radius-${step}`] = theme.radius[step];
+  for (const step of BORDER_STEPS) vars[`--site-border-${step}`] = theme.borderWidth[step];
+  for (const step of SHADOW_STEPS) vars[`--site-shadow-${step}`] = theme.shadow[step];
+  vars["--site-content-width"] = theme.contentWidth;
   return vars;
 };
 

@@ -256,6 +256,35 @@ async function seedPages() {
     },
   });
 
+  // Enough extra pages, in every state, for the admin page list to paginate
+  const filler: [string, Date | null][] = [
+    ["Soldering Basics", YESTERDAY],
+    ["Choosing a Microcontroller", YESTERDAY],
+    ["Bench Power Supply", YESTERDAY],
+    ["Oscilloscope Tips", YESTERDAY],
+    ["Printed Circuit Boards", YESTERDAY],
+    ["Stepper Motors", YESTERDAY],
+    ["Sensor Roundup", YESTERDAY],
+    ["Workshop Safety", YESTERDAY],
+    ["Parts Storage Ideas", null],
+    ["Firmware Notes", null],
+    ["Enclosure Design", null],
+    ["Spring Newsletter", NEXT_YEAR],
+    ["Open Day Announcement", NEXT_YEAR],
+    ["Product Launch", NEXT_YEAR],
+  ];
+  for (const [title, publishedAt] of filler) {
+    await prisma.page.create({
+      data: {
+        title,
+        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+        templateId: DEFAULT_TEMPLATE_ID,
+        publishedAt,
+        blocks: { create: [block(0, "Paragraph", { content: `${title}.` })] },
+      },
+    });
+  }
+
   // One of every block type, with consecutive Cards and both query displays
   await prisma.page.create({
     data: {

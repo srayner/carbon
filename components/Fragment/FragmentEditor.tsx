@@ -89,7 +89,7 @@ const FragmentEditor: React.FC<FragmentEditorProps> = ({
               Name
             </label>
             <input
-              className="w-full border rounded px-2 py-1 text-sm"
+              className="w-full border rounded-sm px-2 py-1 text-sm"
               value={fragment.name}
               maxLength={100}
               placeholder="Name"

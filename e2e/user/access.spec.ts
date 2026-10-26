@@ -3,11 +3,15 @@ import { test, expect } from "@playwright/test";
 // Logged in as the seeded User account (not an admin)
 
 test.describe("a logged in user", () => {
-  test("is sent away from the admin area", async ({ page }) => {
-    await page.goto("/admin");
-    await expect(page).toHaveURL("/");
-    await page.goto("/admin/theme");
-    await expect(page).toHaveURL("/");
+  test("gets a plain 404 for the admin area", async ({ page }) => {
+    for (const path of ["/admin", "/admin/theme", "/admin/no/such/page"]) {
+      const response = await page.goto(path);
+      expect(response?.status(), path).toBe(404);
+      await expect(page, path).toHaveURL(path);
+      await expect(
+        page.getByRole("heading", { name: "Page not found" })
+      ).toBeVisible();
+    }
   });
 
   test("is sent away from the login page", async ({ page }) => {

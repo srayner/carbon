@@ -15,12 +15,12 @@ export default defineConfig({
   workers: 1,
   reporter: [["html", { outputFolder: "playwright-report", open: "never" }], ["list"]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3003",
     trace: "on-first-retry",
   },
   webServer: {
     command: "npm run dev",
-    url: "http://localhost:3000",
+    url: "http://localhost:3003",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

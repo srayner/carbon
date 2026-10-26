@@ -15,8 +15,8 @@ const accounts = [
     role: "user",
     email: "user@example.com",
     password: process.env.USER_PASSWORD_USER,
-    // The admin area sends non-admins on to the home page
-    landing: /localhost:3000\/$/,
+    // Non-admins land on the home page
+    landing: /localhost:3003\/$/,
   },
 ] as const;
 

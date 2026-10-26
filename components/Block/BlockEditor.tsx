@@ -106,7 +106,9 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
         />
       </EditorSidebar>
 
-      <div className="flex-1">
+      {/* The canvas shows the page as the site will: the site theme, in both
+          light and dark mode of the admin UI */}
+      <div className="site-theme light min-w-0 flex-1 overflow-y-auto">
         <div className="p-5 prose max-w-none">
           {blocks.map((block) => {
             const isSelected = block.id === selectedBlockId;
@@ -129,7 +131,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
                   />
                 </Suspense>
                 {isSelected && (
-                  <div className="absolute -inset-1 pointer-events-none border-2 border-blue-500"></div>
+                  <div className="absolute -inset-1 pointer-events-none border-2 border-ring"></div>
                 )}
               </div>
             );

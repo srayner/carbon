@@ -29,8 +29,8 @@ test.describe("public pages", () => {
   test("the page is wrapped in the site theme", async ({ page }) => {
     await page.goto("/hello-world");
     const style = await page.locator(".site-theme").first().getAttribute("style");
-    expect(style).toContain("--color-accent");
-    expect(style).toContain("--space-m");
+    expect(style).toContain("--site-color-accent");
+    expect(style).toContain("--site-space-m");
   });
 
   test("an unknown page is a 404", async ({ page }) => {
@@ -136,5 +136,16 @@ test.describe("every block type", () => {
     await page.locator("#showcase-list").getByRole("link", { name: "Desk Lamp" }).click();
     await expect(page).toHaveURL(/\/desk-lamp$/);
     await expect(page.getByRole("heading", { name: "Desk Lamp" })).toBeVisible();
+  });
+});
+
+test.describe("the 404 page", () => {
+  test("is themed, and links back home", async ({ page }) => {
+    const response = await page.goto("/no-such-page");
+    expect(response?.status()).toBe(404);
+    await expect(page.locator(".site-theme")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    await page.getByRole("link", { name: "Back to home" }).click();
+    await expect(page).toHaveURL(/\/$/);
   });
 });

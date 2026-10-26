@@ -119,9 +119,9 @@ export default function CategoriesPage() {
       ) : rows.length === 0 ? (
         <p className="text-muted-foreground">No categories yet.</p>
       ) : (
-        <table className="w-full border border-gray-200 text-left">
+        <table className="w-full border border-border text-left">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-muted">
               <th className="p-2 border-b">Name</th>
               <th className="p-2 border-b">Pages</th>
               <th className="p-2 border-b">Status</th>
@@ -130,12 +130,12 @@ export default function CategoriesPage() {
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.id}>
+              <tr key={row.id} className="h-14">
                 <td
                   className="p-2 border-b"
                   style={{ paddingLeft: `${row.depth * 1.25}rem` }}
                 >
-                  <span className={row.isEffectivelyActive ? "" : "text-gray-400"}>
+                  <span className={row.isEffectivelyActive ? "" : "text-muted-foreground"}>
                     {row.name}
                   </span>
                   {row.description && (
@@ -149,7 +149,7 @@ export default function CategoriesPage() {
                   <button
                     type="button"
                     className={`font-semibold hover:underline ${
-                      row.isActive ? "text-green-600" : "text-gray-500"
+                      row.isActive ? "text-green-600" : "text-muted-foreground"
                     }`}
                     title={row.isActive ? "Deactivate" : "Activate"}
                     onClick={() => handleToggleActive(row)}

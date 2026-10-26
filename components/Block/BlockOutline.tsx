@@ -64,7 +64,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
   };
 
   return (
-    <div className="p-3 space-y-2 bg-gray-50">
+    <div className="p-3 space-y-2 bg-muted">
       <h2 className="font-bold text-lg">Blocks</h2>
 
       <div className="space-y-1">
@@ -73,10 +73,10 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
             <div
               key={block.id}
               onClick={() => handleSelect(block)}
-              className={`cursor-pointer p-2 border rounded flex items-center justify-between ${
+              className={`cursor-pointer p-2 border rounded-sm flex items-center justify-between ${
                 selectedBlockId === block.id
-                  ? "bg-blue-200 border-blue-400"
-                  : "bg-white"
+                  ? "bg-accent border-ring"
+                  : "bg-card"
               }`}
             >
               <span>{block.type}</span>
@@ -88,7 +88,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
                   type="button"
                   aria-label={`Move ${block.type} up`}
                   disabled={index === 0}
-                  className="px-1 rounded hover:bg-gray-200 disabled:opacity-30"
+                  className="px-1 rounded-sm hover:bg-accent disabled:opacity-30"
                   onClick={() => onMove?.(block.id, -1)}
                 >
                   ↑
@@ -97,7 +97,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
                   type="button"
                   aria-label={`Move ${block.type} down`}
                   disabled={index === blocks.length - 1}
-                  className="px-1 rounded hover:bg-gray-200 disabled:opacity-30"
+                  className="px-1 rounded-sm hover:bg-accent disabled:opacity-30"
                   onClick={() => onMove?.(block.id, 1)}
                 >
                   ↓
@@ -105,7 +105,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
                 <button
                   type="button"
                   aria-label={`Delete ${block.type}`}
-                  className="px-1 rounded text-red-600 hover:bg-red-100"
+                  className="px-1 rounded-sm text-destructive hover:bg-destructive/10"
                   onClick={() => onDelete?.(block.id)}
                 >
                   ✕
@@ -131,13 +131,13 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
           </select>
           <button
             onClick={handleAdd}
-            className="bg-green-500 text-white px-3 py-1 rounded"
+            className="bg-emerald-600 text-white px-3 py-1 rounded-sm"
           >
             Add
           </button>
           <button
             onClick={() => setAdding(false)}
-            className="px-3 py-1 rounded border"
+            className="px-3 py-1 rounded-sm border"
           >
             Cancel
           </button>
@@ -145,7 +145,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
       ) : (
         <button
           onClick={() => setAdding(true)}
-          className="mt-2 w-full text-center bg-blue-500 text-white rounded p-2"
+          className="mt-2 w-full text-center bg-primary text-primary-foreground rounded-sm p-2"
         >
           + Add Block
         </button>

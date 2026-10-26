@@ -3,14 +3,14 @@
 import {
   LogOut,
   Moon,
-  PanelLeft,
+  ListTree,
   PanelRight,
   SlidersHorizontal,
   Sun,
   User,
 } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
-import { SidebarTrigger } from "./ui/sidebar";
+import { SidebarTrigger, useSidebar } from "./ui/sidebar";
+import { Separator } from "./ui/separator";
 import { useSidebarManager } from "@/context/sidebar-manager";
 import { usePageActions } from "@/context/page-actions";
 import { handleSignOut } from "@/actions/logout";
@@ -30,24 +31,55 @@ import { handleSignOut } from "@/actions/logout";
 const NavBar = () => {
   const { setTheme } = useTheme();
   const { showEditorSidebars, showSaveButton, onSave } = usePageActions();
-  const { toggleLeft, toggleRight } = useSidebarManager();
+  const { leftOpen, rightOpen, toggleLeft, toggleRight } = useSidebarManager();
+  const { open: navOpen, setOpen: setNavOpen } = useSidebar();
+
+  // While editing, the editor panels need the room: fold the main navigation
+  // down to its icon rail, and put it back when leaving the editor
+  // setOpen changes identity whenever the sidebar toggles, so it is read
+  // through a ref: the effect must only run on entering and leaving the editor
+  const navRef = useRef({ navOpen, setNavOpen });
+  navRef.current = { navOpen, setNavOpen };
+  useEffect(() => {
+    if (!showEditorSidebars) return;
+    const wasOpen = navRef.current.navOpen;
+    navRef.current.setNavOpen(false);
+    return () => navRef.current.setNavOpen(wasOpen);
+  }, [showEditorSidebars]);
 
   return (
-    <nav className="px-4 py-3 flex items-center justify-between border-b">
+    <nav className="flex h-16 shrink-0 items-center justify-between border-b bg-background px-4">
       {/* LEFT */}
-      <div>
-        <SidebarTrigger />
+      <div className="flex items-center gap-1">
+        <SidebarTrigger aria-label="Toggle navigation" title="Toggle navigation" />
         {showEditorSidebars && (
-          <Button onClick={toggleLeft} variant="ghost" size="icon">
-            <PanelLeft />
-          </Button>
+          <>
+            <Separator orientation="vertical" className="mx-1 h-5" />
+            <Button
+              onClick={toggleLeft}
+              variant={leftOpen ? "secondary" : "ghost"}
+              size="icon"
+              aria-label="Toggle block outline"
+              aria-pressed={leftOpen}
+              title="Block outline"
+            >
+              <ListTree />
+            </Button>
+          </>
         )}
       </div>
       {/* RIGHT */}
       <div className="flex items-center gap-4">
         {showSaveButton && <Button onClick={onSave}>Save</Button>}
         {showEditorSidebars && (
-          <Button onClick={toggleRight} variant="ghost" size="icon">
+          <Button
+            onClick={toggleRight}
+            variant={rightOpen ? "secondary" : "ghost"}
+            size="icon"
+            aria-label="Toggle properties"
+            aria-pressed={rightOpen}
+            title="Properties"
+          >
             <PanelRight />
           </Button>
         )}
@@ -75,10 +107,16 @@ const NavBar = () => {
         {/* USER MENU */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar>
-              <AvatarImage src="https://www.gravatar.com/avatar/c0d2478e84deed28fa290f797e05720d?s=32&d=identicon" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            <button
+              type="button"
+              aria-label="Account menu"
+              className="rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Avatar>
+                <AvatarImage src="https://www.gravatar.com/avatar/c0d2478e84deed28fa290f797e05720d?s=32&d=identicon" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent sideOffset={10}>
             <DropdownMenuLabel>My Account</DropdownMenuLabel>

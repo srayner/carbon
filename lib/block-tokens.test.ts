@@ -17,20 +17,20 @@ describe("getTokenStyle", () => {
         fontRole: "mono",
       })
     ).toEqual({
-      padding: "var(--space-l)",
-      marginTop: "var(--space-s)",
-      marginBottom: "var(--space-xl)",
-      borderRadius: "var(--radius-m)",
-      boxShadow: "var(--shadow-s)",
-      backgroundColor: "var(--color-surface)",
-      color: "var(--color-accent)",
-      fontFamily: "var(--font-mono)",
+      padding: "var(--site-space-l)",
+      marginTop: "var(--site-space-s)",
+      marginBottom: "var(--site-space-xl)",
+      borderRadius: "var(--site-radius-m)",
+      boxShadow: "var(--site-shadow-s)",
+      backgroundColor: "var(--site-color-surface)",
+      color: "var(--site-color-accent)",
+      fontFamily: "var(--site-font-mono)",
     });
   });
 
   it("gives a border a width and a style", () => {
     expect(getTokenStyle({ border: "thin" })).toEqual({
-      borderWidth: "var(--border-thin)",
+      borderWidth: "var(--site-border-thin)",
       borderStyle: "solid",
     });
     expect(getTokenStyle({ border: "none" }).borderStyle).toBe("none");

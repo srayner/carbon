@@ -25,8 +25,8 @@ confirmation at the point it happens. A confirmation for one step does not cover
    **every test must pass**. Zero failures, zero skipped specs. Do not merge with a flaky or
    "known failing" test: fix it or hand it back.
    - The seed resets the database first; that is expected. Just run it, no confirmation needed.
-   - Playwright starts `npm run dev` itself (port 3000) unless something is already
-     listening there; make sure a stale server on 3000 isn't masking the branch's code.
+   - Playwright starts `npm run dev` itself (port 3003) unless something is already
+     listening there; make sure a stale server on 3003 isn't masking the branch's code.
    - The `setup` project (auth) runs first and the specs under `e2e/` depend on its state, so a
      single failure can cascade. Fix the first failure and re-run the whole suite, not one spec.
 6. `docker build -t carbon:premerge .` — the real production path (multi-stage Dockerfile).
