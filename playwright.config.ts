@@ -18,11 +18,14 @@ export default defineConfig({
     baseURL: "http://localhost:3003",
     trace: "on-first-retry",
   },
+  // With port 3003 free: seed, build and start a production server, run the
+  // tests, then stop it. With a server already running there, use it as it is
+  // (no seed, no build). See "Testing" in README.md.
   webServer: {
-    command: "npm run dev",
+    command: "npm run seed && npm run build && npm start",
     url: "http://localhost:3003",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    reuseExistingServer: true,
+    timeout: 300_000, // the production build takes a while
   },
   projects: [
     { name: "setup", testMatch: /auth\.setup\.ts/ },

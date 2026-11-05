@@ -10,14 +10,16 @@ Run these in order on the committed code. All must pass.
 1. `npx tsc --noEmit`
 2. `npm run lint`
 3. `npm run test:unit`
-4. `npm run build`
-5. `npm run test:e2e:seeded`: seeds the database, then runs the Playwright suite. The seed
-   resets the database; that is expected. Every test must pass, with none failed or skipped.
-   - Playwright starts `npm run dev` on port 3003 unless something is already listening
-     there. If something is, stop it first without asking, so the run uses this branch's code.
+4. `npm run test:e2e`. Port 3003 belongs to Carbon and must be free first, so that
+   Playwright seeds, builds and starts a fresh production server; this also covers
+   `npm run build`. If anything is listening on 3003, stop it and confirm the
+   port is free. Don't ask first. The seed resets the database; that is expected.
+   Every test must pass, with none failed or skipped.
    - The `setup` project (auth) runs first and the specs depend on it, so one failure can
      cause others. Report the first failure.
-6. `docker build -t carbon:premerge .`, the real production path. If Docker isn't available, say so: that check was skipped.
+5. `docker build -t carbon:premerge .`, the real production path. When it passes, remove
+   the image with `docker rmi carbon:premerge` so nothing is left behind. If Docker isn't
+   available, say so: that check was skipped.
 
 ## For the deploy
 
