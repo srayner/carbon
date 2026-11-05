@@ -355,6 +355,36 @@ async function seedPages() {
             paddingSize: "l",
             padding: "5px",
           }),
+          // Specifications: a blank row (not shown), a repeated key, a key
+          // with no value, text that looks like HTML, and a long value
+          block(12, "KeyValueTable", {
+            cssId: "showcase-specs",
+            background: "surface",
+            rows: JSON.stringify([
+              { key: "Platter diameter", value: "185 mm" },
+              { key: "Motor", value: "28BYJ-48 geared stepper" },
+              { key: "", value: "" },
+              { key: "Controller", value: "ESP32-C3 Super Mini" },
+              { key: "Motor", value: "Spare: NEMA 17" },
+              {
+                key: "Design tools",
+                value: 'Fusion 360 <mechanical> & EasyEDA "PCB", Arduino for the firmware',
+              },
+              { key: "Wi-Fi", value: "" },
+            ]),
+          }),
+          // Nothing to show: only blank rows, and a value that is not JSON
+          block(13, "KeyValueTable", {
+            cssId: "showcase-specs-blank",
+            rows: JSON.stringify([
+              { key: "", value: "" },
+              { key: "  ", value: " " },
+            ]),
+          }),
+          block(14, "KeyValueTable", {
+            cssId: "showcase-specs-broken",
+            rows: "Motor: 28BYJ-48",
+          }),
         ],
       },
     },

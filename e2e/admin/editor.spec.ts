@@ -1,4 +1,6 @@
-import { test, expect, Page } from "@playwright/test";
+import { test, expect, Locator, Page } from "@playwright/test";
+import { parseRows } from "../../lib/key-value-rows";
+import { KeyValueTableBlockConfig } from "../../config/blocks/keyValueTable";
 
 const openShowcase = async (page: Page) => {
   const response = await page.request.get("/api/pages?search=Block%20Showcase");
@@ -130,5 +132,94 @@ test.describe("the page editor", () => {
     await edit("Showcase heading");
     await page.goto("/block-showcase");
     await expect(page.locator("h2#showcase-heading")).toHaveText("Showcase heading");
+  });
+});
+
+// The key/value table's rows are edited on the canvas, not in the panel
+test.describe("the key/value table editor", () => {
+  const save = async (page: Page) => {
+    const saved = page.waitForResponse(
+      (r) => r.url().includes("/api/pages/") && r.request().method() === "PUT"
+    );
+    await page.getByRole("button", { name: "Save" }).click();
+    expect((await saved).ok()).toBe(true);
+  };
+  // The table added by this test is the last one on the page
+  const table = (page: Page) =>
+    page.getByRole("group", { name: "Key/value rows" }).last();
+  const keys = (page: Page) => table(page).getByRole("textbox", { name: /^Key, row/ });
+  const values = (page: Page) =>
+    table(page).getByRole("textbox", { name: /^Value, row/ });
+  const seededSpecs = (page: Page) => page.locator("dl#showcase-specs dt");
+  // Every text box's value, in order, retried until it matches
+  const expectValues = async (boxes: Locator, expected: string[]) =>
+    expect
+      .poll(() => boxes.evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value)))
+      .toEqual(expected);
+
+  test("rows added, edited, moved and deleted are saved and published", async ({
+    page,
+  }) => {
+    // What must not change: the seeded table on the same page
+    await page.goto("/block-showcase");
+    const seededBefore = await seededSpecs(page).allTextContents();
+    expect(seededBefore.length).toBeGreaterThan(1);
+
+    // A new table starts with the config's default rows
+    await openShowcase(page);
+    await page.getByRole("button", { name: "+ Add Block" }).click();
+    await page
+      .locator("select", { has: page.locator('option[value="KeyValueTable"]') })
+      .selectOption("KeyValueTable");
+    await page.getByRole("button", { name: "Add", exact: true }).click();
+    const defaults = parseRows(
+      KeyValueTableBlockConfig.properties.find((p) => p.name === "rows")!.default
+    );
+    await expectValues(keys(page), defaults.map((r) => r.key));
+    await expectValues(values(page), defaults.map((r) => r.value));
+
+    // The panel has the table's settings but not its rows
+    await keys(page).first().click();
+    await expect(page.getByText("KeyValueTable Properties")).toBeVisible();
+    await page.locator("summary", { hasText: /^Appearance$/ }).click();
+    await expect(page.getByText("Key Column Width")).toBeVisible();
+    await expect(page.locator("label", { hasText: /^Rows$/ })).toHaveCount(0);
+
+    // Edit the defaults, add two rows (one left blank), move one, delete one
+    await keys(page).nth(0).fill("Battery");
+    await values(page).nth(0).fill("2× 18650");
+    await keys(page).nth(1).fill("Charging");
+    await values(page).nth(1).fill("USB-C");
+    await table(page).getByRole("button", { name: "Add row" }).click();
+    await keys(page).nth(2).fill("Weight");
+    await values(page).nth(2).fill("450 g");
+    await table(page).getByRole("button", { name: "Move row 3 up" }).click();
+    await table(page).getByRole("button", { name: "Delete row 1" }).click();
+    await table(page).getByRole("button", { name: "Add row" }).click();
+    await expectValues(keys(page), ["Weight", "Charging", ""]);
+    await expectValues(values(page), ["450 g", "USB-C", ""]);
+    await expect(table(page).getByRole("button", { name: "Move row 1 up" })).toBeDisabled();
+    await expect(table(page).getByRole("button", { name: "Move row 3 down" })).toBeDisabled();
+    await save(page);
+
+    // Saved: the editor shows the same rows after a reload, blank row included
+    await openShowcase(page);
+    await expectValues(keys(page), ["Weight", "Charging", ""]);
+    await expectValues(values(page), ["450 g", "USB-C", ""]);
+
+    // Published: the new rows in order, without the blank one
+    await page.goto("/block-showcase");
+    const added = page.locator("dl", { hasText: "Weight" });
+    await expect(added.locator("dt")).toHaveText(["Weight", "Charging"]);
+    await expect(added.locator("dd")).toHaveText(["450 g", "USB-C"]);
+    await expect(seededSpecs(page)).toHaveText(seededBefore);
+
+    // Remove the table again so the run can be repeated
+    await openShowcase(page);
+    await page.getByRole("button", { name: "Delete KeyValueTable" }).last().click();
+    await save(page);
+    await page.goto("/block-showcase");
+    await expect(page.locator("dl", { hasText: "Weight" })).toHaveCount(0);
+    await expect(seededSpecs(page)).toHaveText(seededBefore);
   });
 });
