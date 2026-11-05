@@ -43,3 +43,9 @@ export const parseRows = (json: string | undefined | null): KeyValueRow[] => {
 /** Write the rows as the string saved in the block. Extra fields are dropped. */
 export const serialiseRows = (rows: readonly KeyValueRow[]): string =>
   JSON.stringify(rows.map(({ key, value }) => ({ key, value })));
+
+const isBlank = (text: string) => text.trim() === "";
+
+/** The rows worth showing on the public page: a row with neither a key nor a value is skipped. */
+export const visibleRows = (rows: readonly KeyValueRow[]): KeyValueRow[] =>
+  rows.filter((row) => !(isBlank(row.key) && isBlank(row.value)));

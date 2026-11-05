@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseRows, serialiseRows } from "@/lib/key-value-rows";
+import { parseRows, serialiseRows, visibleRows } from "@/lib/key-value-rows";
 import { KeyValueTableBlockConfig } from "@/config/blocks/keyValueTable";
 
 // A broken saved value must never throw; it gives an empty table
@@ -85,5 +85,34 @@ describe("the block's default rows", () => {
     const parsed = parseRows(rows);
     expect(parsed.length).toBeGreaterThan(0);
     expect(parsed.every((r) => r.key && r.value)).toBe(true);
+  });
+});
+
+// The public page skips rows with nothing in them, and keeps everything else
+describe("visibleRows", () => {
+  it("skips rows whose key and value are both empty or only spaces", () => {
+    const rows = [
+      { key: "Motor", value: "28BYJ-48" },
+      { key: "", value: "" },
+      { key: "   ", value: "\n\t" },
+      { key: "Platter diameter", value: "185 mm" },
+    ];
+    expect(visibleRows(rows)).toEqual([
+      { key: "Motor", value: "28BYJ-48" },
+      { key: "Platter diameter", value: "185 mm" },
+    ]);
+  });
+
+  it("keeps a row with only a key or only a value, unchanged", () => {
+    const rows = [
+      { key: "Motor", value: "" },
+      { key: "", value: "185 mm" },
+      { key: "  Padded  ", value: "  kept as typed  " },
+    ];
+    expect(visibleRows(rows)).toEqual(rows);
+  });
+
+  it("gives no rows when every row is blank", () => {
+    expect(visibleRows([{ key: "", value: " " }])).toEqual([]);
   });
 });
