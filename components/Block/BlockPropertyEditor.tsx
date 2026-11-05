@@ -2,41 +2,13 @@ import React from "react";
 import { BlockConfig, BlockProperty } from "@/types/blocks";
 import UploadField from "@/components/Block/UploadField";
 import CategoryField from "@/components/Block/CategoryField";
+import { DEFAULT_GROUP, groupProperties } from "@/lib/property-groups";
 
 interface PropertyEditorProps {
   blockConfig: BlockConfig;
   blockData: Record<string, string>;
   onChange: (newData: Record<string, string>) => void;
 }
-
-// The order groups are shown in; a group not listed comes just before Advanced
-const GROUP_ORDER = [
-  "Content",
-  "Appearance",
-  "Layout",
-  "Spacing",
-  "Box",
-  "Colour and font",
-  "Advanced",
-];
-const groupRank = (group: string) => {
-  const rank = GROUP_ORDER.indexOf(group);
-  return rank === -1 ? GROUP_ORDER.length - 1.5 : rank;
-};
-
-// A property with no group goes with the content
-const DEFAULT_GROUP = "Content";
-
-const groupProperties = (
-  properties: readonly BlockProperty[]
-): [string, BlockProperty[]][] => {
-  const groups = new Map<string, BlockProperty[]>();
-  for (const prop of properties) {
-    const group = prop.group ?? DEFAULT_GROUP;
-    groups.set(group, [...(groups.get(group) ?? []), prop]);
-  }
-  return [...groups.entries()].sort(([a], [b]) => groupRank(a) - groupRank(b));
-};
 
 const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
   blockConfig,

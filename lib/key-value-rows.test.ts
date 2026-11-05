@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parseRows, serialiseRows, visibleRows } from "@/lib/key-value-rows";
+import {
+  moveItem,
+  parseRows,
+  serialiseRows,
+  visibleRows,
+} from "@/lib/key-value-rows";
 import { KeyValueTableBlockConfig } from "@/config/blocks/keyValueTable";
 
 // A broken saved value must never throw; it gives an empty table
@@ -114,5 +119,38 @@ describe("visibleRows", () => {
 
   it("gives no rows when every row is blank", () => {
     expect(visibleRows([{ key: "", value: " " }])).toEqual([]);
+  });
+});
+
+// The editor's move up / move down buttons
+describe("moveItem", () => {
+  const list = ["Motor", "Controller", "Drive", "Control"];
+
+  it.each([
+    ["the first item down", 0, 1, ["Controller", "Motor", "Drive", "Control"]],
+    ["a middle item up", 2, -1, ["Motor", "Drive", "Controller", "Control"]],
+    ["a middle item down", 1, 1, ["Motor", "Drive", "Controller", "Control"]],
+    ["the last item up", 3, -1, ["Motor", "Controller", "Control", "Drive"]],
+  ] as const)("moves %s", (_, index, direction, expected) => {
+    expect(moveItem(list, index, direction)).toEqual(expected);
+  });
+
+  it.each([
+    ["the first item up", 0, -1],
+    ["the last item down", 3, 1],
+    ["an index before the list", -1, 1],
+    ["an index past the list", 4, -1],
+  ] as const)("leaves the order alone when moving %s", (_, index, direction) => {
+    expect(moveItem(list, index, direction)).toEqual(list);
+  });
+
+  it("does not change the list it was given", () => {
+    const original = [...list];
+    moveItem(list, 0, 1);
+    expect(list).toEqual(original);
+  });
+
+  it("keeps duplicate items apart", () => {
+    expect(moveItem(["a", "a", "b"], 1, 1)).toEqual(["a", "b", "a"]);
   });
 });

@@ -11,6 +11,8 @@ export type BlockProperty = {
   default?: string;
   optional?: boolean | undefined;
   group?: string;
+  // Edited on the canvas only, so the properties panel leaves it out
+  hidden?: boolean;
 };
 
 export type BlockConfig<TName extends string = string> = {

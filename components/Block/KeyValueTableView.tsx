@@ -2,7 +2,7 @@ import { ViewProps } from "@/types/blocks";
 import { parseRows, visibleRows } from "@/lib/key-value-rows";
 
 // Key column width on wide screens. Written out in full so Tailwind finds the classes.
-const COLUMNS = {
+export const KEY_COLUMNS = {
   "1/4": "sm:grid-cols-[1fr_3fr]",
   "1/3": "sm:grid-cols-[1fr_2fr]",
   "1/2": "sm:grid-cols-[1fr_1fr]",
@@ -15,7 +15,7 @@ const KeyValueTableView = ({ block, shared }: ViewProps<"KeyValueTable">) => {
   const shown = visibleRows(parseRows(rows));
   if (shown.length === 0) return null;
 
-  const columns = COLUMNS[keyWidth] ?? COLUMNS["1/3"];
+  const columns = KEY_COLUMNS[keyWidth] ?? KEY_COLUMNS["1/3"];
 
   return (
     <dl {...shared} className={`not-prose my-6 ${shared.className ?? ""}`}>

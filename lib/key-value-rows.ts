@@ -49,3 +49,15 @@ const isBlank = (text: string) => text.trim() === "";
 /** The rows worth showing on the public page: a row with neither a key nor a value is skipped. */
 export const visibleRows = (rows: readonly KeyValueRow[]): KeyValueRow[] =>
   rows.filter((row) => !(isBlank(row.key) && isBlank(row.value)));
+
+/**
+ * A copy of the list with the item at `index` moved one place up (-1) or down
+ * (+1). Moving past either end gives an unchanged copy.
+ */
+export const moveItem = <T>(list: readonly T[], index: number, direction: -1 | 1): T[] => {
+  const target = index + direction;
+  const copy = [...list];
+  if (index < 0 || index >= list.length || target < 0 || target >= list.length) return copy;
+  [copy[index], copy[target]] = [copy[target], copy[index]];
+  return copy;
+};

@@ -17,6 +17,7 @@ export const KeyValueTableBlockConfig = {
         { key: "Another key", value: "Another value" },
       ]),
       group: "Content",
+      hidden: true, // edited on the canvas
     },
 
     // Appearance group
