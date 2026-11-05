@@ -149,3 +149,80 @@ test.describe("the 404 page", () => {
     await expect(page).toHaveURL(/\/$/);
   });
 });
+
+// KeyValueTable: bold keys beside values, a row per entry, stacking on phones
+test.describe("the key/value table", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/block-showcase");
+  });
+
+  const specs = (page: import("@playwright/test").Page) =>
+    page.locator("dl#showcase-specs");
+
+  test("shows the rows in order, skipping the blank one", async ({ page }) => {
+    await expect(specs(page).locator("dt")).toHaveText([
+      "Platter diameter",
+      "Motor",
+      "Controller",
+      "Motor",
+      "Design tools",
+      "Wi-Fi",
+    ]);
+    await expect(specs(page).locator("dd")).toHaveText([
+      "185 mm",
+      "28BYJ-48 geared stepper",
+      "ESP32-C3 Super Mini",
+      "Spare: NEMA 17",
+      'Fusion 360 <mechanical> & EasyEDA "PCB", Arduino for the firmware',
+      "",
+    ]);
+  });
+
+  test("shows text that looks like HTML as text", async ({ page }) => {
+    await expect(specs(page).locator("mechanical")).toHaveCount(0);
+    await expect(specs(page).getByText("<mechanical>")).toBeVisible();
+  });
+
+  test("makes the keys bold and leaves the values normal", async ({ page }) => {
+    await expect(specs(page).locator("dt").first()).toHaveCSS("font-weight", "600");
+    await expect(specs(page).locator("dd").first()).toHaveCSS("font-weight", "400");
+  });
+
+  test("puts each key beside its value, the key column a third wide", async ({
+    page,
+  }) => {
+    const [key, value] = await Promise.all([
+      specs(page).locator("dt").first().boundingBox(),
+      specs(page).locator("dd").first().boundingBox(),
+    ]);
+    expect(value!.x).toBeGreaterThan(key!.x + key!.width);
+    expect(Math.abs(value!.y - key!.y)).toBeLessThan(2);
+    // Key and value columns split 1fr : 2fr
+    const share = key!.width / (key!.width + value!.width);
+    expect(share).toBeGreaterThan(0.3);
+    expect(share).toBeLessThan(0.37);
+  });
+
+  test("stacks each key above its value on a phone", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const [key, value] = await Promise.all([
+      specs(page).locator("dt").first().boundingBox(),
+      specs(page).locator("dd").first().boundingBox(),
+    ]);
+    expect(value!.y).toBeGreaterThanOrEqual(key!.y + key!.height);
+    expect(Math.abs(value!.x - key!.x)).toBeLessThan(2);
+  });
+
+  test("takes the theme tokens", async ({ page }) => {
+    await expect(specs(page)).toHaveCSS("background-color", rgb(COLORS.surface));
+  });
+
+  test("shows nothing for a table with only blank rows or a broken value", async ({
+    page,
+  }) => {
+    // The rest of the page still renders
+    await expect(specs(page)).toBeVisible();
+    await expect(page.locator("#showcase-specs-blank")).toHaveCount(0);
+    await expect(page.locator("#showcase-specs-broken")).toHaveCount(0);
+  });
+});

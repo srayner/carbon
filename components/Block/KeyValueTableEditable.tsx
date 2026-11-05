@@ -53,7 +53,7 @@ const KeyValueTableEditable = ({
     save([...rows, { key: "", value: "" }], [...ids.current, newId()]);
 
   return (
-    <div className="not-prose my-6">
+    <div role="group" aria-label="Key/value rows" className="not-prose my-6">
       {rows.length === 0 && (
         <p className="px-3 py-3 text-site-muted">No rows yet.</p>
       )}
