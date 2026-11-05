@@ -20,16 +20,24 @@ unless `DATABASE_URL` points at localhost.
 ### Testing
 
 ```bash
-npm run test:unit        # Vitest: the pure logic in lib/
-npm run test:e2e:seeded  # reset the database with the seed, then run Playwright
-npm run test:e2e         # Playwright against the database as it is
+npm run test:unit   # Vitest: the pure logic in lib/
+npm run test:e2e    # Playwright; see below for which server it uses
 ```
+
+Pass Playwright options after `--`, e.g. `npm run test:e2e -- e2e/admin/editor.spec.ts`.
+Which server the tests run against depends on whether port 3003 is free:
+
+- **Nothing on 3003** (the default): Playwright seeds the database, builds,
+  starts a production server, runs the tests and stops the server.
+- **A server already on 3003**: Playwright uses it as it is. It does not seed,
+  build or stop it. You are responsible for it being the right server with the
+  right code, and for running `npm run seed` first. Use this for quick repeated
+  runs of one spec against `npm run dev` while working on a feature.
 
 `npm run seed` **wipes the database** and rebuilds a known state: the two
 accounts, the preset templates, categories, and pages used by the tests
 (`block-showcase` has one of every block type; `secret-draft` and
-`coming-soon` are unpublished). Playwright reuses the dev server on port 3003
-or starts one. Run `npx playwright install chromium` once for the browser.
+`coming-soon` are unpublished). Run `npx playwright install chromium` once for the browser.
 
 Specs are grouped by who is using the site, and each group runs as a
 Playwright project:

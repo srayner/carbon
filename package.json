@@ -1,18 +1,17 @@
 {
   "name": "carbon",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3003",
     "lint": "next lint && npm run check:blocks",
     "check:blocks": "tsx scripts/check-blocks.ts",
     "seed": "tsx prisma/seed.ts",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "test:e2e": "playwright test",
-    "test:e2e:seeded": "npm run seed && npm run test:e2e"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
