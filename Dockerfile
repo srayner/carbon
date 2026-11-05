@@ -54,6 +54,8 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 ENV UPLOAD_DIR=/data/uploads
 RUN mkdir -p /data/uploads
 
+# npm start uses PORT; without it, it falls back to the local port 3003.
+ENV PORT=3000
 EXPOSE 3000
 
 CMD ["npm", "start"]

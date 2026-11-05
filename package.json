@@ -1,11 +1,11 @@
 {
   "name": "carbon",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3003",
     "build": "next build",
-    "start": "next start -p 3003",
+    "start": "next start -p ${PORT:-3003}",
     "lint": "next lint && npm run check:blocks",
     "check:blocks": "tsx scripts/check-blocks.ts",
     "seed": "tsx prisma/seed.ts",
