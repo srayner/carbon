@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { Prisma, PrismaClient } from "../lib/generated/prisma";
 import { DEFAULT_TEMPLATE_ID, PRESET_TEMPLATES } from "../config/templates";
+import { MAX_DEPTH } from "../lib/block-tree";
 
 const prisma = new PrismaClient();
 
@@ -390,7 +391,117 @@ async function seedPages() {
     },
   });
 
+  await seedLayoutPages();
+
   console.log("Pages have been seeded!");
+}
+
+/*
+ * Containers. Nested blocks keep the page as their owner and name their
+ * container in parentId; `order` follows the list (each container followed by
+ * its children), as the editor saves it. Created last, so they come last in
+ * the admin's pages list and leave its first page alone.
+ */
+async function seedLayoutPages() {
+  type Row = ReturnType<typeof block> & { parentId?: string };
+  let order = 0;
+  const add = (
+    rows: Row[],
+    type: string,
+    properties: Prisma.InputJsonObject,
+    parentId?: string
+  ) => {
+    const row = { ...block(order++, type, properties), parentId };
+    rows.push(row);
+    return row.id;
+  };
+
+  // A row holding a paragraph, a column of two paragraphs, and a paragraph,
+  // then a top-level paragraph after it and an empty container
+  const valid: Row[] = [];
+  const row = add(valid, "Container", {
+    direction: "row",
+    gap: "l",
+    align: "start",
+    cssId: "layout-row",
+    background: "surface",
+  });
+  add(valid, "Paragraph", { content: "Row first", cssId: "row-first" }, row);
+  const column = add(
+    valid,
+    "Container",
+    { direction: "column", gap: "s", cssId: "layout-column" },
+    row
+  );
+  add(valid, "Paragraph", { content: "Column top", cssId: "column-top" }, column);
+  add(valid, "Paragraph", { content: "Column bottom", cssId: "column-bottom" }, column);
+  add(valid, "Paragraph", { content: "Row last", cssId: "row-last" }, row);
+  add(valid, "Paragraph", { content: "After the row", cssId: "after-row" });
+  add(valid, "Container", { cssId: "layout-empty" });
+
+  // Grow: a short table beside a long paragraph, both on 1, must split the
+  // row evenly; then a 2 : 1 split
+  const growRow = add(valid, "Container", { direction: "row", cssId: "grow-row" });
+  add(
+    valid,
+    "KeyValueTable",
+    { cssId: "grow-table", grow: "1", rows: JSON.stringify([{ key: "Size", value: "S" }]) },
+    growRow
+  );
+  add(
+    valid,
+    "Paragraph",
+    {
+      cssId: "grow-text",
+      grow: "1",
+      content:
+        "A much longer paragraph than the table beside it, so that sized by " +
+        "content it would take most of the row, and only Grow makes the two even.",
+    },
+    growRow
+  );
+  const ratioRow = add(valid, "Container", { direction: "row", cssId: "ratio-row" });
+  add(valid, "Paragraph", { content: "Two parts", cssId: "ratio-two", grow: "2" }, ratioRow);
+  add(valid, "Paragraph", { content: "One part", cssId: "ratio-one", grow: "1" }, ratioRow);
+
+  await prisma.page.create({
+    data: {
+      title: "Layout Showcase",
+      slug: "layout-showcase",
+      templateId: DEFAULT_TEMPLATE_ID,
+      publishedAt: YESTERDAY,
+      blocks: { create: valid },
+    },
+  });
+
+  // Rows saving would refuse, as if written some other way. The page must
+  // still render, without them. Never saved by the tests, since saving fails.
+  order = 0;
+  const broken: Row[] = [];
+  add(broken, "Paragraph", { content: "Broken layout intro", cssId: "broken-intro" });
+  add(broken, "Paragraph", { content: "Orphan text" }, "no-such-block");
+  const x = crypto.randomUUID();
+  const y = add(broken, "Container", { cssId: "loop-y" }, x);
+  broken.push({ ...block(order++, "Container", { cssId: "loop-x" }), id: x, parentId: y });
+  add(broken, "Paragraph", { content: "Looped text" }, x);
+  const plain = add(broken, "Paragraph", { content: "Not a container", cssId: "not-a-container" });
+  add(broken, "Paragraph", { content: "Child of a paragraph" }, plain);
+  // Containers nested one deeper than MAX_DEPTH allows (lib/block-tree.ts)
+  let parent: string | undefined;
+  for (let depth = 0; depth <= MAX_DEPTH; depth++) {
+    parent = add(broken, "Container", { cssId: `deep-${depth}` }, parent);
+  }
+  add(broken, "Paragraph", { content: "Too deep text" }, parent);
+
+  await prisma.page.create({
+    data: {
+      title: "Broken Layout",
+      slug: "broken-layout",
+      templateId: DEFAULT_TEMPLATE_ID,
+      publishedAt: YESTERDAY,
+      blocks: { create: broken },
+    },
+  });
 }
 
 async function main() {

@@ -6,6 +6,16 @@ import EditorSidebar from "@/components/EditorSidebar";
 import { BlockOutline } from "@/components/Block/BlockOutline";
 import { getEditable } from "@/components/Block/editables";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
+import {
+  BlockNode,
+  buildTree,
+  insertBlock,
+  isContainerType,
+  moveBlock,
+  removeBlock,
+  subtreeIds,
+} from "@/lib/block-tree";
+import { getGrowStyle } from "@/lib/container-style";
 
 type BlockEditorProps = {
   blocks: Block[];
@@ -45,7 +55,8 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
     );
   };
 
-  const handleBlockAdded = (block: Block) => {
+  // Adds to the end of a container, or of the page when parentId is null
+  const handleBlockAdded = (block: Block, parentId: string | null) => {
     onBlocksChange((current) => {
       if (current.some((b) => b.id === block.id)) {
         console.error(
@@ -54,8 +65,15 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
         );
         return current;
       }
+      if (parentId && !current.some((b) => b.id === parentId)) {
+        console.error(
+          "handleBlockAdded: container is no longer on the page — not adding",
+          parentId
+        );
+        return current;
+      }
 
-      return [...current, block];
+      return insertBlock(current, block, parentId);
     });
 
     setSelectedBlockId(block.id);
@@ -72,25 +90,71 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
     handleBlockPropsChanged(selectedBlockId, updatedProperties);
   };
 
+  // Among its siblings, taking anything inside it along
   const handleBlockMoved = (blockId: string, direction: -1 | 1) => {
-    onBlocksChange((current) => {
-      const index = current.findIndex((b) => b.id === blockId);
-      const target = index + direction;
-      if (index < 0 || target < 0 || target >= current.length) {
-        return current;
-      }
-      const moved = [...current];
-      [moved[index], moved[target]] = [moved[target], moved[index]];
-      return moved;
-    });
+    onBlocksChange((current) => moveBlock(current, blockId, direction));
   };
 
+  // A container goes with everything inside it, after a confirm
   const handleBlockDeleted = (blockId: string) => {
-    onBlocksChange((current) => current.filter((b) => b.id !== blockId));
-    setSelectedBlockId((current) => (current === blockId ? null : current));
+    const block = blocks.find((b) => b.id === blockId);
+    const removed = subtreeIds(blocks, blockId);
+    const inside = removed.size - 1;
+    if (
+      inside > 0 &&
+      !window.confirm(
+        `Delete this ${block?.type ?? "block"} and the ${inside} ${
+          inside === 1 ? "block" : "blocks"
+        } inside it?`
+      )
+    ) {
+      return;
+    }
+    onBlocksChange((current) => removeBlock(current, blockId));
+    setSelectedBlockId((current) =>
+      current && removed.has(current) ? null : current
+    );
   };
 
   const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId) || null;
+
+  // Each block in a frame that selects it; a container's children are drawn
+  // inside its Editable, each in its own frame
+  const renderNodes = (nodes: BlockNode<Block>[]): React.ReactNode =>
+    nodes.map(({ block, depth, children }) => {
+      const Editable = getEditable(block.type);
+      if (!Editable) return null;
+      const isSelected = block.id === selectedBlockId;
+
+      return (
+        <div
+          key={block.id}
+          data-block-id={block.id}
+          // Inside a container the frame is the flex item, so it takes the Grow
+          className={depth === 0 ? "relative mr-10" : "relative block-item"}
+          style={depth === 0 ? undefined : getGrowStyle(block.properties)}
+          onClick={(e) => {
+            // The innermost block clicked is the one selected
+            e.stopPropagation();
+            handleBlockSelected(block);
+          }}
+        >
+          <Suspense fallback={null}>
+            <Editable
+              block={block}
+              onChange={(patch) => handleBlockPropsChanged(block.id, patch)}
+            >
+              {isContainerType(block.type) && children.length > 0
+                ? renderNodes(children)
+                : undefined}
+            </Editable>
+          </Suspense>
+          {isSelected && (
+            <div className="absolute -inset-1 pointer-events-none border-2 border-ring"></div>
+          )}
+        </div>
+      );
+    });
 
   return (
     <div className="flex h-full w-full">
@@ -110,32 +174,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
           light and dark mode of the admin UI */}
       <div className="site-theme light min-w-0 flex-1 overflow-y-auto">
         <div className="p-5 prose max-w-none">
-          {blocks.map((block) => {
-            const isSelected = block.id === selectedBlockId;
-
-            const Editable = getEditable(block.type);
-            if (!Editable) return null;
-
-            return (
-              <div
-                key={block.id}
-                className="relative mr-10"
-                onClick={() => handleBlockSelected(block)}
-              >
-                <Suspense fallback={null}>
-                  <Editable
-                    block={block}
-                    onChange={(patch) =>
-                      handleBlockPropsChanged(block.id, patch)
-                    }
-                  />
-                </Suspense>
-                {isSelected && (
-                  <div className="absolute -inset-1 pointer-events-none border-2 border-ring"></div>
-                )}
-              </div>
-            );
-          })}
+          {renderNodes(buildTree(blocks))}
         </div>
       </div>
 

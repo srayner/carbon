@@ -3,7 +3,7 @@ import { Block } from "@/types/blocks";
 import { AppError } from "@/lib/api/error";
 import { getSlugError } from "@/lib/slug";
 import { setPageCategories } from "@/services/categories";
-import { replaceBlocks } from "@/services/blocks";
+import { assertValidBlockTree, replaceBlocks } from "@/services/blocks";
 
 type PageInput = {
   id?: string;
@@ -48,6 +48,7 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
     );
   }
   const image = data.image || null;
+  assertValidBlockTree(data.blocks);
 
   // Create new page if no id
   if (!pageId) {

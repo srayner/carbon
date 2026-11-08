@@ -7,6 +7,7 @@ export type AnyView = (props: {
   block: Block;
   shared: SharedBlockProps;
   currentPageId?: string | null;
+  children?: React.ReactNode;
 }) => React.ReactElement | null | Promise<React.ReactElement | null>;
 
 const loadView = async (name: string): Promise<AnyView> => {
