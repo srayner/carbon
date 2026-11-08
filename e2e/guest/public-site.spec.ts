@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { COLORS, rgb } from "../helpers";
+import { DEFAULT_THEME } from "../../lib/theme";
 
 test.describe("public pages", () => {
   test("the home page offers a login when there is no home page", async ({
@@ -22,7 +23,7 @@ test.describe("public pages", () => {
 
   test("the template's header and footer are shown", async ({ page }) => {
     await page.goto("/hello-world");
-    await expect(page.locator("header").getByText("Carbon")).toBeVisible();
+    await expect(page.locator("header #site-logo")).toHaveText("Steve Rayner Makes");
     await expect(page.locator("footer").getByText("Made with Carbon CMS.")).toBeVisible();
   });
 
@@ -237,5 +238,101 @@ test.describe("the key/value table", () => {
     await expect(specs(page)).toBeVisible();
     await expect(page.locator("#showcase-specs-blank")).toHaveCount(0);
     await expect(page.locator("#showcase-specs-broken")).toHaveCount(0);
+  });
+});
+
+// The seeded header, built from blocks as in the mock: logo, menu, button
+test.describe("the site header", () => {
+  // The mock's width, wider than the page width plus the header's padding
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/hello-world");
+  });
+
+  test("the logo is one link home: the icon and the name, with Makes in the accent", async ({
+    page,
+  }) => {
+    const logo = page.locator("header a#site-logo");
+    await expect(logo).toHaveAttribute("href", "/");
+    const icon = logo.locator("img");
+    await expect(icon).toHaveAttribute("alt", "");
+    expect(await icon.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+
+    const makes = logo.locator("span.site-text-accent");
+    await expect(makes).toHaveText("Makes");
+    await expect(makes).toHaveCSS("color", rgb(COLORS.accent));
+    await expect(logo.locator("p")).toHaveCSS("color", rgb(COLORS.text));
+    await expect(logo).toHaveCSS("text-decoration-line", "none");
+
+    // The icon sits beside the name, centred on it
+    const [iconBox, nameBox] = await Promise.all([
+      icon.boundingBox(),
+      logo.locator("p").boundingBox(),
+    ]);
+    expect(nameBox!.x).toBeGreaterThan(iconBox!.x + iconBox!.width);
+    const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
+    expect(Math.abs(middle(nameBox!) - middle(iconBox!))).toBeLessThan(2);
+  });
+
+  test("the logo, menu and button sit on one line, spread across it", async ({ page }) => {
+    const items = page.locator("header #site-menu a");
+    await expect(items).toHaveText(["Projects", "Build log", "Videos", "About"]);
+
+    const [logo, menu, button] = await Promise.all(
+      ["#site-logo", "#site-menu", "#site-subscribe"].map(
+        async (id) => (await page.locator(`header ${id}`).boundingBox())!
+      )
+    );
+    expect(menu.x).toBeGreaterThan(logo.x + logo.width);
+    expect(button.x).toBeGreaterThan(menu.x + menu.width);
+    const middle = (b: { y: number; height: number }) => b.y + b.height / 2;
+    expect(Math.abs(middle(menu) - middle(logo))).toBeLessThan(2);
+    expect(Math.abs(middle(button) - middle(logo))).toBeLessThan(2);
+  });
+
+  // Set to page width: as wide as the theme's page width, centred in the
+  // header, while the header's border still runs the full width
+  test("lines up with the page width, centred", async ({ page }) => {
+    const rem = parseFloat(DEFAULT_THEME.pageWidth); // e.g. "77.5rem"
+    expect(DEFAULT_THEME.pageWidth).toMatch(/rem$/);
+    const header = page.locator("header");
+    const bar = await header.locator("#site-header").boundingBox();
+    const outer = await header.boundingBox();
+    expect(bar!.width).toBeCloseTo(rem * 16, 0);
+    const left = bar!.x - outer!.x;
+    const right = outer!.x + outer!.width - (bar!.x + bar!.width);
+    expect(Math.abs(left - right)).toBeLessThan(1);
+    expect(left).toBeGreaterThan(24);
+  });
+
+  // A narrow template's content is the content width, inside the padding,
+  // so it lines up with a Container set to the same width. The page is
+  // short, so this also checks the column doesn't shrink to its content.
+  test("the content column is the theme's content width, centred", async ({ page }) => {
+    expect(DEFAULT_THEME.contentWidth).toMatch(/rem$/);
+    const width = parseFloat(DEFAULT_THEME.contentWidth) * 16;
+    const title = await page.locator("main > h1").boundingBox();
+    const main = await page.locator("main").evaluate((el) => {
+      const b = el.getBoundingClientRect();
+      const c = getComputedStyle(el);
+      return {
+        left: b.left + parseFloat(c.paddingLeft),
+        right: b.right - parseFloat(c.paddingRight),
+        // the template's grid, the space the column is centred in
+        page: el.parentElement!.getBoundingClientRect().width,
+      };
+    });
+    expect(main.right - main.left).toBeCloseTo(width, 0);
+    expect(Math.abs(main.left - (main.page - width) / 2)).toBeLessThan(1);
+    expect(Math.abs(title!.x - main.left)).toBeLessThan(1);
+  });
+
+  test("the button opens YouTube in a new tab", async ({ page }) => {
+    const button = page.locator("header #site-subscribe");
+    await expect(button).toHaveText("Subscribe on YouTube");
+    await expect(button).toHaveAttribute("href", "https://www.youtube.com/");
+    await expect(button).toHaveAttribute("target", "_blank");
+    await expect(button).toHaveCSS("background-color", rgb(COLORS.text));
   });
 });

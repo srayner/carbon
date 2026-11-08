@@ -91,3 +91,23 @@ describe("isInlineContainer", () => {
     expect(isInlineContainer({ element })).toBe(false);
   });
 });
+
+describe("getContainerStyle: Width", () => {
+  it("fills the space it is in by default", () => {
+    const style = getContainerStyle(defaults);
+    expect(style).not.toHaveProperty("maxWidth");
+    expect(style).not.toHaveProperty("marginInline");
+  });
+
+  it.each(["page", "content"])("caps %s at the theme's width and centres it", (width) => {
+    expect(getContainerStyle({ ...defaults, width })).toMatchObject({
+      width: "100%",
+      maxWidth: `var(--site-${width}-width)`,
+      marginInline: "auto",
+    });
+  });
+
+  it.each(["wide", "100px", "", null])("treats %p as full", (width) => {
+    expect(getContainerStyle({ ...defaults, width })).not.toHaveProperty("maxWidth");
+  });
+});

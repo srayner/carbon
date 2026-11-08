@@ -212,6 +212,8 @@ export const themeSchema = z.object({
   ),
   // The widest the content column gets on a "narrow" template
   contentWidth: length,
+  // The widest a Container set to "page" gets: headers, footers, wide sections
+  pageWidth: length,
   customCss: z.string().max(CUSTOM_CSS_MAX, "Custom CSS is too long."),
 });
 
@@ -224,6 +226,7 @@ export type Theme = {
   shadow: Record<ShadowStep, string>;
   textSize: Record<TextSizeStep, string>;
   contentWidth: string;
+  pageWidth: string;
   customCss: string;
 };
 
@@ -253,6 +256,7 @@ export const DEFAULT_THEME: Theme = {
   },
   textSize: { xs: "0.75rem", s: "0.875rem", m: "1rem", l: "1.25rem", xl: "1.5rem" },
   contentWidth: "56rem",
+  pageWidth: "77.5rem",
   customCss: "",
 };
 
@@ -286,6 +290,7 @@ export const themeVariables = (theme: Theme): Record<string, string> => {
   for (const step of SHADOW_STEPS) vars[`--site-shadow-${step}`] = theme.shadow[step];
   for (const step of TEXT_SIZE_STEPS) vars[`--site-text-${step}`] = theme.textSize[step];
   vars["--site-content-width"] = theme.contentWidth;
+  vars["--site-page-width"] = theme.pageWidth;
   return vars;
 };
 

@@ -1,6 +1,12 @@
 import { SquareDashed } from "lucide-react";
 import { SPACING_STEPS } from "@/lib/theme";
-import { ALIGN_OPTIONS, DIRECTIONS, ELEMENTS, JUSTIFY_OPTIONS } from "@/lib/container-style";
+import {
+  ALIGN_OPTIONS,
+  DIRECTIONS,
+  ELEMENTS,
+  JUSTIFY_OPTIONS,
+  WIDTHS,
+} from "@/lib/container-style";
 import { SHARED_PROPERTIES } from "./shared";
 
 // Holds other blocks and lays them out in a row or a column. Its children are
@@ -18,6 +24,15 @@ export const ContainerBlockConfig = {
       type: "enum",
       values: ELEMENTS,
       default: "div",
+      group: "Layout",
+    },
+    {
+      // full fills the space it is in; page and content are the theme's widths
+      name: "width",
+      displayName: "Width",
+      type: "enum",
+      values: WIDTHS,
+      default: "full",
       group: "Layout",
     },
     {

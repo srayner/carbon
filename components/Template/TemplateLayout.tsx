@@ -9,9 +9,12 @@ type Props = {
   children: React.ReactNode; // the page's own content, shown in the main area
 };
 
+// Narrow: the content (inside the padding) is the theme's content width, so
+// it lines up with a Container set to the same width. w-full stops the grid
+// shrinking the centred column to fit what is in it.
 const CONTENT_CLASS: Record<Layout["contentWidth"], string> = {
   narrow:
-    "prose prose-lg mx-auto max-w-[var(--site-content-width)] p-[var(--site-space-l)]",
+    "prose prose-lg mx-auto w-full max-w-[calc(var(--site-content-width)+2*var(--site-space-l))] p-[var(--site-space-l)]",
   full: "prose prose-lg max-w-none p-[var(--site-space-l)]",
 };
 

@@ -90,6 +90,7 @@ describe("themeVariables", () => {
     expect(vars["--site-shadow-none"]).toBe("none");
     expect(vars["--site-text-xs"]).toBe(DEFAULT_THEME.textSize.xs);
     expect(vars["--site-content-width"]).toBe(DEFAULT_THEME.contentWidth);
+    expect(vars["--site-page-width"]).toBe(DEFAULT_THEME.pageWidth);
     expect(vars["--site-font-mono"]).toContain("monospace");
   });
 });
@@ -130,5 +131,21 @@ describe("escapeCustomCss", () => {
     expect(escapeCustomCss(".a > .b { color: red; }")).toBe(
       ".a > .b { color: red; }"
     );
+  });
+});
+
+describe("page width", () => {
+  // Themes saved before it existed have none
+  it("is filled from the defaults for an older theme", () => {
+    const { pageWidth: _, ...older } = clone();
+    expect(withDefaults(older).pageWidth).toBe(DEFAULT_THEME.pageWidth);
+  });
+
+  it.each(["1240px", "77.5rem", "90%"])("accepts %s", (pageWidth) => {
+    expect(themeSchema.safeParse({ ...clone(), pageWidth }).success).toBe(true);
+  });
+
+  it.each(["", "wide", "1240px; color: red"])("refuses %j", (pageWidth) => {
+    expect(themeSchema.safeParse({ ...clone(), pageWidth }).success).toBe(false);
   });
 });
