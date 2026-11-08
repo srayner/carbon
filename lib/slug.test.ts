@@ -12,7 +12,11 @@ describe("getSlugError", () => {
     expect(getSlugError("desk-lamp-2")).toBeNull();
   });
 
-  it.each(["", "Upper", "double--hyphen", "-lead", "trail-", "a b"])(
+  it("accepts an empty slug, for the home page", () => {
+    expect(getSlugError("")).toBeNull();
+  });
+
+  it.each(["Upper", "double--hyphen", "-lead", "trail-", "a b"])(
     "rejects %j",
     (slug) => {
       expect(getSlugError(slug)).not.toBeNull();

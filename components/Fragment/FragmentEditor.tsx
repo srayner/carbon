@@ -9,6 +9,7 @@ import { KIND_LABELS } from "@/lib/fragment-routes";
 import type { Fragment } from "@/types/entities";
 import type { FragmentKind } from "@/types/templates";
 import { toast } from "sonner";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
 type FragmentEditorProps = {
   fragmentId?: string; // undefined for add mode
@@ -21,19 +22,28 @@ const FragmentEditor: React.FC<FragmentEditorProps> = ({
   kind,
   afterSave,
 }) => {
-  const [fragment, setFragment] = useState<Fragment>({
+  const [blank] = useState<Fragment>(() => ({
     id: null,
     name: "",
     kind,
     blocks: [],
-  });
+  }));
+  const [fragment, setFragment] = useState<Fragment>(blank);
+  // The fragment as last loaded or saved; any difference is unsaved
+  const [saved, setSaved] = useState<Fragment>(blank);
+  const [saving, setSaving] = useState(false);
+  const dirty = JSON.stringify(fragment) !== JSON.stringify(saved);
+  useUnsavedChanges(dirty);
   const { setPageActions } = usePageActions();
 
   useEffect(() => {
     if (!fragmentId) return; // nothing to load in add mode
 
     fetchFragment(fragmentId)
-      .then(setFragment)
+      .then((loaded) => {
+        setFragment(loaded);
+        setSaved(loaded);
+      })
       .catch((err) => {
         console.error("Failed to load fragment:", err);
         toast.error("Failed to load content.");
@@ -42,13 +52,21 @@ const FragmentEditor: React.FC<FragmentEditorProps> = ({
 
   useEffect(() => {
     const handleSave = async () => {
+      const sent = fragment;
+      setSaving(true);
       try {
-        const saved = await saveFragment(fragment);
+        const result = await saveFragment(sent);
+        const id = result.id!;
+        // What was sent is now saved; edits made while saving stay unsaved
+        setSaved({ ...sent, id });
+        setFragment((prev) => ({ ...prev, id }));
         toast.success("Saved.");
-        afterSave?.(saved.id!);
+        afterSave?.(id);
       } catch (err) {
         console.error("Save failed:", err);
         toast.error(err instanceof Error ? err.message : "Save failed.");
+      } finally {
+        setSaving(false);
       }
     };
 
@@ -57,18 +75,14 @@ const FragmentEditor: React.FC<FragmentEditorProps> = ({
       showAddButton: false,
       showSaveButton: true,
       onSave: handleSave,
+      dirty,
+      saving,
     });
 
     return () => {
-      setPageActions({
-        showEditorSidebars: false,
-        showAddButton: false,
-        showSaveButton: false,
-        onAdd: undefined,
-        onSave: undefined,
-      });
+      setPageActions({});
     };
-  }, [fragment, setPageActions, afterSave]);
+  }, [fragment, dirty, saving, setPageActions, afterSave]);
 
   const handleBlocksChange = (update: (blocks: Block[]) => Block[]) => {
     setFragment((prev) => ({ ...prev, blocks: update(prev.blocks) }));

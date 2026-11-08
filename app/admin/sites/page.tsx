@@ -106,7 +106,8 @@ export default function SitesPage() {
                       href={`/${item.slug}?preview=1`}
                       className="text-primary hover:underline"
                     >
-                      {item.slug}
+                      {/* An empty slug is the home page */}
+                      {item.slug || "/"}
                     </Link>
                   </td>
 
