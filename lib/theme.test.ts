@@ -29,6 +29,12 @@ describe("themeSchema", () => {
     expect(themeSchema.safeParse(theme).success).toBe(false);
   });
 
+  it("rejects a text size without a unit", () => {
+    const theme = clone();
+    theme.textSize.s = "14";
+    expect(themeSchema.safeParse(theme).success).toBe(false);
+  });
+
   it("accepts zero as a length", () => {
     const theme = clone();
     theme.spacing.none = "0";
@@ -59,6 +65,13 @@ describe("withDefaults", () => {
     expect(withDefaults(null)).toEqual(DEFAULT_THEME);
   });
 
+  // A theme saved before text sizes existed still loads, with the defaults
+  it("fills a group the stored theme does not have", () => {
+    const { textSize, ...older } = structuredClone(DEFAULT_THEME);
+    expect(textSize).toBeDefined();
+    expect(withDefaults(older).textSize).toEqual(DEFAULT_THEME.textSize);
+  });
+
   it("keeps stored values and fills the rest from the defaults", () => {
     const theme = withDefaults({ colors: { accent: "#ff0000" } });
     expect(theme.colors.accent).toBe("#ff0000");
@@ -75,6 +88,7 @@ describe("themeVariables", () => {
     expect(vars["--site-radius-full"]).toBe("9999px");
     expect(vars["--site-border-thin"]).toBe("1px");
     expect(vars["--site-shadow-none"]).toBe("none");
+    expect(vars["--site-text-xs"]).toBe(DEFAULT_THEME.textSize.xs);
     expect(vars["--site-content-width"]).toBe(DEFAULT_THEME.contentWidth);
     expect(vars["--site-font-mono"]).toContain("monospace");
   });

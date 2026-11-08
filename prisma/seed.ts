@@ -386,6 +386,18 @@ async function seedPages() {
             cssId: "showcase-specs-broken",
             rows: "Motor: 28BYJ-48",
           }),
+          // Button-like: padding wider than tall over a Padding that the two
+          // directions override, a coloured border and small text
+          block(15, "Paragraph", {
+            content: "Button tokens",
+            cssId: "button-tokens",
+            paddingSize: "m",
+            paddingX: "l",
+            paddingY: "xs",
+            border: "thin",
+            borderColor: "accent",
+            textSize: "xs",
+          }),
         ],
       },
     },

@@ -119,6 +119,19 @@ test.describe("every block type", () => {
     await expect(styled).toHaveCSS("color", rgb(COLORS.accent));
   });
 
+  test("padding directions, border colour and text size use the theme", async ({
+    page,
+  }) => {
+    const button = page.locator("#button-tokens");
+    // Padding is m on all sides, then l across and xs up and down win
+    await expect(button).toHaveCSS("padding-left", "32px");
+    await expect(button).toHaveCSS("padding-right", "32px");
+    await expect(button).toHaveCSS("padding-top", "4px");
+    await expect(button).toHaveCSS("padding-bottom", "4px");
+    await expect(button).toHaveCSS("border-top-color", rgb(COLORS.accent));
+    await expect(button).toHaveCSS("font-size", "12px"); // text xs = 0.75rem
+  });
+
   test("a raw value changed from its default overrides the token", async ({
     page,
   }) => {
