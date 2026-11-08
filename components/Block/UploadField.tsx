@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 import { uploadFile } from "@/lib/api/upload";
+import { IMAGE_ACCEPT } from "@/lib/upload-types";
 
 type UploadFieldProps = {
   kind: "image" | "file";
@@ -47,7 +48,7 @@ const UploadField: React.FC<UploadFieldProps> = ({ kind, value, onChange }) => {
       <input
         ref={inputRef}
         type="file"
-        accept={kind === "image" ? ".png,.jpg,.jpeg,.gif,.webp" : undefined}
+        accept={kind === "image" ? IMAGE_ACCEPT : undefined}
         className="hidden"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />
