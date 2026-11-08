@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_BLOCKS } from "@/config/blocks";
-import { validateBlockUrls } from "@/lib/block-urls";
+import { isLinkBlock, validateBlockUrls, validateNestedLinks } from "@/lib/block-urls";
 
 const link = (url: unknown) => ({ type: "Link", properties: { label: "Go", url } });
 
@@ -40,5 +40,59 @@ describe("validateBlockUrls", () => {
     expect(
       validateBlockUrls([{ type: "Paragraph", properties: { content: "javascript:alert(1)" } }])
     ).toBeNull();
+  });
+});
+
+type Row = { id: string; type: string; properties: Record<string, string>; parentId?: string };
+const row = (id: string, type: string, properties: Record<string, string> = {}, parentId?: string): Row => ({
+  id,
+  type,
+  properties,
+  ...(parentId && { parentId }),
+});
+
+describe("isLinkBlock", () => {
+  it.each([
+    ["a Link with an address", row("a", "Link", { url: "/x" }), true],
+    // Its default address is "/", so it is an <a> even when none was saved
+    ["a Link with no address saved", row("a", "Link"), true],
+    ["a Container with an address", row("a", "Container", { url: "/x" }), true],
+    ["a Container with no address", row("a", "Container"), false],
+    ["a Container with an empty address", row("a", "Container", { url: "  " }), false],
+    ["a block with no url property", row("a", "Paragraph", { url: "/x" }), false],
+    ["an unknown type", row("a", "Nope", { url: "/x" }), false],
+  ])("%s: %s", (_, block, expected) => {
+    expect(isLinkBlock(block)).toBe(expected);
+  });
+});
+
+describe("validateNestedLinks", () => {
+  const linked = (id: string, parentId?: string) => row(id, "Container", { url: "/x" }, parentId);
+  const plain = (id: string, parentId?: string) => row(id, "Container", {}, parentId);
+
+  it.each([
+    ["a Link in a linked Container", [linked("box"), row("in", "Link", {}, "box")]],
+    ["a linked Container in a linked Container", [linked("box"), linked("in", "box")]],
+    // Any ancestor counts, not only the parent
+    [
+      "a Link two levels inside a linked Container",
+      [linked("box"), plain("mid", "box"), row("in", "Link", {}, "mid")],
+    ],
+  ])("refuses %s, and says why", (_, blocks) => {
+    expect(validateNestedLinks(blocks)).toMatch(/can't go inside a linked Container/);
+  });
+
+  it.each([
+    ["Links in a plain Container", [plain("box"), row("a", "Link", {}, "box"), row("b", "Link", {}, "box")]],
+    ["a linked Container holding plain blocks", [linked("box"), plain("mid", "box"), row("p", "Paragraph", {}, "mid")]],
+    ["linked Containers side by side", [plain("row"), linked("a", "row"), linked("b", "row")]],
+    ["a Link with a missing parent", [row("in", "Link", {}, "gone")]],
+  ])("accepts %s", (_, blocks) => {
+    expect(validateNestedLinks(blocks)).toBeNull();
+  });
+
+  // The tree check runs first and refuses a loop, but this must still end
+  it("ends on a loop", () => {
+    expect(validateNestedLinks([plain("x", "y"), plain("y", "x"), row("in", "Link", {}, "x")])).toBeNull();
   });
 });

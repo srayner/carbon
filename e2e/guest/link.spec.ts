@@ -115,6 +115,32 @@ test.describe("a Link", () => {
     expect(two!.x - (one!.x + one!.width)).toBeLessThan(8);
   });
 
+  // A Container with a Link to address: one <a>, laid out as the row it is
+  test("a linked Container is one link, laid out and coloured as a container", async ({
+    page,
+  }) => {
+    const box = page.locator("#link-box");
+    expect(await box.evaluate((el) => el.tagName)).toBe("A");
+    await expect(box).toHaveAttribute("href", "/hello-world");
+    await expect(box).not.toHaveAttribute("target", /.*/);
+    await expect(box).toHaveCSS("display", "flex");
+    await expect(box.locator("> .block-item > p")).toHaveText([
+      "Linked box left",
+      "Linked box right",
+    ]);
+    const [left, right] = await Promise.all([
+      page.locator("#box-left").boundingBox(),
+      page.locator("#box-right").boundingBox(),
+    ]);
+    expect(right!.x).toBeGreaterThan(left!.x + left!.width);
+    // Not the typography's link look: text colour, no underline
+    await expect(page.locator("#box-left")).toHaveCSS("color", rgb(COLORS.text));
+    await expect(box).toHaveCSS("text-decoration-line", "none");
+
+    await page.locator("#box-right").click();
+    await expect(page).toHaveURL(/\/hello-world$/);
+  });
+
   // Saving refuses this address; it is in the database only through the seed
   test("an unsafe address is shown as text, not linked", async ({ page }) => {
     const unsafe = page.locator("#link-unsafe");

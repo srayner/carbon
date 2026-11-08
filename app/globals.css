@@ -186,6 +186,14 @@
   /* lets a Grow share hold even when the content is wider */
   min-width: 0;
 }
+/* A Container with a Link to address is an <a>. It looks like the container it
+   would be: no link colour or underline from the typography plugin, so its
+   own settings (Text colour) and its children decide. */
+.block-link {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
 .block-item {
   display: flex;
   flex-direction: column;

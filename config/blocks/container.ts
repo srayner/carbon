@@ -53,6 +53,23 @@ export const ContainerBlockConfig = {
       group: "Layout",
     },
 
+    // Link group. With an address the container is an <a>, so the whole of
+    // it is one link; it can't hold another link (see validateNestedLinks)
+    {
+      name: "url",
+      displayName: "Link to",
+      type: "url",
+      default: "",
+      group: "Link",
+    },
+    {
+      name: "newTab",
+      displayName: "Open in a new tab",
+      type: "boolean",
+      default: "false",
+      group: "Link",
+    },
+
     // Advanced group
     {
       name: "className",

@@ -558,6 +558,15 @@ async function seedLayoutPages() {
   });
   add(links, "Link", { label: "Inline one", url: "/hello-world", cssId: "span-one" }, span);
   add(links, "Link", { label: "Inline two", url: "/hello-world", cssId: "span-two" }, span);
+  // A linked Container: the whole row is one link, laid out as a row
+  const box = add(links, "Container", {
+    direction: "row",
+    gap: "l",
+    url: "/hello-world",
+    cssId: "link-box",
+  });
+  add(links, "Paragraph", { content: "Linked box left", cssId: "box-left" }, box);
+  add(links, "Paragraph", { content: "Linked box right", cssId: "box-right" }, box);
   add(links, "Link", { label: "Unsafe link", url: "javascript:alert(1)", cssId: "link-unsafe" });
 
   await prisma.page.create({
