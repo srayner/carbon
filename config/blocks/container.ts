@@ -1,6 +1,12 @@
 import { SquareDashed } from "lucide-react";
 import { SPACING_STEPS } from "@/lib/theme";
-import { ALIGN_OPTIONS, DIRECTIONS, JUSTIFY_OPTIONS } from "@/lib/container-style";
+import {
+  ALIGN_OPTIONS,
+  DIRECTIONS,
+  ELEMENTS,
+  JUSTIFY_OPTIONS,
+  WIDTHS,
+} from "@/lib/container-style";
 import { SHARED_PROPERTIES } from "./shared";
 
 // Holds other blocks and lays them out in a row or a column. Its children are
@@ -10,7 +16,25 @@ export const ContainerBlockConfig = {
   icon: SquareDashed,
   container: true,
   properties: [
-    // Layout group
+    // Layout group. A span is inline markup, so the settings after it apply
+    // to a div only (see isInlineContainer)
+    {
+      name: "element",
+      displayName: "Element",
+      type: "enum",
+      values: ELEMENTS,
+      default: "div",
+      group: "Layout",
+    },
+    {
+      // full fills the space it is in; page and content are the theme's widths
+      name: "width",
+      displayName: "Width",
+      type: "enum",
+      values: WIDTHS,
+      default: "full",
+      group: "Layout",
+    },
     {
       name: "direction",
       displayName: "Direction",
@@ -42,6 +66,23 @@ export const ContainerBlockConfig = {
       values: ALIGN_OPTIONS,
       default: "stretch",
       group: "Layout",
+    },
+
+    // Link group. With an address the container is an <a>, so the whole of
+    // it is one link; it can't hold another link (see validateNestedLinks)
+    {
+      name: "url",
+      displayName: "Link to",
+      type: "url",
+      default: "",
+      group: "Link",
+    },
+    {
+      name: "newTab",
+      displayName: "Open in a new tab",
+      type: "boolean",
+      default: "false",
+      group: "Link",
     },
 
     // Advanced group

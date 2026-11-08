@@ -1,46 +1,11 @@
 import path from "path";
 import { randomBytes } from "crypto";
+import { FILE_TYPES, IMAGE_TYPES } from "@/lib/upload-types";
 
 // Where uploaded files are stored. Mount a persistent volume here in production.
 export const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || "./uploads");
 
 export const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
-
-// SVG is deliberately left out: it can carry scripts.
-const IMAGE_TYPES: Record<string, string> = {
-  ".png": "image/png",
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".gif": "image/gif",
-  ".webp": "image/webp",
-};
-
-// Everything else is only ever served as a download.
-const FILE_TYPES: Record<string, string> = {
-  ".pdf": "application/pdf",
-  ".stl": "model/stl",
-  ".3mf": "model/3mf",
-  ".step": "application/octet-stream",
-  ".stp": "application/octet-stream",
-  ".obj": "model/obj",
-  ".zip": "application/zip",
-  ".7z": "application/x-7z-compressed",
-  ".gz": "application/gzip",
-  ".txt": "text/plain",
-  ".md": "text/markdown",
-  ".csv": "text/csv",
-  ".json": "application/json",
-  ".ino": "text/plain",
-  ".py": "text/plain",
-  ".c": "text/plain",
-  ".h": "text/plain",
-  ".cpp": "text/plain",
-  ".kicad_sch": "text/plain",
-  ".kicad_pcb": "text/plain",
-  ".sch": "text/plain",
-  ".brd": "text/plain",
-  ".gbr": "text/plain",
-};
 
 export const isImageExtension = (ext: string) => ext in IMAGE_TYPES;
 

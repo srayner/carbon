@@ -230,6 +230,13 @@ export default function ThemeForm() {
               }
             />
           </label>
+          <label className="block max-w-xs text-sm">
+            <span className="mb-1 block">Page width (Containers set to page width)</span>
+            <Input
+              value={theme.pageWidth}
+              onChange={(e) => setTheme({ ...theme, pageWidth: e.target.value })}
+            />
+          </label>
         </Section>
 
         <Section title="Custom CSS">

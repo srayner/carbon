@@ -20,6 +20,7 @@ import {
 import type { Editor } from "@tiptap/react";
 import TiptapHeadingDropdown from "./TipTapHeadingDropdown";
 import { uploadFile } from "@/lib/api/upload";
+import { TEXT_COLORS } from "@/lib/text-colors";
 
 type TiptapMenuProps = {
   editor: Editor;
@@ -94,6 +95,29 @@ const TiptapMenu = ({ editor }: TiptapMenuProps) => {
         >
           <UnderlineIcon />
         </Button>
+      </ButtonGroup>
+
+      {/* Theme colours: clicking the colour already on the words removes it */}
+      <ButtonGroup className="hidden sm:flex">
+        {TEXT_COLORS.map((color) => {
+          const active = editor.isActive("textColor", { color });
+          return (
+            <Button
+              key={color}
+              variant="outline"
+              size="sm"
+              aria-pressed={active}
+              className={`capitalize ${active ? "bg-accent" : ""}`}
+              onClick={() =>
+                active
+                  ? editor.chain().focus().unsetTextColor().run()
+                  : editor.chain().focus().setTextColor(color).run()
+              }
+            >
+              {color}
+            </Button>
+          );
+        })}
       </ButtonGroup>
 
       <ButtonGroup className="hidden sm:flex">

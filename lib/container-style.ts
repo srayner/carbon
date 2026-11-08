@@ -5,7 +5,9 @@ import { SPACING_STEPS } from "@/lib/theme";
  * The Container block's layout options and the flexbox CSS they set. Shared
  * by its config (the choices), its View and its Editable (the CSS).
  */
+export const ELEMENTS = ["div", "span"] as const;
 export const DIRECTIONS = ["column", "row"] as const;
+export const WIDTHS = ["full", "page", "content"] as const;
 export const JUSTIFY_OPTIONS = ["start", "center", "end", "between"] as const;
 export const ALIGN_OPTIONS = ["stretch", "start", "center", "end"] as const;
 export const GROW_OPTIONS = ["content", "1", "2", "3"] as const;
@@ -30,6 +32,14 @@ const pick = <K extends string>(
 ): K => (options.includes(value as K) ? (value as K) : fallback);
 
 /**
+ * A span Container is plain inline markup: a <span> around its children, with
+ * no flexbox, no layout settings and no wrapper around each child. Anything
+ * other than "span" is a div, the default.
+ */
+export const isInlineContainer = (properties: Record<string, unknown>) =>
+  properties.element === "span";
+
+/**
  * The flexbox CSS for a Container's properties. Values come from the
  * database, so anything that is not one of the options falls back to the
  * default instead of reaching the page.
@@ -38,7 +48,14 @@ export const getContainerStyle = (
   properties: Record<string, unknown>
 ): CSSProperties => {
   const gap = pick(["", ...SPACING_STEPS], properties.gap, "");
+  const width = pick(WIDTHS, properties.width, "full");
   return {
+    // Capped at one of the theme's widths and centred in the space it is in
+    ...(width !== "full" && {
+      width: "100%",
+      maxWidth: `var(--site-${width}-width)`,
+      marginInline: "auto",
+    }),
     flexDirection: pick(DIRECTIONS, properties.direction, "column"),
     justifyContent: JUSTIFY[pick(JUSTIFY_OPTIONS, properties.justify, "start")],
     alignItems: ALIGN[pick(ALIGN_OPTIONS, properties.align, "stretch")],

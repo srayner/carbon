@@ -186,6 +186,33 @@
   /* lets a Grow share hold even when the content is wider */
   min-width: 0;
 }
+/* Text blocks inside a container (a RichText's paragraphs) lose the margins
+   above their first line and below their last, so the container's gap and
+   alignment place them, as for any other child */
+.block-item > * > :first-child {
+  margin-top: 0;
+}
+.block-item > * > :last-child {
+  margin-bottom: 0;
+}
+
+/* A theme colour set on words in rich text (lib/text-colors.ts). Unlayered,
+   so it wins over the typography plugin, including inside bold text. */
+.site-text-accent {
+  color: var(--site-color-accent);
+}
+.site-text-muted {
+  color: var(--site-color-muted);
+}
+
+/* A Container with a Link to address is an <a>. It looks like the container it
+   would be: no link colour or underline from the typography plugin, so its
+   own settings (Text colour) and its children decide. */
+.block-link {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
 .block-item {
   display: flex;
   flex-direction: column;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ContainerBlockConfig } from "@/config/blocks/container";
 import { GROW_PROPERTY } from "@/config/blocks/shared";
-import { getContainerStyle, getGrowStyle } from "@/lib/container-style";
+import { getContainerStyle, getGrowStyle, isInlineContainer } from "@/lib/container-style";
 
 const defaults = Object.fromEntries(
   ContainerBlockConfig.properties.map((p) => [p.name, p.default])
@@ -77,5 +77,37 @@ describe("getGrowStyle", () => {
     for (const grow of ["0", "4", "1; color: red", 1, null]) {
       expect(getGrowStyle({ grow })).toEqual({});
     }
+  });
+});
+
+describe("isInlineContainer", () => {
+  it("is a div unless set to span", () => {
+    expect(isInlineContainer(defaults)).toBe(false);
+    expect(isInlineContainer({ ...defaults, element: "span" })).toBe(true);
+  });
+
+  // Saved values come from the database, so anything else is the default div
+  it.each(["SPAN", " span", "a", "", null, undefined])("treats %p as a div", (element) => {
+    expect(isInlineContainer({ element })).toBe(false);
+  });
+});
+
+describe("getContainerStyle: Width", () => {
+  it("fills the space it is in by default", () => {
+    const style = getContainerStyle(defaults);
+    expect(style).not.toHaveProperty("maxWidth");
+    expect(style).not.toHaveProperty("marginInline");
+  });
+
+  it.each(["page", "content"])("caps %s at the theme's width and centres it", (width) => {
+    expect(getContainerStyle({ ...defaults, width })).toMatchObject({
+      width: "100%",
+      maxWidth: `var(--site-${width}-width)`,
+      marginInline: "auto",
+    });
+  });
+
+  it.each(["wide", "100px", "", null])("treats %p as full", (width) => {
+    expect(getContainerStyle({ ...defaults, width })).not.toHaveProperty("maxWidth");
   });
 });

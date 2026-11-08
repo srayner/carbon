@@ -95,6 +95,52 @@ test.describe("a Link", () => {
     await expect(page.locator("#link-underlined")).toHaveCSS("font-weight", "400");
   });
 
+  // A span Container set to a row with a gap: neither applies to a span
+  test("a span Container is plain inline markup round its children", async ({ page }) => {
+    const span = page.locator("#link-span");
+    expect(await span.evaluate((el) => el.tagName)).toBe("SPAN");
+    await expect(span).toHaveCSS("display", "inline");
+    await expect(span).not.toHaveAttribute("style", /gap|flex/);
+    // Its children sit directly inside it, with no wrapper
+    await expect(span.locator("> a")).toHaveText(["Inline one", "Inline two"]);
+    await expect(span.locator("> :not(a)")).toHaveCount(0);
+    // Its own settings still apply, and its links inherit them
+    await expect(page.locator("#span-one")).toHaveCSS("font-weight", "700");
+    // Inline: the two links share a line, a space's width apart at most
+    const [one, two] = await Promise.all([
+      page.locator("#span-one").boundingBox(),
+      page.locator("#span-two").boundingBox(),
+    ]);
+    expect(Math.abs(two!.y - one!.y)).toBeLessThan(1);
+    expect(two!.x - (one!.x + one!.width)).toBeLessThan(8);
+  });
+
+  // A Container with a Link to address: one <a>, laid out as the row it is
+  test("a linked Container is one link, laid out and coloured as a container", async ({
+    page,
+  }) => {
+    const box = page.locator("#link-box");
+    expect(await box.evaluate((el) => el.tagName)).toBe("A");
+    await expect(box).toHaveAttribute("href", "/hello-world");
+    await expect(box).not.toHaveAttribute("target", /.*/);
+    await expect(box).toHaveCSS("display", "flex");
+    await expect(box.locator("> .block-item > p")).toHaveText([
+      "Linked box left",
+      "Linked box right",
+    ]);
+    const [left, right] = await Promise.all([
+      page.locator("#box-left").boundingBox(),
+      page.locator("#box-right").boundingBox(),
+    ]);
+    expect(right!.x).toBeGreaterThan(left!.x + left!.width);
+    // Not the typography's link look: text colour, no underline
+    await expect(page.locator("#box-left")).toHaveCSS("color", rgb(COLORS.text));
+    await expect(box).toHaveCSS("text-decoration-line", "none");
+
+    await page.locator("#box-right").click();
+    await expect(page).toHaveURL(/\/hello-world$/);
+  });
+
   // Saving refuses this address; it is in the database only through the seed
   test("an unsafe address is shown as text, not linked", async ({ page }) => {
     const unsafe = page.locator("#link-unsafe");

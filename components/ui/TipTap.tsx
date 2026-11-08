@@ -6,6 +6,7 @@ import TiptapMenu from "./TipTapMenu";
 import TextAlign from "@tiptap/extension-text-align";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
+import { TextColorMark } from "@/lib/tiptap-text-color";
 import { forwardRef, useImperativeHandle } from "react";
 
 export interface TiptapHandle {
@@ -32,6 +33,7 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
         }),
         Image,
         TableKit,
+        TextColorMark,
         TextAlign.configure({
           types: ["heading", "paragraph"],
         }),
@@ -63,9 +65,11 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
     return (
       <div>
         {showMenu && <TiptapMenu editor={editor} />}
+        {/* The text takes its size from the block, as on the site */}
         <EditorContent
           editor={editor}
-          className="prose prose-sm w-full max-w-none"
+          className="prose w-full max-w-none"
+          style={{ fontSize: "inherit" }}
         />
       </div>
     );

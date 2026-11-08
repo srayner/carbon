@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import { EditableProps } from "@/types/blocks";
 import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
+import { getTokenStyle } from "@/lib/block-tokens";
 
 const RichTextEditable = ({ block, onChange }: EditableProps<"RichText">) => {
   const { content } = block.properties;
@@ -12,12 +13,11 @@ const RichTextEditable = ({ block, onChange }: EditableProps<"RichText">) => {
     onChange({ content });
   };
 
+  // The block's theme settings (text size, colour, spacing...) as on the site
   return (
-    <Tiptap
-      ref={tiptapRef}
-      onBlur={handleBlur}
-      initialContent={content}
-    />
+    <div style={getTokenStyle(block.properties)}>
+      <Tiptap ref={tiptapRef} onBlur={handleBlur} initialContent={content} />
+    </div>
   );
 };
 

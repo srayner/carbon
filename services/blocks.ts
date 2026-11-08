@@ -1,18 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
 import { validateBlockTree } from "@/lib/block-tree";
-import { validateBlockUrls } from "@/lib/block-urls";
+import { validateBlockUrls, validateNestedLinks } from "@/lib/block-urls";
 import { Block } from "@/types/blocks";
 
 type BlockOwner = { pageId: string } | { fragmentId: string };
 
 /**
- * Rejects a block list that is not a valid tree, or has a link address
- * that must not be published (see lib/link-url.ts). Callers run it before
+ * Rejects a block list that is not a valid tree, has a link address that
+ * must not be published (see lib/link-url.ts), or has a link inside a link. Callers run it before
  * writing anything else, so a bad list leaves the page or fragment untouched.
  */
 export const assertValidBlocks = (blocks: Block[]) => {
-  const error = validateBlockTree(blocks) ?? validateBlockUrls(blocks);
+  const error =
+    validateBlockTree(blocks) ?? validateBlockUrls(blocks) ?? validateNestedLinks(blocks);
   if (error) throw new AppError(error, 400);
 };
 

@@ -15,7 +15,7 @@ import {
   removeBlock,
   subtreeIds,
 } from "@/lib/block-tree";
-import { getGrowStyle } from "@/lib/container-style";
+import { getGrowStyle, isInlineContainer } from "@/lib/container-style";
 
 type BlockEditorProps = {
   blocks: Block[];
@@ -119,20 +119,24 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
   const selectedBlock = blocks.find((bl) => bl.id === selectedBlockId) || null;
 
   // Each block in a frame that selects it; a container's children are drawn
-  // inside its Editable, each in its own frame
-  const renderNodes = (nodes: BlockNode<Block>[]): React.ReactNode =>
+  // inside its Editable, each in its own frame. Inside a span the frames are
+  // inline spans, so the children flow as they will on the site.
+  const renderNodes = (nodes: BlockNode<Block>[], inline = false): React.ReactNode =>
     nodes.map(({ block, depth, children }) => {
       const Editable = getEditable(block.type);
       if (!Editable) return null;
       const isSelected = block.id === selectedBlockId;
+      const Frame = inline ? "span" : "div";
 
       return (
-        <div
+        <Frame
           key={block.id}
           data-block-id={block.id}
-          // Inside a container the frame is the flex item, so it takes the Grow
-          className={depth === 0 ? "relative mr-10" : "relative block-item"}
-          style={depth === 0 ? undefined : getGrowStyle(block.properties)}
+          // Inside a div container the frame is the flex item, so it takes the Grow
+          className={
+            inline ? "relative" : depth === 0 ? "relative mr-10" : "relative block-item"
+          }
+          style={inline || depth === 0 ? undefined : getGrowStyle(block.properties)}
           onClick={(e) => {
             // The innermost block clicked is the one selected
             e.stopPropagation();
@@ -145,14 +149,14 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
               onChange={(patch) => handleBlockPropsChanged(block.id, patch)}
             >
               {isContainerType(block.type) && children.length > 0
-                ? renderNodes(children)
+                ? renderNodes(children, isInlineContainer(block.properties))
                 : undefined}
             </Editable>
           </Suspense>
           {isSelected && (
-            <div className="absolute -inset-1 pointer-events-none border-2 border-ring"></div>
+            <span className="absolute -inset-1 pointer-events-none border-2 border-ring"></span>
           )}
-        </div>
+        </Frame>
       );
     });
 

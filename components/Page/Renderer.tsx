@@ -5,7 +5,7 @@ import { loadViews } from "@/components/Block/views";
 import { getBlockStyle } from "@/lib/block-style";
 import { getTokenStyle } from "@/lib/block-tokens";
 import { BlockNode, buildTree, isContainerType } from "@/lib/block-tree";
-import { getGrowStyle } from "@/lib/container-style";
+import { getGrowStyle, isInlineContainer } from "@/lib/container-style";
 
 interface RendererProps {
   page: Page;
@@ -58,15 +58,15 @@ export const BlocksView = async ({
 }) => {
   const views = await loadViews(blocks.map((block) => block.type));
 
-  // Inside a container each item is wrapped in the flex item that carries its
-  // Grow (see .block-item in globals.css)
+  // Inside a div container each item is wrapped in the flex item that carries
+  // its Grow (see .block-item in globals.css); a span's children are not
   const renderNodes = (
     nodes: BlockNode<Block>[],
-    inContainer = false
+    wrapItems = false
   ): React.ReactNode[] =>
     groupBlocks(nodes).map((item) => {
       const rendered = renderItem(item);
-      if (!inContainer || !rendered) return rendered;
+      if (!wrapItems || !rendered) return rendered;
       const key = item.kind === "cards" ? item.cards[0].id : item.node.block.id;
       // A group of cards has no Grow of its own
       const style =
@@ -106,7 +106,9 @@ export const BlocksView = async ({
         shared={getSharedProps(block)}
         currentPageId={currentPageId}
       >
-        {isContainerType(block.type) ? renderNodes(children, true) : undefined}
+        {isContainerType(block.type)
+          ? renderNodes(children, !isInlineContainer(block.properties))
+          : undefined}
       </View>
     );
   };

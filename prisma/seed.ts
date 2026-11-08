@@ -87,20 +87,7 @@ async function seedTemplates() {
   }
 
   const header = await prisma.fragment.create({
-    data: {
-      name: "Main header",
-      kind: "HEADER",
-      blocks: {
-        create: [
-          {
-            id: crypto.randomUUID(),
-            type: "Heading",
-            order: 0,
-            properties: { level: "h3", content: "Carbon" },
-          },
-        ],
-      },
-    },
+    data: { name: "Main header", kind: "HEADER", blocks: { create: headerBlocks() } },
   });
   const footer = await prisma.fragment.create({
     data: {
@@ -151,6 +138,67 @@ async function seedTemplates() {
   });
 
   console.log("Templates have been seeded!");
+}
+
+/*
+ * The site header from the mock: the logo (icon and "Steve Rayner Makes",
+ * linked home) on the left, the menu in the middle, the YouTube button on
+ * the right. Listed in tree order, each container before its children.
+ */
+function headerBlocks() {
+  const rows: { id: string; type: string; order: number; properties: Prisma.InputJsonObject; parentId?: string }[] = [];
+  const add = (type: string, properties: Prisma.InputJsonObject, parentId?: string) => {
+    const id = crypto.randomUUID();
+    rows.push({ id, type, order: rows.length, properties, parentId });
+    return id;
+  };
+
+  const bar = add("Container", {
+    direction: "row",
+    justify: "between",
+    align: "center",
+    gap: "l",
+    width: "page",
+    cssId: "site-header",
+  });
+
+  const logo = add(
+    "Container",
+    { direction: "row", align: "center", gap: "s", url: "/", cssId: "site-logo" },
+    bar
+  );
+  add("Image", { src: "/logo-icon.svg", alt: "", width: "36px", height: "36px" }, logo);
+  add(
+    "RichText",
+    {
+      content: '<p>Steve Rayner <span class="site-text-accent">Makes</span></p>',
+      weight: "semibold",
+      textSize: "l",
+    },
+    logo
+  );
+
+  const menu = add(
+    "Container",
+    { direction: "row", align: "center", gap: "l", weight: "medium", textSize: "s", cssId: "site-menu" },
+    bar
+  );
+  for (const label of ["Projects", "Build log", "Videos", "About"]) {
+    add("Link", { label, url: `/${label.toLowerCase().replace(" ", "-")}` }, menu);
+  }
+
+  add(
+    "Link",
+    {
+      label: "Subscribe on YouTube",
+      url: "https://www.youtube.com/",
+      newTab: "true",
+      style: "button",
+      cssId: "site-subscribe",
+    },
+    bar
+  );
+  return rows;
 }
 
 // Fixed ids and slugs, so the tests can rely on them
@@ -547,6 +595,26 @@ async function seedLayoutPages() {
   for (const label of ["Projects", "Build log", "Videos", "About"]) {
     add(links, "Link", { label, url: `/${label.toLowerCase().replace(" ", "-")}` }, nav);
   }
+  // A span Container: plain inline markup round its children. Its own
+  // settings apply (the weight); the layout ones (a row, a gap) do not
+  const span = add(links, "Container", {
+    element: "span",
+    direction: "row",
+    gap: "xl",
+    weight: "bold",
+    cssId: "link-span",
+  });
+  add(links, "Link", { label: "Inline one", url: "/hello-world", cssId: "span-one" }, span);
+  add(links, "Link", { label: "Inline two", url: "/hello-world", cssId: "span-two" }, span);
+  // A linked Container: the whole row is one link, laid out as a row
+  const box = add(links, "Container", {
+    direction: "row",
+    gap: "l",
+    url: "/hello-world",
+    cssId: "link-box",
+  });
+  add(links, "Paragraph", { content: "Linked box left", cssId: "box-left" }, box);
+  add(links, "Paragraph", { content: "Linked box right", cssId: "box-right" }, box);
   add(links, "Link", { label: "Unsafe link", url: "javascript:alert(1)", cssId: "link-unsafe" });
 
   await prisma.page.create({
