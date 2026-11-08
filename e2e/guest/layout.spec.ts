@@ -18,7 +18,8 @@ test.describe("a Container", () => {
   test("shows its children inside it, nested as saved", async ({ page }) => {
     const row = page.locator("#layout-row");
     await expect(row.locator("> *")).toHaveCount(3);
-    await expect(row.locator("> #layout-column > p")).toHaveText([
+    // Each child sits in its own flex item
+    await expect(row.locator("> .block-item > #layout-column > .block-item > p")).toHaveText([
       "Column top",
       "Column bottom",
     ]);
@@ -78,6 +79,38 @@ test.describe("a Container", () => {
   });
 });
 
+// Grow shares a row's width by ratio, ignoring the content's own size
+test.describe("Grow", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/layout-showcase");
+  });
+
+  const width = async (page: import("@playwright/test").Page, id: string) =>
+    (await box(page.locator(id))).width;
+
+  test("on 1 and 1 splits the row evenly, a short table beside long text", async ({ page }) => {
+    const [table, text] = await Promise.all([width(page, "#grow-table"), width(page, "#grow-text")]);
+    expect(Math.abs(table - text)).toBeLessThan(1);
+    // and the two fill the row between them
+    const row = await width(page, "#grow-row");
+    expect(table + text).toBeGreaterThan(row * 0.9);
+  });
+
+  test("on 2 and 1 splits the row two to one", async ({ page }) => {
+    const [two, one] = await Promise.all([width(page, "#ratio-two"), width(page, "#ratio-one")]);
+    expect(two / one).toBeCloseTo(2, 1);
+  });
+
+  test("left on content, blocks keep their own size and leave the rest of the row", async ({
+    page,
+  }) => {
+    const [first, column, last, row] = await Promise.all(
+      ["#row-first", "#layout-column", "#row-last", "#layout-row"].map((id) => width(page, id))
+    );
+    expect(first + column + last).toBeLessThan(row * 0.6);
+  });
+});
+
 // Rows that saving would refuse (see prisma/seed.ts) must not break the page
 test.describe("a page with bad nested blocks", () => {
   test.beforeEach(async ({ page }) => {
@@ -105,7 +138,9 @@ test.describe("a page with bad nested blocks", () => {
   });
 
   test(`shows containers down to depth ${MAX_DEPTH}, nested`, async ({ page }) => {
-    const chain = Array.from({ length: MAX_DEPTH + 1 }, (_, d) => `#deep-${d}`).join(" > ");
+    const chain = Array.from({ length: MAX_DEPTH + 1 }, (_, d) => `#deep-${d}`).join(
+      " > .block-item > "
+    );
     await expect(page.locator(chain)).toBeAttached();
     await expect(page.locator(`#deep-${MAX_DEPTH} > *`)).toHaveCount(0);
   });

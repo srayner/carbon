@@ -5,6 +5,11 @@ import {
   MAX_DEPTH,
   TreeBlock,
   buildTree,
+  depthOf,
+  insertBlock,
+  moveBlock,
+  removeBlock,
+  subtreeIds,
   validateBlockTree,
 } from "@/lib/block-tree";
 
@@ -154,5 +159,150 @@ describe("buildTree", () => {
       expect(warn).not.toHaveBeenCalled();
       warn.mockRestore();
     });
+  });
+});
+
+/*
+ * Editing the flat list. The fixture is in tree order, as the editor keeps it:
+ *
+ *   intro
+ *   row
+ *     left
+ *     col
+ *       top
+ *       bottom
+ *     right
+ *   empty      (a container with nothing in it)
+ *   outro
+ */
+const page = (): TreeBlock[] => [
+  block("intro"),
+  box("row"),
+  block("left", "row"),
+  box("col", "row"),
+  block("top", "col"),
+  block("bottom", "col"),
+  block("right", "row"),
+  box("empty"),
+  block("outro"),
+];
+const ids = (blocks: TreeBlock[]) => blocks.map((b) => b.id);
+
+/** The list must still be a valid tree, in tree order. */
+const expectTreeOrder = (blocks: TreeBlock[]) => {
+  expect(validateBlockTree(blocks, isBox)).toBeNull();
+  expect(outline(buildTree(blocks)).map((line) => line.trim())).toEqual(ids(blocks));
+};
+
+describe("the fixture", () => {
+  it("is itself a valid tree in tree order", () => expectTreeOrder(page()));
+});
+
+describe("subtreeIds", () => {
+  it.each([
+    ["row", ["row", "left", "col", "top", "bottom", "right"]],
+    ["col", ["col", "top", "bottom"]],
+    ["left", ["left"]],
+    ["empty", ["empty"]],
+  ])("of %s is it and everything inside it", (id, expected) => {
+    expect([...subtreeIds(page(), id)].sort()).toEqual([...expected].sort());
+  });
+
+  it("stops on a loop", () => {
+    expect([...subtreeIds([box("x", "y"), box("y", "x")], "x")].sort()).toEqual(["x", "y"]);
+  });
+});
+
+describe("depthOf", () => {
+  it.each([
+    ["intro", 0],
+    ["row", 0],
+    ["left", 1],
+    ["col", 1],
+    ["top", 2],
+  ])("%s is %i deep", (id, depth) => {
+    expect(depthOf(page(), id)).toBe(depth);
+  });
+
+  it("stops on a loop", () => {
+    expect(depthOf([box("x", "y"), box("y", "x")], "x")).toBe(1);
+  });
+});
+
+describe("insertBlock", () => {
+  it.each([
+    ["the top level", null, "outro"],
+    ["a row, after everything inside it", "row", "right"],
+    ["a column inside a row", "col", "bottom"],
+    ["an empty container", "empty", "empty"],
+  ])("adds to the end of %s", (_, parentId, after) => {
+    const result = insertBlock(page(), block("new"), parentId);
+    expect(result.find((b) => b.id === "new")!.parentId).toBe(parentId);
+    expect(ids(result)[ids(result).indexOf(after) + 1]).toBe("new");
+    expect(ids(result).filter((id) => id !== "new")).toEqual(ids(page()));
+    expectTreeOrder(result);
+  });
+
+  it("refuses a container that is not in the list", () => {
+    expect(() => insertBlock(page(), block("new"), "gone")).toThrow("not in the list");
+  });
+
+  it("leaves the list it was given alone", () => {
+    const before = page();
+    insertBlock(before, block("new"), "row");
+    expect(before).toEqual(page());
+  });
+});
+
+describe("removeBlock", () => {
+  it("removes a plain block and nothing else", () => {
+    expect(ids(removeBlock(page(), "top"))).toEqual(ids(page()).filter((id) => id !== "top"));
+  });
+
+  it("removes a container with everything inside it", () => {
+    const result = removeBlock(page(), "row");
+    expect(ids(result)).toEqual(["intro", "empty", "outro"]);
+    expectTreeOrder(result);
+  });
+});
+
+describe("moveBlock", () => {
+  it.each([
+    ["a container up, taking its children", "col", -1,
+      ["intro", "row", "col", "top", "bottom", "left", "right", "empty", "outro"]],
+    ["a block down past a container and its children", "left", 1,
+      ["intro", "row", "col", "top", "bottom", "left", "right", "empty", "outro"]],
+    ["a block up past a container and its children", "right", -1,
+      ["intro", "row", "left", "right", "col", "top", "bottom", "empty", "outro"]],
+    ["a whole row down", "row", 1,
+      ["intro", "empty", "row", "left", "col", "top", "bottom", "right", "outro"]],
+    ["a block inside a nested column", "bottom", -1,
+      ["intro", "row", "left", "col", "bottom", "top", "right", "empty", "outro"]],
+  ])("moves %s", (_, id, direction, expected) => {
+    expect(ids(moveBlock(page(), id, direction as -1 | 1))).toEqual(expected);
+  });
+
+  // A block stays with its siblings: it never leaves or enters a container
+  it.each([
+    ["the first top-level block up", "intro", -1],
+    ["the last top-level block down", "outro", 1],
+    ["the first child up, out of its container", "left", -1],
+    ["the last child down, out of its container", "right", 1],
+    ["a block that is not in the list", "gone", 1],
+  ])("does nothing to %s", (_, id, direction) => {
+    expect(moveBlock(page(), id, direction as -1 | 1)).toEqual(page());
+  });
+
+  it("keeps every block, the tree and its order, for every move", () => {
+    for (const { id } of page()) {
+      for (const direction of [-1, 1] as const) {
+        const result = moveBlock(page(), id, direction);
+        expect(ids(result).sort()).toEqual(ids(page()).sort());
+        expect(result.map((b) => [b.id, b.parentId])).toEqual(
+          expect.arrayContaining(page().map((b) => [b.id, b.parentId]))
+        );
+        expectTreeOrder(result);
+      }
+    }
   });
 });

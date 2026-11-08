@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { SHARED_PROPERTIES } from "@/config/blocks/shared";
+import { TOKEN_PROPERTIES } from "@/config/blocks/shared";
 
 // Each shared property -> the CSS it sets, given a token name
 const CSS: Record<string, (token: string) => CSSProperties> = {
@@ -27,7 +27,7 @@ export const getTokenStyle = (
 ): CSSProperties => {
   let style: CSSProperties = {};
 
-  for (const prop of SHARED_PROPERTIES) {
+  for (const prop of TOKEN_PROPERTIES) {
     const value = properties[prop.name];
     if (typeof value !== "string" || value === "") continue;
     if (!(prop.values as readonly string[]).includes(value)) continue;

@@ -439,6 +439,31 @@ async function seedLayoutPages() {
   add(valid, "Paragraph", { content: "After the row", cssId: "after-row" });
   add(valid, "Container", { cssId: "layout-empty" });
 
+  // Grow: a short table beside a long paragraph, both on 1, must split the
+  // row evenly; then a 2 : 1 split
+  const growRow = add(valid, "Container", { direction: "row", cssId: "grow-row" });
+  add(
+    valid,
+    "KeyValueTable",
+    { cssId: "grow-table", grow: "1", rows: JSON.stringify([{ key: "Size", value: "S" }]) },
+    growRow
+  );
+  add(
+    valid,
+    "Paragraph",
+    {
+      cssId: "grow-text",
+      grow: "1",
+      content:
+        "A much longer paragraph than the table beside it, so that sized by " +
+        "content it would take most of the row, and only Grow makes the two even.",
+    },
+    growRow
+  );
+  const ratioRow = add(valid, "Container", { direction: "row", cssId: "ratio-row" });
+  add(valid, "Paragraph", { content: "Two parts", cssId: "ratio-two", grow: "2" }, ratioRow);
+  add(valid, "Paragraph", { content: "One part", cssId: "ratio-one", grow: "1" }, ratioRow);
+
   await prisma.page.create({
     data: {
       title: "Layout Showcase",

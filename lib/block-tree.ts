@@ -106,3 +106,101 @@ export const buildTree = <T extends TreeBlock>(blocks: T[]): BlockNode<T>[] => {
   }
   return tree;
 };
+
+/* ----- Editing the flat list -----
+ *
+ * The editor keeps one flat list in tree order: each container is followed by
+ * everything inside it. These keep it that way, and never drop a block they
+ * were not asked to remove.
+ */
+
+const childIdsOf = (blocks: TreeBlock[]) => {
+  const children = new Map<string, string[]>();
+  for (const b of blocks) {
+    if (!b.parentId) continue;
+    const list = children.get(b.parentId) ?? [];
+    list.push(b.id);
+    children.set(b.parentId, list);
+  }
+  return children;
+};
+
+/** The ids of a block and everything inside it. Safe on loops. */
+export const subtreeIds = (blocks: TreeBlock[], id: string): Set<string> => {
+  const children = childIdsOf(blocks);
+  const ids = new Set<string>();
+  const stack = [id];
+  while (stack.length) {
+    const current = stack.pop()!;
+    if (ids.has(current)) continue;
+    ids.add(current);
+    stack.push(...(children.get(current) ?? []));
+  }
+  return ids;
+};
+
+/** How many containers a block is inside (0 at the top). Safe on loops. */
+export const depthOf = (blocks: TreeBlock[], id: string): number => {
+  const byId = new Map(blocks.map((b) => [b.id, b]));
+  const seen = new Set([id]);
+  let depth = 0;
+  for (let p = byId.get(id)?.parentId; p && byId.has(p) && !seen.has(p); p = byId.get(p)!.parentId) {
+    seen.add(p);
+    depth++;
+  }
+  return depth;
+};
+
+/**
+ * Adds a block at the end of a container, or at the end of the top level when
+ * parentId is null.
+ */
+export const insertBlock = <T extends TreeBlock>(
+  blocks: T[],
+  block: T,
+  parentId: string | null
+): T[] => {
+  const added = { ...block, parentId };
+  if (!parentId) return [...blocks, added];
+
+  if (!blocks.some((b) => b.id === parentId)) {
+    throw new Error(`insertBlock: container ${parentId} is not in the list`);
+  }
+  const inside = subtreeIds(blocks, parentId);
+  const last = blocks.findLastIndex((b) => inside.has(b.id));
+  return [...blocks.slice(0, last + 1), added, ...blocks.slice(last + 1)];
+};
+
+/** Removes a block and everything inside it. */
+export const removeBlock = <T extends TreeBlock>(blocks: T[], id: string): T[] => {
+  const gone = subtreeIds(blocks, id);
+  return blocks.filter((b) => !gone.has(b.id));
+};
+
+/**
+ * Swaps a block with its previous (-1) or next (1) sibling, each taking
+ * everything inside it along. Does nothing at either end.
+ */
+export const moveBlock = <T extends TreeBlock>(
+  blocks: T[],
+  id: string,
+  direction: -1 | 1
+): T[] => {
+  const target = blocks.find((b) => b.id === id);
+  if (!target) return blocks;
+
+  const parentId = target.parentId ?? null;
+  const siblings = blocks.filter((b) => (b.parentId ?? null) === parentId);
+  const other = siblings[siblings.indexOf(target) + direction];
+  if (!other) return blocks;
+
+  const moving = subtreeIds(blocks, id);
+  const passed = subtreeIds(blocks, other.id);
+  const movingBlocks = blocks.filter((b) => moving.has(b.id));
+  const rest = blocks.filter((b) => !moving.has(b.id));
+  const at =
+    direction === -1
+      ? rest.indexOf(other)
+      : rest.findLastIndex((b) => passed.has(b.id)) + 1;
+  return [...rest.slice(0, at), ...movingBlocks, ...rest.slice(at)];
+};

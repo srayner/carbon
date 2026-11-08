@@ -87,6 +87,7 @@ const QueryView = async ({
               linkLabel: "Read more",
               className: "",
               cssId: "",
+              grow: "content",
             },
           }}
         />

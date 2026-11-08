@@ -173,15 +173,26 @@
   }
 }
 
-/* A Container block. Its gap spaces its children, so their prose margins are
-   dropped; a child's own spacing tokens are inline styles and still apply.
-   Unlayered, so it wins over the typography plugin's rules. */
+/* A Container block. Each child sits in a .block-item, the flex item that
+   carries the child's Grow. The gap spaces the items, so the children's prose
+   margins are dropped; a child's own spacing tokens are inline styles and
+   still apply. The child fills its item, so it fills a stretched row's height
+   too. Unlayered, so it wins over the typography plugin's rules. */
 .block-container {
   display: flex;
 }
 .block-container > * {
   margin-block: 0;
+  /* lets a Grow share hold even when the content is wider */
   min-width: 0;
+}
+.block-item {
+  display: flex;
+  flex-direction: column;
+}
+.block-item > * {
+  margin-block: 0;
+  flex: 1 1 auto;
 }
 
 /* The site theme. The variables are set on .site-theme from the saved theme

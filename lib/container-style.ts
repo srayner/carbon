@@ -8,6 +8,7 @@ import { SPACING_STEPS } from "@/lib/theme";
 export const DIRECTIONS = ["column", "row"] as const;
 export const JUSTIFY_OPTIONS = ["start", "center", "end", "between"] as const;
 export const ALIGN_OPTIONS = ["stretch", "start", "center", "end"] as const;
+export const GROW_OPTIONS = ["content", "1", "2", "3"] as const;
 
 const JUSTIFY: Record<(typeof JUSTIFY_OPTIONS)[number], string> = {
   start: "flex-start",
@@ -43,4 +44,15 @@ export const getContainerStyle = (
     alignItems: ALIGN[pick(ALIGN_OPTIONS, properties.align, "stretch")],
     ...(gap && { gap: `var(--site-space-${gap})` }),
   };
+};
+
+/**
+ * The flexbox CSS for a block inside a container, from its Grow property.
+ * "content" keeps the browser's default (sized by its content, taking no
+ * spare space). A number starts the block from nothing and shares out all
+ * the space by ratio, so two blocks on 1 get half each whatever their content.
+ */
+export const getGrowStyle = (properties: Record<string, unknown>): CSSProperties => {
+  const grow = pick(GROW_OPTIONS, properties.grow, "content");
+  return grow === "content" ? {} : { flex: `${grow} 1 0` };
 };

@@ -8,6 +8,8 @@ import MissingRenderer from "@/components/Block/MissingRenderer";
 export type AnyEditable = ComponentType<{
   block: Block;
   onChange: (patch: Record<string, unknown>) => void;
+  // A container's children, already drawn by the block editor
+  children?: React.ReactNode;
 }>;
 
 const cache = new Map<string, AnyEditable>();

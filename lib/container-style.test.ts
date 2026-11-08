@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ContainerBlockConfig } from "@/config/blocks/container";
-import { getContainerStyle } from "@/lib/container-style";
+import { GROW_PROPERTY } from "@/config/blocks/shared";
+import { getContainerStyle, getGrowStyle } from "@/lib/container-style";
 
 const defaults = Object.fromEntries(
   ContainerBlockConfig.properties.map((p) => [p.name, p.default])
@@ -58,5 +59,23 @@ describe("getContainerStyle", () => {
       justifyContent: "flex-start",
       alignItems: "stretch",
     });
+  });
+});
+
+describe("getGrowStyle", () => {
+  it("leaves a block on the default sized by its content", () => {
+    expect(getGrowStyle({ grow: GROW_PROPERTY.default })).toEqual({});
+    expect(getGrowStyle({})).toEqual({});
+  });
+
+  // A number ignores the content's size (basis 0) and shares space by ratio
+  it.each(GROW_PROPERTY.values.filter((v) => v !== "content"))("shares space on %s", (n) => {
+    expect(getGrowStyle({ grow: n })).toEqual({ flex: `${n} 1 0` });
+  });
+
+  it("ignores values that are not one of the options", () => {
+    for (const grow of ["0", "4", "1; color: red", 1, null]) {
+      expect(getGrowStyle({ grow })).toEqual({});
+    }
   });
 });

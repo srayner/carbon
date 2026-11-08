@@ -5,6 +5,7 @@ import { loadViews } from "@/components/Block/views";
 import { getBlockStyle } from "@/lib/block-style";
 import { getTokenStyle } from "@/lib/block-tokens";
 import { BlockNode, buildTree, isContainerType } from "@/lib/block-tree";
+import { getGrowStyle } from "@/lib/container-style";
 
 interface RendererProps {
   page: Page;
@@ -57,39 +58,58 @@ export const BlocksView = async ({
 }) => {
   const views = await loadViews(blocks.map((block) => block.type));
 
-  const renderNodes = (nodes: BlockNode<Block>[]): React.ReactNode[] =>
+  // Inside a container each item is wrapped in the flex item that carries its
+  // Grow (see .block-item in globals.css)
+  const renderNodes = (
+    nodes: BlockNode<Block>[],
+    inContainer = false
+  ): React.ReactNode[] =>
     groupBlocks(nodes).map((item) => {
-      if (item.kind === "cards") {
-        return (
-          <div
-            key={item.cards[0].id}
-            className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {item.cards.map((card) => (
-              <CardView
-                key={card.id}
-                block={card}
-                style={getSharedProps(card).style}
-              />
-            ))}
-          </div>
-        );
-      }
-
-      const { block, children } = item.node;
-      const View = views.get(block.type);
-      if (!View) return null;
+      const rendered = renderItem(item);
+      if (!inContainer || !rendered) return rendered;
+      const key = item.kind === "cards" ? item.cards[0].id : item.node.block.id;
+      // A group of cards has no Grow of its own
+      const style =
+        item.kind === "cards" ? {} : getGrowStyle(item.node.block.properties);
       return (
-        <View
-          key={block.id}
-          block={block}
-          shared={getSharedProps(block)}
-          currentPageId={currentPageId}
-        >
-          {isContainerType(block.type) ? renderNodes(children) : undefined}
-        </View>
+        <div key={key} className="block-item" style={style}>
+          {rendered}
+        </div>
       );
     });
+
+  const renderItem = (item: RenderItem): React.ReactNode => {
+    if (item.kind === "cards") {
+      return (
+        <div
+          key={item.cards[0].id}
+          className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {item.cards.map((card) => (
+            <CardView
+              key={card.id}
+              block={card}
+              style={getSharedProps(card).style}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    const { block, children } = item.node;
+    const View = views.get(block.type);
+    if (!View) return null;
+    return (
+      <View
+        key={block.id}
+        block={block}
+        shared={getSharedProps(block)}
+        currentPageId={currentPageId}
+      >
+        {isContainerType(block.type) ? renderNodes(children, true) : undefined}
+      </View>
+    );
+  };
 
   return <>{renderNodes(buildTree(blocks))}</>;
 };
