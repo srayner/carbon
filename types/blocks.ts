@@ -89,4 +89,6 @@ export type ViewProps<N extends BlockName> = {
   block: Block<N>;
   shared: SharedBlockProps;
   currentPageId?: string | null;
+  // A container block's children, already rendered
+  children?: React.ReactNode;
 };

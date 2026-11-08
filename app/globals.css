@@ -173,6 +173,17 @@
   }
 }
 
+/* A Container block. Its gap spaces its children, so their prose margins are
+   dropped; a child's own spacing tokens are inline styles and still apply.
+   Unlayered, so it wins over the typography plugin's rules. */
+.block-container {
+  display: flex;
+}
+.block-container > * {
+  margin-block: 0;
+  min-width: 0;
+}
+
 /* The site theme. The variables are set on .site-theme from the saved theme
    (see components/Theme/SiteTheme.tsx), so none of this reaches the admin UI. */
 .site-theme {

@@ -69,6 +69,14 @@ describe("validateBlockTree rejects", () => {
   });
 
   // With the real block configs: only container blocks can be parents
+  it("nothing when the parent's config is a container", () => {
+    const containers = ALL_BLOCKS.filter((c) => "container" in c && c.container);
+    expect(containers.map((c) => c.name)).toContain("Container");
+    for (const { name } of containers) {
+      expect(validateBlockTree([block("p", null, name), block("a", "p")])).toBeNull();
+    }
+  });
+
   it("any child of a block whose config is not a container", () => {
     const plain = ALL_BLOCKS.filter((c) => !("container" in c && c.container));
     expect(plain.length).toBeGreaterThan(0);

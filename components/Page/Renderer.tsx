@@ -4,6 +4,7 @@ import CardView from "@/components/Block/CardView";
 import { loadViews } from "@/components/Block/views";
 import { getBlockStyle } from "@/lib/block-style";
 import { getTokenStyle } from "@/lib/block-tokens";
+import { BlockNode, buildTree, isContainerType } from "@/lib/block-tree";
 
 interface RendererProps {
   page: Page;
@@ -24,24 +25,29 @@ const getSharedProps = (block: Block): SharedBlockProps => {
 };
 
 type RenderItem =
-  | { kind: "block"; block: Block }
+  | { kind: "block"; node: BlockNode<Block> }
   | { kind: "cards"; cards: Block<"Card">[] };
 
-// Consecutive Card blocks are shown together in one grid
-const groupBlocks = (blocks: Block[]): RenderItem[] => {
+// Consecutive Card blocks among the same siblings are shown together in one grid
+const groupBlocks = (nodes: BlockNode<Block>[]): RenderItem[] => {
   const items: RenderItem[] = [];
-  for (const block of blocks) {
+  for (const node of nodes) {
     const last = items[items.length - 1];
-    if (block.type === "Card") {
-      if (last?.kind === "cards") last.cards.push(block);
-      else items.push({ kind: "cards", cards: [block] });
+    if (node.block.type === "Card") {
+      if (last?.kind === "cards") last.cards.push(node.block);
+      else items.push({ kind: "cards", cards: [node.block] });
     } else {
-      items.push({ kind: "block", block });
+      items.push({ kind: "block", node });
     }
   }
   return items;
 };
 
+/**
+ * Renders an owner's blocks (a page's, or a fragment's) from the flat list,
+ * with each container's children inside it. The views for every block type in
+ * the list are loaded once, up front.
+ */
 export const BlocksView = async ({
   blocks,
   currentPageId,
@@ -51,39 +57,41 @@ export const BlocksView = async ({
 }) => {
   const views = await loadViews(blocks.map((block) => block.type));
 
-  return (
-    <>
-      {groupBlocks(blocks).map((item) => {
-        if (item.kind === "cards") {
-          return (
-            <div
-              key={item.cards[0].id}
-              className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            >
-              {item.cards.map((card) => (
-                <CardView
-                  key={card.id}
-                  block={card}
-                  style={getSharedProps(card).style}
-                />
-              ))}
-            </div>
-          );
-        }
-
-        const View = views.get(item.block.type);
-        if (!View) return null;
+  const renderNodes = (nodes: BlockNode<Block>[]): React.ReactNode[] =>
+    groupBlocks(nodes).map((item) => {
+      if (item.kind === "cards") {
         return (
-          <View
-            key={item.block.id}
-            block={item.block}
-            shared={getSharedProps(item.block)}
-            currentPageId={currentPageId}
-          />
+          <div
+            key={item.cards[0].id}
+            className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {item.cards.map((card) => (
+              <CardView
+                key={card.id}
+                block={card}
+                style={getSharedProps(card).style}
+              />
+            ))}
+          </div>
         );
-      })}
-    </>
-  );
+      }
+
+      const { block, children } = item.node;
+      const View = views.get(block.type);
+      if (!View) return null;
+      return (
+        <View
+          key={block.id}
+          block={block}
+          shared={getSharedProps(block)}
+          currentPageId={currentPageId}
+        >
+          {isContainerType(block.type) ? renderNodes(children) : undefined}
+        </View>
+      );
+    });
+
+  return <>{renderNodes(buildTree(blocks))}</>;
 };
 
 const Renderer: React.FC<RendererProps> = ({ page }) => {
