@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/api/error";
-import { assertValidBlockTree, replaceBlocks } from "@/services/blocks";
+import { assertValidBlocks, replaceBlocks } from "@/services/blocks";
 import { KIND_LABELS } from "@/lib/fragment-routes";
 import { Block } from "@/types/blocks";
 import { FRAGMENT_KINDS, FragmentKind } from "@/types/templates";
@@ -56,7 +56,7 @@ export const createFragment = async (data: FragmentInput) => {
   if (!data.kind || !FRAGMENT_KINDS.includes(data.kind)) {
     throw new AppError("A valid kind is required.", 400);
   }
-  if (data.blocks) assertValidBlockTree(data.blocks);
+  if (data.blocks) assertValidBlocks(data.blocks);
 
   const fragment = await prisma.fragment.create({
     data: { name, kind: data.kind },
@@ -70,7 +70,7 @@ export const createFragment = async (data: FragmentInput) => {
 export const updateFragment = async (id: string, data: FragmentInput) => {
   const name = cleanName(data.name);
   await getFragment(id);
-  if (data.blocks) assertValidBlockTree(data.blocks);
+  if (data.blocks) assertValidBlocks(data.blocks);
 
   await prisma.fragment.update({ where: { id }, data: { name } });
   if (data.blocks) await replaceBlocks({ fragmentId: id }, data.blocks);

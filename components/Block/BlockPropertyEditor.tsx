@@ -3,6 +3,7 @@ import { BlockConfig, BlockProperty } from "@/types/blocks";
 import UploadField from "@/components/Block/UploadField";
 import CategoryField from "@/components/Block/CategoryField";
 import { DEFAULT_GROUP, groupProperties } from "@/lib/property-groups";
+import { URL_HINT, safeHref } from "@/lib/link-url";
 
 interface PropertyEditorProps {
   blockConfig: BlockConfig;
@@ -25,6 +26,20 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
   const renderField = (prop: BlockProperty) => {
     const value = blockData[prop.name] ?? prop.default;
 
+    // A checkbox sits before its label, which toggles it too
+    if (prop.type === "boolean") {
+      return (
+        <label key={prop.name} className="flex items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={String(value) === "true"}
+            onChange={(e) => handleChange(prop.name, String(e.target.checked))}
+          />
+          {prop.displayName}
+        </label>
+      );
+    }
+
     let inputEl: React.ReactNode;
     switch (prop.type) {
       case "string":
@@ -36,6 +51,28 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
           />
         );
         break;
+      case "url": {
+        // Saving refuses an address that can't be linked; say so while typing
+        const text = String(value ?? "");
+        const refused = text.trim() !== "" && safeHref(text) === null;
+        inputEl = (
+          <>
+            <input
+              value={text}
+              placeholder="https://… or /page"
+              aria-invalid={refused || undefined}
+              onChange={(e) => handleChange(prop.name, e.target.value)}
+              className={`border p-1 w-full ${refused ? "border-destructive" : ""}`}
+            />
+            {refused && (
+              <p role="alert" className="mt-1 text-xs text-destructive">
+                {URL_HINT}
+              </p>
+            )}
+          </>
+        );
+        break;
+      }
       case "image":
       case "file":
         inputEl = (
@@ -51,15 +88,6 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
           <CategoryField
             value={(value as string) ?? ""}
             onChange={(id) => handleChange(prop.name, id)}
-          />
-        );
-        break;
-      case "boolean":
-        inputEl = (
-          <input
-            type="checkbox"
-            checked={String(value) === "true"}
-            onChange={(e) => handleChange(prop.name, String(e.target.checked))}
           />
         );
         break;

@@ -19,6 +19,10 @@ export const SPACING_STEPS = ["none", "xs", "s", "m", "l", "xl"] as const;
 export const RADIUS_STEPS = ["none", "s", "m", "l", "full"] as const;
 export const BORDER_STEPS = ["none", "thin", "medium", "thick"] as const;
 export const SHADOW_STEPS = ["none", "s", "m", "l"] as const;
+export const TEXT_SIZE_STEPS = ["xs", "s", "m", "l", "xl"] as const;
+// Standard CSS weights, so fixed rather than set by the theme
+export const FONT_WEIGHTS = { regular: 400, medium: 500, semibold: 600, bold: 700 } as const;
+export const FONT_WEIGHT_NAMES = Object.keys(FONT_WEIGHTS) as (keyof typeof FONT_WEIGHTS)[];
 
 export type ColorRole = (typeof COLOR_ROLES)[number];
 export type FontRole = (typeof FONT_ROLES)[number];
@@ -26,6 +30,7 @@ export type SpacingStep = (typeof SPACING_STEPS)[number];
 export type RadiusStep = (typeof RADIUS_STEPS)[number];
 export type BorderStep = (typeof BORDER_STEPS)[number];
 export type ShadowStep = (typeof SHADOW_STEPS)[number];
+export type TextSizeStep = (typeof TEXT_SIZE_STEPS)[number];
 
 /* ----- Fonts ----- */
 
@@ -199,6 +204,12 @@ export const themeSchema = z.object({
       typeof shadow
     >
   ),
+  textSize: z.object(
+    Object.fromEntries(TEXT_SIZE_STEPS.map((step) => [step, length])) as Record<
+      TextSizeStep,
+      typeof length
+    >
+  ),
   // The widest the content column gets on a "narrow" template
   contentWidth: length,
   customCss: z.string().max(CUSTOM_CSS_MAX, "Custom CSS is too long."),
@@ -211,6 +222,7 @@ export type Theme = {
   radius: Record<RadiusStep, string>;
   borderWidth: Record<BorderStep, string>;
   shadow: Record<ShadowStep, string>;
+  textSize: Record<TextSizeStep, string>;
   contentWidth: string;
   customCss: string;
 };
@@ -239,6 +251,7 @@ export const DEFAULT_THEME: Theme = {
     m: "0 4px 12px rgba(0, 0, 0, 0.12)",
     l: "0 12px 32px rgba(0, 0, 0, 0.16)",
   },
+  textSize: { xs: "0.75rem", s: "0.875rem", m: "1rem", l: "1.25rem", xl: "1.5rem" },
   contentWidth: "56rem",
   customCss: "",
 };
@@ -271,6 +284,7 @@ export const themeVariables = (theme: Theme): Record<string, string> => {
   for (const step of RADIUS_STEPS) vars[`--site-radius-${step}`] = theme.radius[step];
   for (const step of BORDER_STEPS) vars[`--site-border-${step}`] = theme.borderWidth[step];
   for (const step of SHADOW_STEPS) vars[`--site-shadow-${step}`] = theme.shadow[step];
+  for (const step of TEXT_SIZE_STEPS) vars[`--site-text-${step}`] = theme.textSize[step];
   vars["--site-content-width"] = theme.contentWidth;
   return vars;
 };

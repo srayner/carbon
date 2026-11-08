@@ -28,6 +28,42 @@ describe("getTokenStyle", () => {
     });
   });
 
+  it.each([
+    ["regular", 400],
+    ["medium", 500],
+    ["semibold", 600],
+    ["bold", 700],
+  ])("sets Font weight %s to %i", (weight, value) => {
+    expect(getTokenStyle({ weight })).toEqual({ fontWeight: value });
+  });
+
+  it("ignores a Font weight that is not one of the choices", () => {
+    expect(getTokenStyle({ weight: "heavy" })).toEqual({});
+  });
+
+  it("turns the text size and border colour into the theme's variables", () => {
+    expect(getTokenStyle({ textSize: "xs", borderColor: "accent" })).toEqual({
+      fontSize: "var(--site-text-xs)",
+      borderColor: "var(--site-color-accent)",
+    });
+  });
+
+  // A button: more padding at the sides than above and below
+  it("sets the sides that the two padding directions cover", () => {
+    expect(getTokenStyle({ paddingX: "l", paddingY: "s" })).toEqual({
+      paddingLeft: "var(--site-space-l)",
+      paddingRight: "var(--site-space-l)",
+      paddingTop: "var(--site-space-s)",
+      paddingBottom: "var(--site-space-s)",
+    });
+  });
+
+  // Inline styles apply in order, so the sides must come after the shorthand
+  it("puts the padding directions after Padding, so they win on their sides", () => {
+    const keys = Object.keys(getTokenStyle({ paddingSize: "m", paddingX: "l" }));
+    expect(keys).toEqual(["padding", "paddingLeft", "paddingRight"]);
+  });
+
   it("gives a border a width and a style", () => {
     expect(getTokenStyle({ border: "thin" })).toEqual({
       borderWidth: "var(--site-border-thin)",

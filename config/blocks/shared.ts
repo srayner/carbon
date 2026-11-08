@@ -5,6 +5,8 @@ import {
   RADIUS_STEPS,
   SHADOW_STEPS,
   SPACING_STEPS,
+  TEXT_SIZE_STEPS,
+  FONT_WEIGHT_NAMES,
 } from "@/lib/theme";
 import { GROW_OPTIONS } from "@/lib/container-style";
 
@@ -31,16 +33,23 @@ const token = (
 
 export const TOKEN_PROPERTIES = [
   token("paddingSize", "Padding", "Spacing", SPACING_STEPS),
+  // Override the sides that Padding sets, e.g. a button wider than it is tall
+  token("paddingX", "Padding left and right", "Spacing", SPACING_STEPS),
+  token("paddingY", "Padding top and bottom", "Spacing", SPACING_STEPS),
   token("marginTopSize", "Space above", "Spacing", SPACING_STEPS),
   token("marginBottomSize", "Space below", "Spacing", SPACING_STEPS),
 
   token("radius", "Corner radius", "Box", RADIUS_STEPS),
   token("border", "Border", "Box", BORDER_STEPS),
+  token("borderColor", "Border colour", "Box", COLOR_ROLES),
   token("shadow", "Shadow", "Box", SHADOW_STEPS),
 
   token("background", "Background", "Colour and font", COLOR_ROLES),
   token("textColor", "Text colour", "Colour and font", COLOR_ROLES),
   token("fontRole", "Font", "Colour and font", FONT_ROLES),
+  token("textSize", "Text size", "Colour and font", TEXT_SIZE_STEPS),
+  // Inherited, so set on a Container it applies to everything inside
+  token("weight", "Font weight", "Colour and font", FONT_WEIGHT_NAMES),
 ] as const;
 
 /*

@@ -386,6 +386,18 @@ async function seedPages() {
             cssId: "showcase-specs-broken",
             rows: "Motor: 28BYJ-48",
           }),
+          // Button-like: padding wider than tall over a Padding that the two
+          // directions override, a coloured border and small text
+          block(15, "Paragraph", {
+            content: "Button tokens",
+            cssId: "button-tokens",
+            paddingSize: "m",
+            paddingX: "l",
+            paddingY: "xs",
+            border: "thin",
+            borderColor: "accent",
+            textSize: "xs",
+          }),
         ],
       },
     },
@@ -500,6 +512,50 @@ async function seedLayoutPages() {
       templateId: DEFAULT_TEMPLATE_ID,
       publishedAt: YESTERDAY,
       blocks: { create: broken },
+    },
+  });
+
+  // Links: each style, an underline, a new tab, tokens over a style, a nav
+  // row like the mock's header, and an address saving would refuse
+  order = 0;
+  const links: Row[] = [];
+  add(links, "Link", { label: "Plain link", url: "/hello-world", cssId: "link-plain" });
+  add(links, "Link", { label: "Button link", url: "/hello-world", style: "button", cssId: "link-button" });
+  add(links, "Link", { label: "Outline link", url: "/hello-world", style: "outline", cssId: "link-outline" });
+  add(links, "Link", {
+    label: "Accent button",
+    url: "/hello-world",
+    style: "button",
+    background: "accent",
+    cssId: "link-accent",
+  });
+  add(links, "Link", { label: "Footer link", url: "/hello-world", underline: "always", cssId: "link-underlined" });
+  add(links, "Link", {
+    label: "Subscribe on YouTube",
+    url: "https://www.youtube.com/",
+    newTab: "true",
+    style: "button",
+    cssId: "link-external",
+  });
+  // Font weight set once on the Container; the links inherit it
+  const nav = add(links, "Container", {
+    direction: "row",
+    gap: "l",
+    weight: "medium",
+    cssId: "link-nav",
+  });
+  for (const label of ["Projects", "Build log", "Videos", "About"]) {
+    add(links, "Link", { label, url: `/${label.toLowerCase().replace(" ", "-")}` }, nav);
+  }
+  add(links, "Link", { label: "Unsafe link", url: "javascript:alert(1)", cssId: "link-unsafe" });
+
+  await prisma.page.create({
+    data: {
+      title: "Link Showcase",
+      slug: "link-showcase",
+      templateId: DEFAULT_TEMPLATE_ID,
+      publishedAt: YESTERDAY,
+      blocks: { create: links },
     },
   });
 }

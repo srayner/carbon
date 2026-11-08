@@ -230,3 +230,50 @@
   --tw-prose-th-borders: var(--site-color-border);
   --tw-prose-td-borders: var(--site-color-border);
 }
+
+/* A Link block (see lib/link-style.ts). Its Style is a look from the theme;
+   the block's tokens are inline styles, so they override it, but hover stays
+   with the style. After the .site-theme rules, which set every border colour
+   with the same specificity. */
+.site-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  color: var(--site-color-text);
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+  transition:
+    color 0.15s,
+    background-color 0.15s,
+    opacity 0.15s;
+}
+.site-link-plain:hover {
+  color: var(--site-color-accent);
+}
+.site-link-button,
+.site-link-outline {
+  padding: var(--site-space-s) var(--site-space-m);
+  border: var(--site-border-thin) solid transparent;
+  border-radius: var(--site-radius-s);
+  font-size: var(--site-text-s);
+  font-weight: 600;
+  line-height: 1.25;
+}
+.site-link-button {
+  background-color: var(--site-color-text);
+  color: var(--site-color-background);
+}
+.site-link-button:hover {
+  opacity: 0.85;
+}
+.site-link-outline {
+  border-color: var(--site-color-text);
+}
+.site-link-outline:hover {
+  background-color: var(--site-color-surface);
+}
+.site-link-underline-always,
+.site-link-underline-hover:hover {
+  text-decoration: underline;
+}

@@ -13,6 +13,7 @@ import {
   BORDER_STEPS,
   FONT_ROLES,
   SHADOW_STEPS,
+  TEXT_SIZE_STEPS,
   FontKey,
   RADIUS_STEPS,
   SPACING_STEPS,
@@ -58,7 +59,8 @@ type Group =
   | "spacing"
   | "radius"
   | "borderWidth"
-  | "shadow";
+  | "shadow"
+  | "textSize";
 
 export default function ThemeForm() {
   const [theme, setTheme] = useState<Theme | null>(null);
@@ -196,6 +198,20 @@ export default function ThemeForm() {
                 <Input
                   value={theme.shadow[step]}
                   onChange={(e) => setValue("shadow", step, e.target.value)}
+                />
+              </label>
+            ))}
+          </div>
+        </Section>
+
+        <Section title="Text sizes">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+            {TEXT_SIZE_STEPS.map((step) => (
+              <label key={step} className="block text-sm">
+                <span className="mb-1 block">{step}</span>
+                <Input
+                  value={theme.textSize[step]}
+                  onChange={(e) => setValue("textSize", step, e.target.value)}
                 />
               </label>
             ))}
