@@ -226,6 +226,32 @@ test.describe("deleting", () => {
     await expect(page.locator("main")).not.toContainText("Child");
   });
 
+  // Found in code review: the open form kept the deleted container as its
+  // target, and pressing Add crashed the editor
+  test("a container deleted while adding inside it closes the form, and editing goes on", async ({
+    page,
+    request,
+  }) => {
+    await createPage(request, [container("box"), paragraph("p", "Kept")]);
+    await openEditor(page);
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message));
+
+    await outline(page).getByRole("button", { name: "Add block inside Container" }).click();
+    await expect(outline(page).getByText("Adding inside Container")).toBeVisible();
+    await outline(page).getByRole("button", { name: "Delete Container" }).click();
+
+    await expect(outline(page).locator("select")).toHaveCount(0);
+    await addBlock(page, "Heading");
+    await expect.poll(() => outlineRows(page)).toEqual(["0:Paragraph", "0:Heading"]);
+    await save(page);
+    expect((await savedBlocks(request)).map((b) => [b.type, b.parentId])).toEqual([
+      ["Paragraph", null],
+      ["Heading", null],
+    ]);
+    expect(errors).toEqual([]);
+  });
+
   test("an empty container goes without asking", async ({ page, request }) => {
     await createPage(request, [container("empty"), paragraph("p", "Kept")]);
     await openEditor(page);

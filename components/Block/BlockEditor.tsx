@@ -65,6 +65,13 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
         );
         return current;
       }
+      if (parentId && !current.some((b) => b.id === parentId)) {
+        console.error(
+          "handleBlockAdded: container is no longer on the page — not adding",
+          parentId
+        );
+        return current;
+      }
 
       return insertBlock(current, block, parentId);
     });

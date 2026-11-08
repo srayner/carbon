@@ -45,6 +45,10 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
   // Where the add form adds to: undefined when closed, null for the top level
   const [addingTo, setAddingTo] = useState<string | null | undefined>(undefined);
   const [newType, setNewType] = useState<BlockName>(ALL_BLOCKS[0].name);
+  // The form closes if the container it adds to is deleted while it is open
+  const isAdding =
+    addingTo === null ||
+    (addingTo !== undefined && blocks.some((b) => b.id === addingTo));
 
   // A container at the deepest level could not hold anything, so none is offered
   const newDepth = addingTo ? depthOf(blocks, addingTo) + 1 : 0;
@@ -59,7 +63,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
 
   const handleAdd = () => {
     const config = choices.find((b) => b.name === newType);
-    if (!config || addingTo === undefined) return;
+    if (!config || !isAdding || addingTo === undefined) return;
 
     const newBlock = {
       id: crypto.randomUUID(),
@@ -143,7 +147,7 @@ export const BlockOutline: React.FC<BlockOutlineProps> = ({
 
       <ul className="space-y-1">{renderNodes(buildTree(blocks))}</ul>
 
-      {addingTo !== undefined ? (
+      {isAdding ? (
         <div className="mt-2 space-y-1">
           <p className="text-sm text-muted-foreground">
             {target ? `Adding inside ${target.type}` : "Adding to the page"}
