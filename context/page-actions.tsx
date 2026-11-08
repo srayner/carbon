@@ -7,6 +7,11 @@ type PageActions = {
   showSaveButton?: boolean;
   onAdd?: () => void;
   onSave?: () => void;
+  // There are changes that Save would store
+  dirty?: boolean;
+  saving?: boolean;
+  // Where the saved version can be seen; shows a Preview button
+  previewHref?: string;
 };
 
 type PageActionsContextType = PageActions & {

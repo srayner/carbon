@@ -9,9 +9,9 @@ import { getPageMetadata, loadPublicPage } from "@/lib/public-page";
 // change when a page is published
 export const dynamic = "force-dynamic";
 
-// The home page is the page with the slug "home". Until one is published,
+// The home page is the page with an empty slug. Until one is published,
 // show a simple welcome screen.
-const HOME_SLUG = "home";
+const HOME_SLUG = "";
 
 export async function generateMetadata() {
   const result = await loadPublicPage(HOME_SLUG);

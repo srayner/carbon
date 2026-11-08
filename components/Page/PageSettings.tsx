@@ -177,6 +177,11 @@ export function PageSettings({
           onChange={(e) => onSlugChange(e.target.value)}
         />
       </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {slug
+          ? "Leave empty to make this the home page."
+          : "This is the home page."}
+      </p>
     </section>
 
     {/* Summary and image, shown when this page is listed on a card */}

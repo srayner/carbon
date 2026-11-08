@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fetchTheme, saveTheme } from "@/lib/api/theme";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import {
   COLOR_ROLES,
   CUSTOM_CSS_MAX,
@@ -78,12 +79,14 @@ export default function ThemeForm() {
       );
   }, []);
 
+  const dirty = theme !== null && JSON.stringify(theme) !== JSON.stringify(saved);
+  useUnsavedChanges(dirty);
+
   if (!theme) return <p>Loading...</p>;
 
   const setValue = (group: Group, key: string, value: string) =>
     setTheme({ ...theme, [group]: { ...theme[group], [key]: value } });
 
-  const dirty = JSON.stringify(theme) !== JSON.stringify(saved);
   const fontsUrl = googleFontsUrl(theme);
 
   const handleSave = async () => {

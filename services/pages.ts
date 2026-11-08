@@ -28,6 +28,19 @@ export const upsertPage = async (pageId: string | null, data: PageInput) => {
   if (slugError) {
     throw new AppError(slugError, 400);
   }
+  // Only one page can be the home page (the slug is unique); say so plainly
+  if (!data.slug) {
+    const home = await prisma.page.findUnique({
+      where: { slug: "" },
+      select: { id: true, title: true },
+    });
+    if (home && home.id !== pageId) {
+      throw new AppError(
+        `"${home.title}" is already the home page. Give it a slug first.`,
+        409
+      );
+    }
+  }
 
   if (!data.templateId) {
     throw new AppError("Template is required.", 400);

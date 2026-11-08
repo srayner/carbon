@@ -8,8 +8,9 @@ export const slugify = (text: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+// An empty slug is the site's home page, shown at "/"
 export const getSlugError = (slug: string): string | null => {
-  if (!slug) return "Slug is required.";
+  if (!slug) return null;
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     return "Slug can only contain lowercase letters, numbers and single hyphens.";
   }

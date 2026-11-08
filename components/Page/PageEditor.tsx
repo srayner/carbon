@@ -13,27 +13,36 @@ import { DEFAULT_TEMPLATE_ID } from "@/config/templates";
 import { Page, Template } from "@/types/entities";
 import { slugify } from "@/lib/slug";
 import { toast } from "sonner";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
 type PageEditorProps = {
   pageId?: string; // undefined for add mode
   afterSave?: (pageId: string) => void;
 };
 
+const blankPage = (): Page => ({
+  id: "",
+  title: "",
+  slug: "",
+  blocks: [],
+  categoryIds: [],
+  templateId: DEFAULT_TEMPLATE_ID,
+  summary: null,
+  image: null,
+  meta: null,
+  publishedAt: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+});
+
 const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
-  const [page, setPage] = useState<Page>({
-    id: "",
-    title: "",
-    slug: "",
-    blocks: [],
-    categoryIds: [],
-    templateId: DEFAULT_TEMPLATE_ID,
-    summary: null,
-    image: null,
-    meta: null,
-    publishedAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
+  const [blank] = useState(blankPage);
+  const [page, setPage] = useState<Page>(blank);
+  // The page as last loaded or saved; any difference is unsaved
+  const [saved, setSaved] = useState<Page>(blank);
+  const [saving, setSaving] = useState(false);
+  const dirty = JSON.stringify(page) !== JSON.stringify(saved);
+  useUnsavedChanges(dirty);
   // Until the slug is edited by hand, a new page's slug follows its title
   const [slugEdited, setSlugEdited] = useState(!!pageId);
   const [categories, setCategories] = useState<CategoryRow[]>([]);
@@ -56,6 +65,7 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
       try {
         const loadedPage = await fetchPage(pageId);
         setPage(loadedPage);
+        setSaved(loadedPage);
       } catch (err) {
         console.error("Failed to load page:", err);
         alert("Failed to load page content.");
@@ -68,12 +78,21 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
   useEffect(() => {
     const handleAdd = () => console.log("Add clicked");
     const handleSave = async () => {
+      const sent = page;
+      setSaving(true);
       try {
-        const newPage = await savePage(page);
-        afterSave?.(newPage.id!);
+        const newPage = await savePage(sent);
+        const id = newPage.id!;
+        // What was sent is now saved; edits made while saving stay unsaved
+        setSaved({ ...sent, id });
+        setPage((prev) => ({ ...prev, id }));
+        toast.success("Page saved.");
+        afterSave?.(id);
       } catch (err) {
         console.error("Save failed:", err);
         toast.error(err instanceof Error ? err.message : "Save failed.");
+      } finally {
+        setSaving(false);
       }
     };
 
@@ -83,19 +102,17 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
       showSaveButton: true,
       onAdd: handleAdd,
       onSave: handleSave,
+      dirty,
+      saving,
+      // A new page has nothing to preview until its first save
+      previewHref: saved.id ? `/${saved.slug}` : undefined,
     });
 
     return () => {
       // reset buttons when leaving page
-      setPageActions({
-        showEditorSidebars: false,
-        showAddButton: false,
-        showSaveButton: false,
-        onAdd: undefined,
-        onSave: undefined,
-      });
+      setPageActions({});
     };
-  }, [page, setPageActions, afterSave]);
+  }, [page, saved, dirty, saving, setPageActions, afterSave]);
 
   const handleBlocksChange = (update: (blocks: Block[]) => Block[]) => {
     setPage((prevPage) => ({ ...prevPage, blocks: update(prevPage.blocks) }));

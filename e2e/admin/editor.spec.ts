@@ -32,23 +32,30 @@ test.describe("the page editor", () => {
     await expect(page.getByText(/^Pages in/).first()).toBeVisible();
   });
 
-  test("the block outline is open, and the main navigation can still be toggled", async ({
+  test("the block outline is open, and the main navigation stays as it was", async ({
     page,
   }) => {
-    await openShowcase(page);
+    const nav = page.locator('[data-sidebar="sidebar"]').first();
+    const sidebar = page.locator('[data-collapsible]').first();
+    const toggleNav = page.getByRole("button", { name: "Toggle navigation" });
 
+    // Opened by the user before editing...
+    await page.goto("/admin");
+    if ((await sidebar.getAttribute("data-state")) !== "expanded") await toggleNav.click();
+    await expect(sidebar).toHaveAttribute("data-state", "expanded");
+
+    // ...it stays open in the editor
+    await openShowcase(page);
     await expect(
       page.getByRole("button", { name: "Toggle block outline" })
     ).toHaveAttribute("aria-pressed", "true");
-
-    // The navigation folds to its rail while editing, and opens on request
-    const nav = page.locator('[data-sidebar="sidebar"]').first();
-    const sidebar = page.locator('[data-collapsible]').first();
-    await expect(sidebar).toHaveAttribute("data-state", "collapsed");
-    await page.getByRole("button", { name: "Toggle navigation" }).click();
     await expect(sidebar).toHaveAttribute("data-state", "expanded");
     await expect(nav).toBeVisible();
-    await page.getByRole("button", { name: "Toggle navigation" }).click();
+
+    // Folded in the editor, it stays folded after leaving it
+    await toggleNav.click();
+    await expect(sidebar).toHaveAttribute("data-state", "collapsed");
+    await page.goto("/admin");
     await expect(sidebar).toHaveAttribute("data-state", "collapsed");
   });
 
