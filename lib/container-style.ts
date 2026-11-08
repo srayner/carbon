@@ -5,6 +5,7 @@ import { SPACING_STEPS } from "@/lib/theme";
  * The Container block's layout options and the flexbox CSS they set. Shared
  * by its config (the choices), its View and its Editable (the CSS).
  */
+export const ELEMENTS = ["div", "span"] as const;
 export const DIRECTIONS = ["column", "row"] as const;
 export const JUSTIFY_OPTIONS = ["start", "center", "end", "between"] as const;
 export const ALIGN_OPTIONS = ["stretch", "start", "center", "end"] as const;
@@ -28,6 +29,14 @@ const pick = <K extends string>(
   value: unknown,
   fallback: K
 ): K => (options.includes(value as K) ? (value as K) : fallback);
+
+/**
+ * A span Container is plain inline markup: a <span> around its children, with
+ * no flexbox, no layout settings and no wrapper around each child. Anything
+ * other than "span" is a div, the default.
+ */
+export const isInlineContainer = (properties: Record<string, unknown>) =>
+  properties.element === "span";
 
 /**
  * The flexbox CSS for a Container's properties. Values come from the

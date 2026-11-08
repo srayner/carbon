@@ -368,6 +368,51 @@ test("Grow set in the panel splits a row evenly, in the editor and on the site",
   expect(Math.abs(short - long)).toBeLessThan(1);
 });
 
+test("a Container set to span in the panel is a span in the editor and on the site", async ({
+  page,
+  request,
+}) => {
+  await createPage(request, [
+    container("box", undefined, "row"),
+    {
+      id: "inside",
+      type: "Link",
+      parentId: "box",
+      properties: { label: "Inside the box", url: "/hello-world", cssId: "inside" },
+    },
+  ]);
+  await openEditor(page);
+
+  // A div by default
+  const box = canvas(page).locator('[data-block-id="box"] > *').first();
+  expect(await box.evaluate((el) => el.tagName)).toBe("DIV");
+
+  await outline(page).locator('[data-depth="0"]').first().click();
+  await page.locator("summary", { hasText: /^Layout$/ }).click();
+  const element = page.locator("label", { hasText: /^Element$/ }).locator("..").locator("select");
+  await expect(element).toHaveValue("div");
+  await element.selectOption("span");
+
+  // On the canvas the span flows inline, its child's frame a span too
+  expect(await box.evaluate((el) => el.tagName)).toBe("SPAN");
+  await expect(box).toHaveCSS("display", "inline");
+  expect(
+    await canvas(page).locator('[data-block-id="inside"]').evaluate((el) => el.tagName)
+  ).toBe("SPAN");
+
+  await save(page);
+  expect((await savedBlocks(request)).map((b) => [b.id, b.properties.element])).toEqual([
+    ["box", "span"],
+    ["inside", undefined],
+  ]);
+
+  await page.goto(`/${slug}`);
+  const published = page.locator("#box");
+  expect(await published.evaluate((el) => el.tagName)).toBe("SPAN");
+  // No flex item wrapper round the child
+  await expect(published.locator("> #inside")).toHaveText("Inside the box");
+});
+
 // A page that already has nested blocks opens as a tree
 test("an existing nested page opens with its children inside their containers", async ({
   page,

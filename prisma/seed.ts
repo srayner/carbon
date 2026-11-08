@@ -547,6 +547,17 @@ async function seedLayoutPages() {
   for (const label of ["Projects", "Build log", "Videos", "About"]) {
     add(links, "Link", { label, url: `/${label.toLowerCase().replace(" ", "-")}` }, nav);
   }
+  // A span Container: plain inline markup round its children. Its own
+  // settings apply (the weight); the layout ones (a row, a gap) do not
+  const span = add(links, "Container", {
+    element: "span",
+    direction: "row",
+    gap: "xl",
+    weight: "bold",
+    cssId: "link-span",
+  });
+  add(links, "Link", { label: "Inline one", url: "/hello-world", cssId: "span-one" }, span);
+  add(links, "Link", { label: "Inline two", url: "/hello-world", cssId: "span-two" }, span);
   add(links, "Link", { label: "Unsafe link", url: "javascript:alert(1)", cssId: "link-unsafe" });
 
   await prisma.page.create({

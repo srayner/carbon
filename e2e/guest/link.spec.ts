@@ -95,6 +95,26 @@ test.describe("a Link", () => {
     await expect(page.locator("#link-underlined")).toHaveCSS("font-weight", "400");
   });
 
+  // A span Container set to a row with a gap: neither applies to a span
+  test("a span Container is plain inline markup round its children", async ({ page }) => {
+    const span = page.locator("#link-span");
+    expect(await span.evaluate((el) => el.tagName)).toBe("SPAN");
+    await expect(span).toHaveCSS("display", "inline");
+    await expect(span).not.toHaveAttribute("style", /gap|flex/);
+    // Its children sit directly inside it, with no wrapper
+    await expect(span.locator("> a")).toHaveText(["Inline one", "Inline two"]);
+    await expect(span.locator("> :not(a)")).toHaveCount(0);
+    // Its own settings still apply, and its links inherit them
+    await expect(page.locator("#span-one")).toHaveCSS("font-weight", "700");
+    // Inline: the two links share a line, a space's width apart at most
+    const [one, two] = await Promise.all([
+      page.locator("#span-one").boundingBox(),
+      page.locator("#span-two").boundingBox(),
+    ]);
+    expect(Math.abs(two!.y - one!.y)).toBeLessThan(1);
+    expect(two!.x - (one!.x + one!.width)).toBeLessThan(8);
+  });
+
   // Saving refuses this address; it is in the database only through the seed
   test("an unsafe address is shown as text, not linked", async ({ page }) => {
     const unsafe = page.locator("#link-unsafe");

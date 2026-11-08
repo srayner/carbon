@@ -1,6 +1,6 @@
 import { SquareDashed } from "lucide-react";
 import { SPACING_STEPS } from "@/lib/theme";
-import { ALIGN_OPTIONS, DIRECTIONS, JUSTIFY_OPTIONS } from "@/lib/container-style";
+import { ALIGN_OPTIONS, DIRECTIONS, ELEMENTS, JUSTIFY_OPTIONS } from "@/lib/container-style";
 import { SHARED_PROPERTIES } from "./shared";
 
 // Holds other blocks and lays them out in a row or a column. Its children are
@@ -10,7 +10,16 @@ export const ContainerBlockConfig = {
   icon: SquareDashed,
   container: true,
   properties: [
-    // Layout group
+    // Layout group. A span is inline markup, so the settings after it apply
+    // to a div only (see isInlineContainer)
+    {
+      name: "element",
+      displayName: "Element",
+      type: "enum",
+      values: ELEMENTS,
+      default: "div",
+      group: "Layout",
+    },
     {
       name: "direction",
       displayName: "Direction",
