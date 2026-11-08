@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { TOKEN_PROPERTIES } from "@/config/blocks/shared";
+import { FONT_WEIGHTS } from "@/lib/theme";
 
 // Each shared property -> the CSS it sets, given a token name
 const CSS: Record<string, (token: string) => CSSProperties> = {
@@ -26,6 +27,7 @@ const CSS: Record<string, (token: string) => CSSProperties> = {
   textColor: (t) => ({ color: `var(--site-color-${t})` }),
   fontRole: (t) => ({ fontFamily: `var(--site-font-${t})` }),
   textSize: (t) => ({ fontSize: `var(--site-text-${t})` }),
+  weight: (t) => ({ fontWeight: FONT_WEIGHTS[t as keyof typeof FONT_WEIGHTS] }),
 };
 
 /**

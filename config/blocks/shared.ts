@@ -6,6 +6,7 @@ import {
   SHADOW_STEPS,
   SPACING_STEPS,
   TEXT_SIZE_STEPS,
+  FONT_WEIGHT_NAMES,
 } from "@/lib/theme";
 import { GROW_OPTIONS } from "@/lib/container-style";
 
@@ -47,6 +48,8 @@ export const TOKEN_PROPERTIES = [
   token("textColor", "Text colour", "Colour and font", COLOR_ROLES),
   token("fontRole", "Font", "Colour and font", FONT_ROLES),
   token("textSize", "Text size", "Colour and font", TEXT_SIZE_STEPS),
+  // Inherited, so set on a Container it applies to everything inside
+  token("weight", "Font weight", "Colour and font", FONT_WEIGHT_NAMES),
 ] as const;
 
 /*

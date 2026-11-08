@@ -20,6 +20,9 @@ export const RADIUS_STEPS = ["none", "s", "m", "l", "full"] as const;
 export const BORDER_STEPS = ["none", "thin", "medium", "thick"] as const;
 export const SHADOW_STEPS = ["none", "s", "m", "l"] as const;
 export const TEXT_SIZE_STEPS = ["xs", "s", "m", "l", "xl"] as const;
+// Standard CSS weights, so fixed rather than set by the theme
+export const FONT_WEIGHTS = { regular: 400, medium: 500, semibold: 600, bold: 700 } as const;
+export const FONT_WEIGHT_NAMES = Object.keys(FONT_WEIGHTS) as (keyof typeof FONT_WEIGHTS)[];
 
 export type ColorRole = (typeof COLOR_ROLES)[number];
 export type FontRole = (typeof FONT_ROLES)[number];

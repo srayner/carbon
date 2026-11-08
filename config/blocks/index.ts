@@ -4,6 +4,7 @@ import { FileBlockConfig } from "./file";
 import { HeadingBlockConfig } from "./heading";
 import { ImageBlockConfig } from "./image";
 import { KeyValueTableBlockConfig } from "./keyValueTable";
+import { LinkBlockConfig } from "./link";
 import { ParagraphBlockConfig } from "./paragraph";
 import { QueryBlockConfig } from "./query";
 import { RichTextBlockConfig } from "./richText";
@@ -18,4 +19,5 @@ export const ALL_BLOCKS = [
   KeyValueTableBlockConfig,
   QueryBlockConfig,
   ContainerBlockConfig,
+  LinkBlockConfig,
 ];

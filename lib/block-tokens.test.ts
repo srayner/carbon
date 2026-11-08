@@ -28,6 +28,19 @@ describe("getTokenStyle", () => {
     });
   });
 
+  it.each([
+    ["regular", 400],
+    ["medium", 500],
+    ["semibold", 600],
+    ["bold", 700],
+  ])("sets Font weight %s to %i", (weight, value) => {
+    expect(getTokenStyle({ weight })).toEqual({ fontWeight: value });
+  });
+
+  it("ignores a Font weight that is not one of the choices", () => {
+    expect(getTokenStyle({ weight: "heavy" })).toEqual({});
+  });
+
   it("turns the text size and border colour into the theme's variables", () => {
     expect(getTokenStyle({ textSize: "xs", borderColor: "accent" })).toEqual({
       fontSize: "var(--site-text-xs)",
