@@ -19,6 +19,8 @@ export type BlockConfig<TName extends string = string> = {
   name: TName;
   icon: LucideIcon;
   properties: readonly BlockProperty[];
+  // Can hold other blocks (see lib/block-tree.ts)
+  container?: boolean;
 };
 
 /* ----- Types derived from the configs in config/blocks ----- */
