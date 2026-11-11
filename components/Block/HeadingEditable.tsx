@@ -1,29 +1,17 @@
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import { EditableProps } from "@/types/blocks";
-import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
+import Tiptap from "@/components/ui/TipTap";
 
-const HeadingEditable = ({ block, onChange }: EditableProps<"Heading">) => {
-  const { content } = block.properties;
-  const tiptapRef = useRef<TiptapHandle | null>(null);
-
-  const handleChange = (content: string) => {
-    const rawText = content.replace(/<[^>]*>/g, "");
-    onChange({ content: rawText });
-  };
-
-  // TipTap expects HTML, wrap plain text content in <p> tag
-  const htmlContent = `<p>${content || ''}</p>`;
-
-  return (
-    <Tiptap
-      ref={tiptapRef}
-      showMenu={false}
-      onChange={handleChange}
-      initialContent={htmlContent}
-    />
-  );
-};
+// A heading is plain text: no menu, and the editor reports text, not HTML
+const HeadingEditable = ({ block, onChange }: EditableProps<"Heading">) => (
+  <Tiptap
+    format="text"
+    showMenu={false}
+    initialValue={block.properties.content ?? ""}
+    onChange={(content) => onChange({ content })}
+  />
+);
 
 export default HeadingEditable;

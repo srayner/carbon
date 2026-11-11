@@ -8,6 +8,10 @@ import { LEAVE_MESSAGE } from "../../lib/leave-guard";
 
 test.describe.configure({ mode: "serial" });
 
+// The Hello World rich-text block (it holds a table)
+const richText = (page: Page) =>
+  page.locator(".ProseMirror", { hasText: "Resistor" });
+
 const openHelloWorld = async (page: Page) => {
   // The admin search matches titles, as a user would search
   const response = await page.request.get("/api/pages?search=Hello%20World");
@@ -17,10 +21,8 @@ const openHelloWorld = async (page: Page) => {
   // Loaded: the settings show the page's slug, and the text editors are up
   await expect(page.getByPlaceholder("page-slug")).toHaveValue("hello-world");
   await expect(richText(page)).toBeVisible();
+  return found.id as string;
 };
-
-const richText = (page: Page) =>
-  page.locator(".ProseMirror", { hasText: "Resistor" });
 
 const saveButton = (page: Page) => page.getByRole("button", { name: "Save" });
 const unsaved = (page: Page) =>
@@ -75,40 +77,41 @@ test.describe("the page editor's save state and preview", () => {
     await saveSummary(original);
   });
 
-  test("typing in rich text is unsaved at once, before the editor loses focus", async ({
+  test("typing in rich text is unsaved at once, and undoing it leaves nothing to save", async ({
     page,
   }) => {
-    await openHelloWorld(page);
+    const id = await openHelloWorld(page);
+    // The page as seeded, put back at the end however the test ends
+    const { page: original } = await (await page.request.get(`/api/pages/${id}`)).json();
     const line = "A line added by the test";
-    // Makes an edit, checks it shows as unsaved while the cursor is still in
-    // the editor, then saves
-    const editAndSave = async (edit: () => Promise<void>) => {
-      await edit();
-      await expect(richText(page)).toBeFocused();
-      await expect(unsaved(page)).toBeVisible();
-      await saveButton(page).click();
-      await expect(page.getByText("Page saved.").first()).toBeVisible();
-      await expect(unsaved(page)).toHaveCount(0);
-    };
-
-    // Type a line at the end of the block, below the table
-    await editAndSave(async () => {
+    const typeLineAtEnd = async () => {
       await richText(page).getByText("Resistor").click();
       await page.keyboard.press("Control+End");
       await page.keyboard.type(line);
-    });
-    // Really saved: it is there after a reload
-    await page.reload();
-    await expect(richText(page)).toContainText(line);
+    };
 
-    // Put it back so the run can be repeated: select the line and delete it
-    await editAndSave(async () => {
-      await richText(page).getByText(line).click({ clickCount: 3 });
-      await page.keyboard.press("Backspace");
-    });
-    await page.reload();
-    await expect(richText(page)).toContainText("Capacitor4");
-    await expect(richText(page)).not.toContainText(line);
+    try {
+      // Unsaved while still typing: the cursor has not left the editor
+      await typeLineAtEnd();
+      await expect(richText(page)).toBeFocused();
+      await expect(unsaved(page)).toBeVisible();
+
+      // Undone, the page is as saved again
+      await page.keyboard.press("Control+Z");
+      await expect(richText(page)).not.toContainText(line);
+      await expect(unsaved(page)).toHaveCount(0);
+      await expect(saveButton(page)).toBeDisabled();
+
+      // Typed again and saved, it is there after a reload
+      await typeLineAtEnd();
+      await saveButton(page).click();
+      await expect(page.getByText("Page saved.").first()).toBeVisible();
+      await page.reload();
+      await expect(richText(page)).toContainText(line);
+    } finally {
+      const restored = await page.request.put(`/api/pages/${id}`, { data: original });
+      expect(restored.ok()).toBe(true);
+    }
   });
 
   test("a failed save is reported and the changes stay unsaved", async ({ page }) => {

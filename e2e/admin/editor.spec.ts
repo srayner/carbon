@@ -110,7 +110,7 @@ test.describe("the page editor", () => {
     await expect(await cardShadow()).toHaveCSS("box-shadow", "none");
   });
 
-  test("an edit to a heading is saved and published", async ({ page }) => {
+  test("an edit to a heading is saved, published and loaded back as typed", async ({ page }) => {
     await openShowcase(page);
 
     const edit = async (text: string) => {
@@ -126,12 +126,16 @@ test.describe("the page editor", () => {
       expect((await saved).ok()).toBe(true);
     };
 
-    await edit("Edited heading");
+    // Text that looks like an entity or a tag is still just text
+    const edited = "Tom & Jerry <b>live</b> &amp; more";
+    await edit(edited);
     await page.goto("/block-showcase");
-    await expect(page.locator("h2#showcase-heading")).toHaveText("Edited heading");
+    await expect(page.locator("h2#showcase-heading")).toHaveText(edited);
+    // And it loads back into the editor as typed
+    await openShowcase(page);
+    await expect(page.locator(".ProseMirror").first()).toHaveText(edited);
 
     // Put it back so the run can be repeated
-    await openShowcase(page);
     await edit("Showcase heading");
     await page.goto("/block-showcase");
     await expect(page.locator("h2#showcase-heading")).toHaveText("Showcase heading");
