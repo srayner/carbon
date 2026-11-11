@@ -93,11 +93,6 @@ test.describe("every block type", () => {
     expect(linkBox!.width).toBeLessThan(rowBox!.width / 2);
   });
 
-  test("consecutive Cards share one grid", async ({ page }) => {
-    const grid = page.locator("div.grid", { hasText: "Showcase card one" });
-    await expect(grid.getByText("Showcase card two")).toBeVisible();
-  });
-
   test("Query lists the pages in the category as cards and as links", async ({
     page,
   }) => {

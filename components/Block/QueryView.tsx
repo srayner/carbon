@@ -90,6 +90,7 @@ const QueryView = async ({
               grow: "content",
             },
           }}
+          shared={{ id: undefined, className: undefined, style: {} }}
         />
       ))}
     </div>

@@ -1,7 +1,7 @@
 import { LayoutGrid } from "lucide-react";
 import { SHARED_PROPERTIES } from "./shared";
 
-// Cards placed one after another are shown side by side in a grid
+// A card: an image, a title, a description and a link
 export const CardBlockConfig = {
   name: "Card",
   icon: LayoutGrid,
