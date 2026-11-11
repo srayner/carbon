@@ -32,6 +32,16 @@ export async function GET(
   const downloadName = name.replace(/^[a-f0-9]{12}-/, "");
   const isImage = isImageExtension(ext);
 
+  // Uploaded files are never trusted pages. An SVG can carry scripts: shown
+  // through <img> they never run, but opening its address directly would run
+  // them as this site. `sandbox` gives the document a unique origin (no
+  // cookies, no same-origin API calls) and `default-src 'none'` blocks
+  // scripts and any outside loads. Inline styles and embedded (data:) images
+  // and fonts stay allowed, as design tools often export SVGs with them.
+  // Browsers ignore this header for <img> loads.
+  const csp =
+    "default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:; sandbox";
+
   return new NextResponse(
     Readable.toWeb(createReadStream(filePath)) as ReadableStream,
     {
@@ -40,6 +50,7 @@ export async function GET(
         "Content-Length": String(info.size),
         "Content-Disposition": `${isImage ? "inline" : "attachment"}; filename="${downloadName}"`,
         "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": csp,
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     }
