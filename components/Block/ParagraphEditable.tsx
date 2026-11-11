@@ -1,32 +1,17 @@
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import { EditableProps } from "@/types/blocks";
-import Tiptap, { TiptapHandle } from "@/components/ui/TipTap";
+import Tiptap from "@/components/ui/TipTap";
 
-const ParagraphEditable = ({ block, onChange }: EditableProps<"Paragraph">) => {
-  const { content } = block.properties;
-  const tiptapRef = useRef<TiptapHandle | null>(null);
-
-  const handleBlur = (content: string) => {
-    const rawText = content.replace(/<[^>]*>/g, "");
-    onChange({ content: rawText });
-  };
-
-  // TipTap expects HTML, so wrap the plain text content in a <p> tag
-  const escaped = (content || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  return (
-    <Tiptap
-      ref={tiptapRef}
-      showMenu={false}
-      onBlur={handleBlur}
-      initialContent={`<p>${escaped}</p>`}
-    />
-  );
-};
+// A paragraph is plain text: no menu, and the editor reports text, not HTML
+const ParagraphEditable = ({ block, onChange }: EditableProps<"Paragraph">) => (
+  <Tiptap
+    format="text"
+    showMenu={false}
+    initialValue={block.properties.content ?? ""}
+    onChange={(content) => onChange({ content })}
+  />
+);
 
 export default ParagraphEditable;
