@@ -3,9 +3,9 @@
  * imports, so the upload field in the browser can share the list.
  */
 
-// SVG can carry scripts. Shown through <img> they don't run, but opening an
-// uploaded SVG's address directly would run them as this site. Accepted while
-// there is one author; see "Fix soon" in docs/plans/03-backlog.md.
+// SVG can carry scripts. Shown through <img> they don't run, and
+// app/files/[name]/route.ts serves every upload with a sandboxing
+// Content-Security-Policy so they don't run when opened directly either.
 export const IMAGE_TYPES: Record<string, string> = {
   ".png": "image/png",
   ".jpg": "image/jpeg",

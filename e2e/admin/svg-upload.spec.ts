@@ -10,6 +10,14 @@ const ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" vie
   <path d="M20 6v8M20 26v8M6 20h8M26 20h8" stroke="#141413" stroke-width="2.5"/>
 </svg>`;
 
+// A hostile SVG: it draws a square, and its inline script marks the document.
+// An inline script runs while the file is parsed, so by the time the page has
+// loaded it has either run or been blocked.
+const HOSTILE = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+  <rect width="40" height="40" fill="#141413"/>
+  <script>document.documentElement.setAttribute("data-script-ran", "yes");</script>
+</svg>`;
+
 let pageId: string | null = null;
 let uploaded: string | null = null;
 
@@ -71,4 +79,31 @@ test("an SVG uploaded to an Image block is saved and shown on the site", async (
   await expect(img).toBeVisible();
   // It loaded and drew: a broken image has no natural width
   expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(40);
+});
+
+test("a script in an uploaded SVG doesn't run when the file is opened directly", async ({
+  page,
+  request,
+}) => {
+  const res = await request.post("/api/upload", {
+    multipart: {
+      file: { name: "hostile.svg", mimeType: "image/svg+xml", buffer: Buffer.from(HOSTILE) },
+    },
+  });
+  expect(res.status(), await res.text()).toBe(201);
+  uploaded = (await res.json()).url as string;
+
+  // Opened by a logged-in admin, as a malicious link would be. goto waits for
+  // the load event, after which the inline script has run or been blocked.
+  const opened = await page.goto(uploaded);
+  expect(opened?.status()).toBe(200);
+  expect(opened?.headers()["content-type"]).toBe("image/svg+xml");
+
+  // The drawing is still there, but the script didn't run
+  await expect(page.locator("rect")).toHaveCount(1);
+  await expect(page.locator(":root")).not.toHaveAttribute("data-script-ran");
+
+  // And the file isn't treated as part of the site: any script that did get
+  // in would have no access to its cookies or same-origin API calls
+  expect(await page.evaluate(() => window.origin)).toBe("null");
 });
