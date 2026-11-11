@@ -118,8 +118,7 @@ test.describe("the page editor", () => {
       await heading.click();
       await page.keyboard.press("Control+A");
       await page.keyboard.type(text);
-      // Leave the editor so the change is committed, then save
-      await page.getByText("Showcase card one").click();
+      // Saved straight away, with the cursor still in the heading
       const saved = page.waitForResponse(
         (r) => r.url().includes("/api/pages/") && r.request().method() === "PUT"
       );

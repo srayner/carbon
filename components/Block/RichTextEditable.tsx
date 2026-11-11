@@ -9,14 +9,14 @@ const RichTextEditable = ({ block, onChange }: EditableProps<"RichText">) => {
   const { content } = block.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
-  const handleBlur = (content: string) => {
+  const handleChange = (content: string) => {
     onChange({ content });
   };
 
   // The block's theme settings (text size, colour, spacing...) as on the site
   return (
     <div style={getTokenStyle(block.properties)}>
-      <Tiptap ref={tiptapRef} onBlur={handleBlur} initialContent={content} />
+      <Tiptap ref={tiptapRef} onChange={handleChange} initialContent={content} />
     </div>
   );
 };

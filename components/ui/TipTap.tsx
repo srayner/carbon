@@ -17,12 +17,13 @@ export interface TiptapHandle {
 
 interface TiptapProps {
   showMenu?: boolean;
-  onBlur?: (html: string) => void;
+  // Called with the HTML after every edit, so nothing waits for a blur
+  onChange?: (html: string) => void;
   initialContent?: string;
 }
 
 const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
-  ({ showMenu = true, onBlur, initialContent }, ref) => {
+  ({ showMenu = true, onChange, initialContent }, ref) => {
     const editor = useEditor({
       extensions: [
         StarterKit.configure({
@@ -45,8 +46,13 @@ const Tiptap = forwardRef<TiptapHandle, TiptapProps>(
           class: "p-2",
         },
       },
-      onBlur: () => {
-        if (onBlur) onBlur(editor?.getHTML() || "");
+      // Fires only for edits, not for the initial content. Skip updates whose
+      // own transaction changed nothing: those come from a plugin tidying the
+      // document (e.g. the trailing paragraph added after a final table on
+      // load), not from the user, and would show an unchanged page as unsaved
+      onUpdate: ({ editor, transaction }) => {
+        if (!transaction.docChanged) return;
+        onChange?.(editor.getHTML());
       },
     });
 

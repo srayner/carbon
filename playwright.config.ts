@@ -17,6 +17,8 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3003",
     trace: "on-first-retry",
+    // A failed test leaves a screenshot of the page in test-results/
+    screenshot: "only-on-failure",
   },
   // With port 3003 free: seed, build and start a production server, run the
   // tests, then stop it. With a server already running there, use it as it is

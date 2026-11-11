@@ -14,9 +14,13 @@ const openHelloWorld = async (page: Page) => {
   const { content } = await response.json();
   const found = content.find((p: { slug: string }) => p.slug === "hello-world");
   await page.goto(`/admin/pages/${found.id}`);
-  // Loaded: the settings show the page's slug
+  // Loaded: the settings show the page's slug, and the text editors are up
   await expect(page.getByPlaceholder("page-slug")).toHaveValue("hello-world");
+  await expect(richText(page)).toBeVisible();
 };
+
+const richText = (page: Page) =>
+  page.locator(".ProseMirror", { hasText: "Resistor" });
 
 const saveButton = (page: Page) => page.getByRole("button", { name: "Save" });
 const unsaved = (page: Page) =>
@@ -69,6 +73,42 @@ test.describe("the page editor's save state and preview", () => {
 
     // Put it back so the run can be repeated
     await saveSummary(original);
+  });
+
+  test("typing in rich text is unsaved at once, before the editor loses focus", async ({
+    page,
+  }) => {
+    await openHelloWorld(page);
+    const line = "A line added by the test";
+    // Makes an edit, checks it shows as unsaved while the cursor is still in
+    // the editor, then saves
+    const editAndSave = async (edit: () => Promise<void>) => {
+      await edit();
+      await expect(richText(page)).toBeFocused();
+      await expect(unsaved(page)).toBeVisible();
+      await saveButton(page).click();
+      await expect(page.getByText("Page saved.").first()).toBeVisible();
+      await expect(unsaved(page)).toHaveCount(0);
+    };
+
+    // Type a line at the end of the block, below the table
+    await editAndSave(async () => {
+      await richText(page).getByText("Resistor").click();
+      await page.keyboard.press("Control+End");
+      await page.keyboard.type(line);
+    });
+    // Really saved: it is there after a reload
+    await page.reload();
+    await expect(richText(page)).toContainText(line);
+
+    // Put it back so the run can be repeated: select the line and delete it
+    await editAndSave(async () => {
+      await richText(page).getByText(line).click({ clickCount: 3 });
+      await page.keyboard.press("Backspace");
+    });
+    await page.reload();
+    await expect(richText(page)).toContainText("Capacitor4");
+    await expect(richText(page)).not.toContainText(line);
   });
 
   test("a failed save is reported and the changes stay unsaved", async ({ page }) => {

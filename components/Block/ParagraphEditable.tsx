@@ -8,7 +8,7 @@ const ParagraphEditable = ({ block, onChange }: EditableProps<"Paragraph">) => {
   const { content } = block.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
-  const handleBlur = (content: string) => {
+  const handleChange = (content: string) => {
     const rawText = content.replace(/<[^>]*>/g, "");
     onChange({ content: rawText });
   };
@@ -23,7 +23,7 @@ const ParagraphEditable = ({ block, onChange }: EditableProps<"Paragraph">) => {
     <Tiptap
       ref={tiptapRef}
       showMenu={false}
-      onBlur={handleBlur}
+      onChange={handleChange}
       initialContent={`<p>${escaped}</p>`}
     />
   );

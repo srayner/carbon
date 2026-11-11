@@ -8,7 +8,7 @@ const HeadingEditable = ({ block, onChange }: EditableProps<"Heading">) => {
   const { content } = block.properties;
   const tiptapRef = useRef<TiptapHandle | null>(null);
 
-  const handleBlur = (content: string) => {
+  const handleChange = (content: string) => {
     const rawText = content.replace(/<[^>]*>/g, "");
     onChange({ content: rawText });
   };
@@ -20,7 +20,7 @@ const HeadingEditable = ({ block, onChange }: EditableProps<"Heading">) => {
     <Tiptap
       ref={tiptapRef}
       showMenu={false}
-      onBlur={handleBlur}
+      onChange={handleChange}
       initialContent={htmlContent}
     />
   );
