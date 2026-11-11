@@ -1,21 +1,15 @@
 import React from "react";
-import type { CSSProperties } from "react";
 import { ViewProps } from "@/types/blocks";
 
-// A single card, used by both the editing area and the public renderer
-const CardView = ({
-  block,
-  style,
-}: Pick<ViewProps<"Card">, "block"> & { style?: CSSProperties }) => {
-  const { title, image, alt, description, linkUrl, linkLabel, className, cssId } =
-    block.properties;
+// A single card, used by the editing area, the public renderer and Query
+const CardView = ({ block, shared }: Pick<ViewProps<"Card">, "block" | "shared">) => {
+  const { title, image, alt, description, linkUrl, linkLabel } = block.properties;
 
   return (
     <div
-      id={cssId || undefined}
-      style={style}
+      {...shared}
       className={`not-prose flex flex-col overflow-hidden rounded-site-l border bg-site-surface ${
-        className ?? ""
+        shared.className ?? ""
       }`}
     >
       {image && (

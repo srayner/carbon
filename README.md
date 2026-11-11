@@ -58,7 +58,8 @@ again without reseeding.
 - **Pages:** published when their publish date has passed. Pages with no date
   or a future date are drafts, visible only to admins as a preview.
 - **Blocks:** Heading, Paragraph, RichText (links, tables, images), Image,
-  File (download), Card and Query. Consecutive Card blocks display as a grid.
+  File (download), Card, Query, KeyValueTable, Container and Link. A Container lays out
+  the blocks inside it in a row or a column.
 
 ### Adding a block
 

@@ -99,10 +99,7 @@ test.describe("the page editor", () => {
     };
     const cardShadow = async () => {
       await page.goto("/block-showcase");
-      return page
-        .locator("div.grid", { hasText: "Showcase card one" })
-        .locator("> div")
-        .first();
+      return page.locator("#showcase-card-one");
     };
 
     await setShadow("m");

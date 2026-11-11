@@ -334,7 +334,12 @@ async function seedPages() {
     });
   }
 
-  // One of every block type, with consecutive Cards and both query displays
+  // One of every block type, with Cards side by side in a row Container and
+  // both query displays
+  const cardRow = block(5, "Container", {
+    direction: "row",
+    gap: "l",
+  });
   await prisma.page.create({
     data: {
       title: "Block Showcase",
@@ -360,9 +365,25 @@ async function seedPages() {
             label: "Showcase download",
             description: "A file",
           }),
-          block(5, "Card", { title: "Showcase card one", description: "One" }),
-          block(6, "Card", { title: "Showcase card two", description: "Two" }),
-          block(7, "Query", {
+          cardRow,
+          {
+            ...block(6, "Card", {
+              title: "Showcase card one",
+              description: "One",
+              cssId: "showcase-card-one",
+              grow: "1",
+            }),
+            parentId: cardRow.id,
+          },
+          {
+            ...block(7, "Card", {
+              title: "Showcase card two",
+              description: "Two",
+              grow: "1",
+            }),
+            parentId: cardRow.id,
+          },
+          block(8, "Query", {
             category: SEED.categories.projects,
             includeSubcategories: "true",
             orderBy: "title",
@@ -370,7 +391,7 @@ async function seedPages() {
             display: "cards",
             columns: "2",
           }),
-          block(8, "Query", {
+          block(9, "Query", {
             category: SEED.categories.projects,
             includeSubcategories: "true",
             orderBy: "title",
@@ -381,7 +402,7 @@ async function seedPages() {
             background: "surface",
           }),
           // Theme tokens, and a raw value that overrides one of them
-          block(9, "Paragraph", {
+          block(10, "Paragraph", {
             content: "Styled with tokens",
             cssId: "styled-paragraph",
             paddingSize: "l",
@@ -392,13 +413,13 @@ async function seedPages() {
             textColor: "accent",
           }),
           // A download with a background token: only the link is filled
-          block(11, "File", {
+          block(12, "File", {
             file: "/files/example.pdf",
             label: "Tinted download",
             background: "border",
             radius: "l",
           }),
-          block(10, "Paragraph", {
+          block(11, "Paragraph", {
             content: "Raw padding wins",
             cssId: "override-paragraph",
             paddingSize: "l",
@@ -406,7 +427,7 @@ async function seedPages() {
           }),
           // Specifications: a blank row (not shown), a repeated key, a key
           // with no value, text that looks like HTML, and a long value
-          block(12, "KeyValueTable", {
+          block(13, "KeyValueTable", {
             cssId: "showcase-specs",
             background: "surface",
             rows: JSON.stringify([
@@ -423,20 +444,20 @@ async function seedPages() {
             ]),
           }),
           // Nothing to show: only blank rows, and a value that is not JSON
-          block(13, "KeyValueTable", {
+          block(14, "KeyValueTable", {
             cssId: "showcase-specs-blank",
             rows: JSON.stringify([
               { key: "", value: "" },
               { key: "  ", value: " " },
             ]),
           }),
-          block(14, "KeyValueTable", {
+          block(15, "KeyValueTable", {
             cssId: "showcase-specs-broken",
             rows: "Motor: 28BYJ-48",
           }),
           // Button-like: padding wider than tall over a Padding that the two
           // directions override, a coloured border and small text
-          block(15, "Paragraph", {
+          block(16, "Paragraph", {
             content: "Button tokens",
             cssId: "button-tokens",
             paddingSize: "m",

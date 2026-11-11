@@ -1,6 +1,5 @@
 import { Page } from "@/types/entities";
 import { Block, SharedBlockProps } from "@/types/blocks";
-import CardView from "@/components/Block/CardView";
 import { loadViews } from "@/components/Block/views";
 import { getBlockStyle } from "@/lib/block-style";
 import { getTokenStyle } from "@/lib/block-tokens";
@@ -25,25 +24,6 @@ const getSharedProps = (block: Block): SharedBlockProps => {
   };
 };
 
-type RenderItem =
-  | { kind: "block"; node: BlockNode<Block> }
-  | { kind: "cards"; cards: Block<"Card">[] };
-
-// Consecutive Card blocks among the same siblings are shown together in one grid
-const groupBlocks = (nodes: BlockNode<Block>[]): RenderItem[] => {
-  const items: RenderItem[] = [];
-  for (const node of nodes) {
-    const last = items[items.length - 1];
-    if (node.block.type === "Card") {
-      if (last?.kind === "cards") last.cards.push(node.block);
-      else items.push({ kind: "cards", cards: [node.block] });
-    } else {
-      items.push({ kind: "block", node });
-    }
-  }
-  return items;
-};
-
 /**
  * Renders an owner's blocks (a page's, or a fragment's) from the flat list,
  * with each container's children inside it. The views for every block type in
@@ -64,39 +44,21 @@ export const BlocksView = async ({
     nodes: BlockNode<Block>[],
     wrapItems = false
   ): React.ReactNode[] =>
-    groupBlocks(nodes).map((item) => {
-      const rendered = renderItem(item);
+    nodes.map((node) => {
+      const rendered = renderNode(node);
       if (!wrapItems || !rendered) return rendered;
-      const key = item.kind === "cards" ? item.cards[0].id : item.node.block.id;
-      // A group of cards has no Grow of its own
-      const style =
-        item.kind === "cards" ? {} : getGrowStyle(item.node.block.properties);
       return (
-        <div key={key} className="block-item" style={style}>
+        <div
+          key={node.block.id}
+          className="block-item"
+          style={getGrowStyle(node.block.properties)}
+        >
           {rendered}
         </div>
       );
     });
 
-  const renderItem = (item: RenderItem): React.ReactNode => {
-    if (item.kind === "cards") {
-      return (
-        <div
-          key={item.cards[0].id}
-          className="not-prose my-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {item.cards.map((card) => (
-            <CardView
-              key={card.id}
-              block={card}
-              style={getSharedProps(card).style}
-            />
-          ))}
-        </div>
-      );
-    }
-
-    const { block, children } = item.node;
+  const renderNode = ({ block, children }: BlockNode<Block>): React.ReactNode => {
     const View = views.get(block.type);
     if (!View) return null;
     return (
