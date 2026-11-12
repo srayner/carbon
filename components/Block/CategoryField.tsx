@@ -5,12 +5,14 @@ import { fetchCategories } from "@/lib/api/categories";
 import { CategoryRow, flattenCategories } from "@/lib/category-tree";
 
 type CategoryFieldProps = {
+  // So the field's label names the list
+  id?: string;
   value: string;
   onChange: (categoryId: string) => void;
 };
 
 // Picks a category; the block stores its id so renaming it breaks nothing
-const CategoryField: React.FC<CategoryFieldProps> = ({ value, onChange }) => {
+const CategoryField: React.FC<CategoryFieldProps> = ({ id, value, onChange }) => {
   const [rows, setRows] = useState<CategoryRow[] | null>(null);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ const CategoryField: React.FC<CategoryFieldProps> = ({ value, onChange }) => {
 
   return (
     <select
+      id={id}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="border p-1 w-full"

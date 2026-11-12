@@ -59,7 +59,8 @@ test("an SVG uploaded to an Image block is saved and shown on the site", async (
     mimeType: "image/svg+xml",
     buffer: Buffer.from(ICON),
   });
-  const url = page.getByPlaceholder("Image URL");
+  // The Image block's own picture, not its Background image
+  const url = page.getByLabel("Image", { exact: true });
   await expect(url).toHaveValue(/^\/files\/[a-f0-9]{12}-logo-icon\.svg$/);
   uploaded = await url.inputValue();
 

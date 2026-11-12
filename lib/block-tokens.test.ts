@@ -75,6 +75,38 @@ describe("getTokenStyle", () => {
   it("does nothing for properties left on the theme default", () => {
     expect(getTokenStyle({ paddingSize: "", radius: "" })).toEqual({});
     expect(getTokenStyle({})).toEqual({});
+    // No background image unless one is given
+    expect(getTokenStyle({ backgroundImage: "", background: "" })).toEqual({});
+    expect(getTokenStyle({ backgroundImage: "   " })).toEqual({});
+  });
+
+  // The colour stays, so it shows through where the image is clear
+  it("covers the block with its background image, centred, over its colour", () => {
+    expect(
+      getTokenStyle({ background: "surface", backgroundImage: "/files/hero.jpg" })
+    ).toEqual({
+      backgroundColor: "var(--site-color-surface)",
+      backgroundImage: 'url("/files/hero.jpg")',
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    });
+  });
+
+  // Rows saved before the check existed, or written straight to the database
+  it.each([
+    "javascript:alert(1)",
+    "data:image/svg+xml,<svg/>",
+    '/a.png"); color: red; ("',
+    "/a.png'",
+    "/a\\.png",
+    "/a.png\nx",
+    "hero.jpg",
+    42,
+  ])("leaves out an unsafe background image %j", (backgroundImage) => {
+    expect(getTokenStyle({ background: "accent", backgroundImage })).toEqual({
+      backgroundColor: "var(--site-color-accent)",
+    });
   });
 
   it("ignores values that are not tokens", () => {
@@ -98,6 +130,11 @@ describe("shared properties", () => {
         expect(names, `${config.name} has ${shared.name}`).toContain(shared.name);
       }
     }
+  });
+
+  it("include a Background image field, empty by default", () => {
+    const image = SHARED_PROPERTIES.find((p) => p.name === "backgroundImage");
+    expect(image).toMatchObject({ displayName: "Background image", type: "image", default: "" });
   });
 
   it("do not clash with a block's own property names", () => {

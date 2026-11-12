@@ -66,10 +66,11 @@ test.describe("a Container", () => {
   });
 
   test("takes the theme tokens", async ({ page }) => {
-    await expect(page.locator("#layout-row")).toHaveCSS(
-      "background-color",
-      rgb(COLORS.surface)
-    );
+    const row = page.locator("#layout-row");
+    await expect(row).toHaveCSS("background-color", rgb(COLORS.surface));
+    // Its background image goes on the same element, covering it
+    await expect(row).toHaveCSS("background-image", /^url\(".*\/logo-icon\.svg"\)$/);
+    await expect(row).toHaveCSS("background-size", "cover");
   });
 
   test("an empty container is still on the page", async ({ page }) => {

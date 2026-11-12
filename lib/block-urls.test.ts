@@ -36,6 +36,50 @@ describe("validateBlockUrls", () => {
     }
   });
 
+  // The address goes into CSS url("..."), so it must not be able to end it
+  describe("a background image", () => {
+    const withImage = (type: string, backgroundImage: unknown) => ({
+      type,
+      properties: { backgroundImage },
+    });
+
+    it.each([
+      "/files/hero.jpg",
+      "/logo-icon.svg",
+      "https://example.com/a b.png",
+      "HTTP://example.com/a.png",
+      "",
+      "  ",
+    ])("accepts %j", (url) => {
+      expect(validateBlockUrls([withImage("Heading", url)])).toBeNull();
+    });
+
+    it.each([
+      "javascript:alert(1)",
+      "data:image/png;base64,AAAA",
+      "hero.jpg",
+      '/a.png"); color: red; ("',
+      "/a.png'",
+      "/a(1).png",
+      "/a\\.png",
+      "/a.png\nb",
+      "/a\u0000.png",
+    ])("refuses %j, and says what is allowed", (url) => {
+      expect(validateBlockUrls([withImage("Heading", url)])).toMatch(
+        /Heading "Background image" can't be saved: Use an uploaded image/
+      );
+    });
+
+    it("is checked on every block type", () => {
+      for (const config of ALL_BLOCKS) {
+        expect(
+          validateBlockUrls([withImage(config.name, "javascript:alert(1)")]),
+          config.name
+        ).not.toBeNull();
+      }
+    });
+  });
+
   it("leaves blocks with no url properties alone", () => {
     expect(
       validateBlockUrls([{ type: "Paragraph", properties: { content: "javascript:alert(1)" } }])

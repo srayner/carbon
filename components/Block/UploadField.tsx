@@ -6,12 +6,14 @@ import { uploadFile } from "@/lib/api/upload";
 import { IMAGE_ACCEPT } from "@/lib/upload-types";
 
 type UploadFieldProps = {
+  // Given to the address box, so the field's label names it
+  id?: string;
   kind: "image" | "file";
   value: string;
   onChange: (url: string) => void;
 };
 
-const UploadField: React.FC<UploadFieldProps> = ({ kind, value, onChange }) => {
+const UploadField: React.FC<UploadFieldProps> = ({ id, kind, value, onChange }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -40,6 +42,7 @@ const UploadField: React.FC<UploadFieldProps> = ({ kind, value, onChange }) => {
         />
       )}
       <input
+        id={id}
         value={value}
         placeholder={kind === "image" ? "Image URL" : "File URL"}
         onChange={(e) => onChange(e.target.value)}

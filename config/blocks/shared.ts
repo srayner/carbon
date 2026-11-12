@@ -44,13 +44,27 @@ export const TOKEN_PROPERTIES = [
   token("borderColor", "Border colour", "Box", COLOR_ROLES),
   token("shadow", "Shadow", "Box", SHADOW_STEPS),
 
-  token("background", "Background", "Colour and font", COLOR_ROLES),
   token("textColor", "Text colour", "Colour and font", COLOR_ROLES),
   token("fontRole", "Font", "Colour and font", FONT_ROLES),
   token("textSize", "Text size", "Colour and font", TEXT_SIZE_STEPS),
   // Inherited, so set on a Container it applies to everything inside
   token("weight", "Font weight", "Colour and font", FONT_WEIGHT_NAMES),
+  // Last in its group, so Background image follows it in the panel
+  token("background", "Background", "Colour and font", COLOR_ROLES),
 ] as const;
+
+/*
+ * An image behind the block, covering it (see lib/block-tokens.ts). An
+ * address rather than a token; "" means none. Saving refuses an unsafe one
+ * (see lib/image-url.ts).
+ */
+export const BACKGROUND_IMAGE_PROPERTY = {
+  name: "backgroundImage",
+  displayName: "Background image",
+  type: "image",
+  default: "",
+  group: "Colour and font",
+} as const;
 
 /*
  * How a block shares its container's space along the container's direction
@@ -66,4 +80,8 @@ export const GROW_PROPERTY = {
 } as const;
 
 /** Spread into each block's config, so adding one here adds it to every block. */
-export const SHARED_PROPERTIES = [...TOKEN_PROPERTIES, GROW_PROPERTY] as const;
+export const SHARED_PROPERTIES = [
+  ...TOKEN_PROPERTIES,
+  BACKGROUND_IMAGE_PROPERTY,
+  GROW_PROPERTY,
+] as const;

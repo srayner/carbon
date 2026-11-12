@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { ALL_BLOCKS } from "@/config/blocks";
-import { Block, BlockName, BlockConfig } from "@/types/blocks";
+import { Block, BlockName } from "@/types/blocks";
+import { getDefaultProps } from "@/lib/block-defaults";
 import {
   BlockNode,
   MAX_DEPTH,
@@ -10,14 +11,6 @@ import {
   depthOf,
   isContainerType,
 } from "@/lib/block-tree";
-
-function getDefaultProps(blockConfig: BlockConfig) {
-  const defaults: Record<string, string> = {};
-  for (const prop of blockConfig.properties) {
-    defaults[prop.name] = prop.default ?? "";
-  }
-  return defaults;
-}
 
 interface BlockOutlineProps {
   blocks?: Block[];
