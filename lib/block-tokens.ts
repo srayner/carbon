@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { TOKEN_PROPERTIES } from "@/config/blocks/shared";
+import { BACKGROUND_IMAGE_PROPERTY, TOKEN_PROPERTIES } from "@/config/blocks/shared";
+import { safeImageUrl } from "@/lib/image-url";
 import { FONT_WEIGHTS } from "@/lib/theme";
 
 // Each shared property -> the CSS it sets, given a token name
@@ -31,8 +32,9 @@ const CSS: Record<string, (token: string) => CSSProperties> = {
 };
 
 /**
- * A block's token properties as inline CSS using the theme's variables. A
- * value that is not one of the property's tokens is ignored (the properties
+ * A block's shared style properties as inline CSS: the tokens using the
+ * theme's variables, and the background image. A value that is not one of the
+ * property's tokens, or an unsafe image address, is ignored (the properties
  * come from the database), and only the public site defines the variables.
  */
 export const getTokenStyle = (
@@ -45,6 +47,18 @@ export const getTokenStyle = (
     if (typeof value !== "string" || value === "") continue;
     if (!(prop.values as readonly string[]).includes(value)) continue;
     style = { ...style, ...CSS[prop.name](value) };
+  }
+
+  // Covers the block; a background colour shows through where it is clear
+  const image = safeImageUrl(properties[BACKGROUND_IMAGE_PROPERTY.name]);
+  if (image) {
+    style = {
+      ...style,
+      backgroundImage: `url("${image}")`,
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+    };
   }
 
   return style;

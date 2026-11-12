@@ -1,14 +1,16 @@
 import { ALL_BLOCKS } from "@/config/blocks";
 import { URL_HINT, safeHref } from "@/lib/link-url";
+import { BACKGROUND_IMAGE_PROPERTY } from "@/config/blocks/shared";
+import { IMAGE_URL_HINT, safeImageUrl } from "@/lib/image-url";
 
 type BlockLike = { id?: string; type: string; properties: unknown; parentId?: string | null };
 
 const configOf = (type: string) => ALL_BLOCKS.find((c) => c.name === type);
 
 /**
- * Why a block's link address cannot be saved, or null. Checks every
- * property of type "url" in the block configs; an empty one is allowed and
- * simply links nowhere.
+ * Why a block's link or background image address cannot be saved, or null.
+ * Checks every property of type "url" in the block configs, and the
+ * background image every block has; an empty one is allowed and means none.
  */
 export const validateBlockUrls = (
   blocks: { type: string; properties: unknown }[]
@@ -24,6 +26,16 @@ export const validateBlockUrls = (
       if (safeHref(value) === null) {
         return `${config.name} "${prop.displayName}" can't be saved: ${URL_HINT}`;
       }
+    }
+    // Every block has a background image, which goes into CSS
+    const image = properties[BACKGROUND_IMAGE_PROPERTY.name];
+    if (
+      image !== undefined &&
+      image !== null &&
+      String(image).trim() !== "" &&
+      safeImageUrl(image) === null
+    ) {
+      return `${config.name} "${BACKGROUND_IMAGE_PROPERTY.displayName}" can't be saved: ${IMAGE_URL_HINT}`;
     }
   }
   return null;

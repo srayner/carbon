@@ -1,4 +1,6 @@
 import CardView from "@/components/Block/CardView";
+import { CardBlockConfig } from "@/config/blocks/card";
+import { getDefaultProps } from "@/lib/block-defaults";
 import { ViewProps } from "@/types/blocks";
 import { QUERY_ORDERS, QueryOrder, queryPages } from "@/services/page-query";
 
@@ -78,16 +80,13 @@ const QueryView = async ({
           block={{
             id: page.id,
             type: "Card",
+            // Every Card property from its config, then this page's own
             properties: {
+              ...getDefaultProps(CardBlockConfig),
               title: page.title,
               image: page.image ?? "",
-              alt: "",
               description: page.summary ?? "",
               linkUrl: `/${page.slug}`,
-              linkLabel: "Read more",
-              className: "",
-              cssId: "",
-              grow: "content",
             },
           }}
           shared={{ id: undefined, className: undefined, style: {} }}

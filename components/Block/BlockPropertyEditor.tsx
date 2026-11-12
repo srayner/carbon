@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { BlockConfig, BlockProperty } from "@/types/blocks";
 import UploadField from "@/components/Block/UploadField";
 import CategoryField from "@/components/Block/CategoryField";
@@ -16,6 +16,9 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
   blockData,
   onChange,
 }) => {
+  // Ties each label to its control, so the field is named by its label
+  const idPrefix = useId();
+
   const handleChange = (propName: string, value: string) => {
     onChange({ ...blockData, [propName]: value });
   };
@@ -25,6 +28,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
 
   const renderField = (prop: BlockProperty) => {
     const value = blockData[prop.name] ?? prop.default;
+    const id = `${idPrefix}-${prop.name}`;
 
     // A checkbox sits before its label, which toggles it too
     if (prop.type === "boolean") {
@@ -45,6 +49,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
       case "string":
         inputEl = (
           <input
+            id={id}
             value={value as string}
             onChange={(e) => handleChange(prop.name, e.target.value)}
             className="border p-1 w-full"
@@ -58,6 +63,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
         inputEl = (
           <>
             <input
+              id={id}
               value={text}
               placeholder="https://… or /page"
               aria-invalid={refused || undefined}
@@ -77,6 +83,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
       case "file":
         inputEl = (
           <UploadField
+            id={id}
             kind={prop.type}
             value={(value as string) ?? ""}
             onChange={(url) => handleChange(prop.name, url)}
@@ -86,6 +93,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
       case "category":
         inputEl = (
           <CategoryField
+            id={id}
             value={(value as string) ?? ""}
             onChange={(id) => handleChange(prop.name, id)}
           />
@@ -94,6 +102,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
       case "enum":
         inputEl = (
           <select
+            id={id}
             value={value as string}
             onChange={(e) => handleChange(prop.name, e.target.value)}
             className="border p-1 w-full"
@@ -110,6 +119,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
       case "color":
         inputEl = (
           <input
+            id={id}
             type="color"
             value={value as string}
             onChange={(e) => handleChange(prop.name, e.target.value)}
@@ -119,6 +129,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
       case "richtext":
         inputEl = (
           <textarea
+            id={id}
             value={value as string}
             onChange={(e) => handleChange(prop.name, e.target.value)}
             className="border p-1 w-full h-24"
@@ -131,7 +142,9 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
 
     return (
       <div key={prop.name} className="flex flex-col">
-        <label className="text-sm font-medium">{prop.displayName}</label>
+        <label htmlFor={id} className="text-sm font-medium">
+          {prop.displayName}
+        </label>
         {inputEl}
       </div>
     );

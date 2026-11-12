@@ -506,6 +506,7 @@ async function seedLayoutPages() {
     align: "start",
     cssId: "layout-row",
     background: "surface",
+    backgroundImage: "/logo-icon.svg",
   });
   add(valid, "Paragraph", { content: "Row first", cssId: "row-first" }, row);
   const column = add(
