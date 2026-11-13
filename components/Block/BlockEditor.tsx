@@ -8,10 +8,12 @@ import { getEditable } from "@/components/Block/editables";
 import { PagePropertiesTabs } from "@/components/Page/PagePropertiesTabs";
 import {
   BlockNode,
+  BlockPlace,
   buildTree,
   insertBlock,
   isContainerType,
   moveBlock,
+  moveBlockTo,
   removeBlock,
   subtreeIds,
 } from "@/lib/block-tree";
@@ -95,6 +97,14 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
     onBlocksChange((current) => moveBlock(current, blockId, direction));
   };
 
+  // Dragged in the outline, taking anything inside it along; a block that
+  // really moved is selected
+  const handleBlockMovedTo = (blockId: string, place: BlockPlace) => {
+    if (moveBlockTo(blocks, blockId, place) === blocks) return;
+    onBlocksChange((current) => moveBlockTo(current, blockId, place));
+    setSelectedBlockId(blockId);
+  };
+
   // A container goes with everything inside it, after a confirm
   const handleBlockDeleted = (blockId: string) => {
     const block = blocks.find((b) => b.id === blockId);
@@ -169,6 +179,7 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
           onAdd={handleBlockAdded}
           onSelect={handleBlockSelected}
           onMove={handleBlockMoved}
+          onMoveTo={handleBlockMovedTo}
           onDelete={handleBlockDeleted}
           selectedBlockId={selectedBlockId}
         />

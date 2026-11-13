@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Block } from "@/types/blocks";
 import { usePageActions } from "@/context/page-actions";
 import BlockEditor from "@/components/Block/BlockEditor";
+import { Loaded } from "@/components/Loaded";
 import { PageSettings } from "@/components/Page/PageSettings";
 import { fetchPage, savePage } from "@/lib/api/pages";
 import { fetchCategories } from "@/lib/api/categories";
@@ -35,16 +36,34 @@ const blankPage = (): Page => ({
   updatedAt: new Date(),
 });
 
-const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
-  const [blank] = useState(blankPage);
-  const [page, setPage] = useState<Page>(blank);
+/**
+ * Loads the page, then shows the editor for it. The editor only appears once
+ * the page is there, so nothing typed or added can be overwritten by the load.
+ */
+const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) =>
+  pageId ? (
+    <Loaded id={pageId} load={fetchPage} failedMessage="Failed to load page content.">
+      {(page) => <PageForm key={pageId} initial={page} isNew={false} afterSave={afterSave} />}
+    </Loaded>
+  ) : (
+    <PageForm initial={blankPage()} isNew afterSave={afterSave} />
+  );
+
+type PageFormProps = {
+  initial: Page; // the page as loaded, or a blank one to add
+  isNew: boolean;
+  afterSave?: (pageId: string) => void;
+};
+
+const PageForm: React.FC<PageFormProps> = ({ initial, isNew, afterSave }) => {
+  const [page, setPage] = useState<Page>(initial);
   // The page as last loaded or saved; any difference is unsaved
-  const [saved, setSaved] = useState<Page>(blank);
+  const [saved, setSaved] = useState<Page>(initial);
   const [saving, setSaving] = useState(false);
   const dirty = JSON.stringify(page) !== JSON.stringify(saved);
   useUnsavedChanges(dirty);
   // Until the slug is edited by hand, a new page's slug follows its title
-  const [slugEdited, setSlugEdited] = useState(!!pageId);
+  const [slugEdited, setSlugEdited] = useState(!isNew);
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
   const { setPageActions } = usePageActions();
@@ -57,23 +76,6 @@ const PageEditor: React.FC<PageEditorProps> = ({ pageId, afterSave }) => {
       .then(setTemplates)
       .catch((err) => console.error("Failed to load templates:", err));
   }, []);
-
-  useEffect(() => {
-    if (!pageId) return; // nothing to load in add mode
-
-    const loadPage = async () => {
-      try {
-        const loadedPage = await fetchPage(pageId);
-        setPage(loadedPage);
-        setSaved(loadedPage);
-      } catch (err) {
-        console.error("Failed to load page:", err);
-        alert("Failed to load page content.");
-      }
-    };
-
-    loadPage();
-  }, [pageId]);
 
   useEffect(() => {
     const handleAdd = () => console.log("Add clicked");

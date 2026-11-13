@@ -1,6 +1,7 @@
 import { test, expect, APIRequestContext, Page } from "@playwright/test";
 import { DEFAULT_TEMPLATE_ID } from "../../config/templates";
 import { MAX_DEPTH } from "../../lib/block-tree";
+import { outline, outlineRows, selectedRow } from "../outline";
 
 type SavedBlock = { id: string; type: string; parentId: string | null; order: number; properties: Record<string, string> };
 type NewBlock = { id: string; type: string; parentId?: string; properties: Record<string, string> };
@@ -37,7 +38,11 @@ const savedBlocks = async (request: APIRequestContext): Promise<SavedBlock[]> =>
   return (await response.json()).page.blocks;
 };
 
-const openEditor = (page: Page) => page.goto(`/admin/pages/${pageId}`);
+// Opened once the page has loaded: its title is in the settings
+const openEditor = async (page: Page) => {
+  await page.goto(`/admin/pages/${pageId}`);
+  await expect(page.getByRole("textbox", { name: "Page title" })).toHaveValue("Container test");
+};
 
 const save = async (page: Page) => {
   const saved = page.waitForResponse(
@@ -48,17 +53,7 @@ const save = async (page: Page) => {
   expect(response.ok(), await response.text()).toBe(true);
 };
 
-const outline = (page: Page) =>
-  page.locator("aside", { has: page.getByRole("heading", { name: "Blocks", exact: true }) });
 const canvas = (page: Page) => page.locator(".site-theme");
-
-/** The outline as "depth:Type" lines, top to bottom. */
-const outlineRows = (page: Page) =>
-  outline(page)
-    .locator("[data-depth]")
-    .evaluateAll((rows) =>
-      rows.map((r) => `${(r as HTMLElement).dataset.depth}:${r.querySelector("span")!.textContent}`)
-    );
 
 /** Adds a block with the bottom button (parent: null) or a container's "+". */
 const addBlock = async (page: Page, type: string, parentRow?: number) => {
@@ -147,8 +142,7 @@ test.describe("adding blocks inside a container", () => {
 
     await canvas(page).getByText("Inner text").click();
     await expect(page.getByText("Paragraph Properties")).toBeVisible();
-    await expect(outline(page).locator("[data-depth='1']")).toHaveClass(/border-ring/);
-    await expect(outline(page).locator("[data-depth='0']")).not.toHaveClass(/border-ring/);
+    await expect(selectedRow(page)).toHaveAttribute("data-block-id", "inner");
   });
 
   test(`stops at ${MAX_DEPTH} containers deep`, async ({ page, request }) => {
@@ -343,7 +337,9 @@ test("Grow set in the panel splits a row evenly, in the editor and on the site",
   const frameWidth = async (id: string) =>
     (await canvas(page).locator(`[data-block-id="${id}"]`).boundingBox())!.width;
 
-  // Sized by content first, so the two differ
+  // Sized by content first, so the two differ (once their text is drawn)
+  await expect(canvas(page).getByText("Short", { exact: true })).toBeVisible();
+  await expect(canvas(page).getByText("A much longer")).toBeVisible();
   expect(Math.abs((await frameWidth("short")) - (await frameWidth("long")))).toBeGreaterThan(20);
 
   await setGrow("Short", "1");
