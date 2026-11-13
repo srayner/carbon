@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Block } from "@/types/blocks";
 import { usePageActions } from "@/context/page-actions";
 import BlockEditor from "@/components/Block/BlockEditor";
+import { Loaded } from "@/components/Loaded";
 import { fetchFragment, saveFragment } from "@/lib/api/fragments";
 import { KIND_LABELS } from "@/lib/fragment-routes";
 import type { Fragment } from "@/types/entities";
@@ -17,38 +18,32 @@ type FragmentEditorProps = {
   afterSave?: (fragmentId: string) => void;
 };
 
-const FragmentEditor: React.FC<FragmentEditorProps> = ({
-  fragmentId,
-  kind,
-  afterSave,
-}) => {
-  const [blank] = useState<Fragment>(() => ({
-    id: null,
-    name: "",
-    kind,
-    blocks: [],
-  }));
-  const [fragment, setFragment] = useState<Fragment>(blank);
+/**
+ * Loads the fragment, then shows the editor for it. The editor only appears
+ * once the fragment is there, so nothing added can be overwritten by the load.
+ */
+const FragmentEditor: React.FC<FragmentEditorProps> = ({ fragmentId, kind, afterSave }) =>
+  fragmentId ? (
+    <Loaded id={fragmentId} load={fetchFragment} failedMessage="Failed to load content.">
+      {(fragment) => <FragmentForm key={fragmentId} initial={fragment} afterSave={afterSave} />}
+    </Loaded>
+  ) : (
+    <FragmentForm initial={{ id: null, name: "", kind, blocks: [] }} afterSave={afterSave} />
+  );
+
+type FragmentFormProps = {
+  initial: Fragment; // the fragment as loaded, or a blank one to add
+  afterSave?: (fragmentId: string) => void;
+};
+
+const FragmentForm: React.FC<FragmentFormProps> = ({ initial, afterSave }) => {
+  const [fragment, setFragment] = useState<Fragment>(initial);
   // The fragment as last loaded or saved; any difference is unsaved
-  const [saved, setSaved] = useState<Fragment>(blank);
+  const [saved, setSaved] = useState<Fragment>(initial);
   const [saving, setSaving] = useState(false);
   const dirty = JSON.stringify(fragment) !== JSON.stringify(saved);
   useUnsavedChanges(dirty);
   const { setPageActions } = usePageActions();
-
-  useEffect(() => {
-    if (!fragmentId) return; // nothing to load in add mode
-
-    fetchFragment(fragmentId)
-      .then((loaded) => {
-        setFragment(loaded);
-        setSaved(loaded);
-      })
-      .catch((err) => {
-        console.error("Failed to load fragment:", err);
-        toast.error("Failed to load content.");
-      });
-  }, [fragmentId]);
 
   useEffect(() => {
     const handleSave = async () => {

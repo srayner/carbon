@@ -178,6 +178,84 @@ export const removeBlock = <T extends TreeBlock>(blocks: T[], id: string): T[] =
 };
 
 /**
+ * A place in the tree: inside `parentId` (null for the top level), just
+ * before the sibling `beforeId`, or at the end when `beforeId` is null.
+ */
+export type BlockPlace = { parentId: string | null; beforeId: string | null };
+
+/**
+ * Whether a block can be moved to a place. It cannot go inside itself or its
+ * own contents, inside a block that is not a container, before a block that
+ * is not in that container, or so deep that it or anything inside it would be
+ * nested past MAX_DEPTH.
+ */
+export const canMoveTo = (blocks: TreeBlock[], id: string, to: BlockPlace): boolean => {
+  const byId = new Map(blocks.map((b) => [b.id, b]));
+  if (!byId.has(id)) return false;
+
+  // The block and everything inside it, and how far below it the deepest is
+  const children = childIdsOf(blocks);
+  const moving = new Set<string>();
+  let below = 0;
+  const stack: [string, number][] = [[id, 0]];
+  while (stack.length) {
+    const [current, depth] = stack.pop()!;
+    if (moving.has(current)) continue;
+    moving.add(current);
+    below = Math.max(below, depth);
+    for (const child of children.get(current) ?? []) stack.push([child, depth + 1]);
+  }
+
+  if (to.parentId !== null) {
+    const parent = byId.get(to.parentId);
+    if (!parent || !isContainerType(parent.type) || moving.has(parent.id)) return false;
+  }
+  if (to.beforeId !== null) {
+    const before = byId.get(to.beforeId);
+    if (!before || (before.parentId ?? null) !== to.parentId) return false;
+  }
+
+  // Where it would now start
+  const newDepth = to.parentId === null ? 0 : depthOf(blocks, to.parentId) + 1;
+  return newDepth + below <= MAX_DEPTH;
+};
+
+/**
+ * Moves a block, with everything inside it, to a place. Returns the list it
+ * was given when the move is refused (see canMoveTo) or changes nothing.
+ */
+export const moveBlockTo = <T extends TreeBlock>(
+  blocks: T[],
+  id: string,
+  to: BlockPlace
+): T[] => {
+  // Just before itself is where it already is
+  if (to.beforeId === id || !canMoveTo(blocks, id, to)) return blocks;
+
+  const moving = subtreeIds(blocks, id);
+  const movingBlocks = blocks
+    .filter((b) => moving.has(b.id))
+    .map((b) => (b.id === id ? { ...b, parentId: to.parentId } : b));
+  const rest = blocks.filter((b) => !moving.has(b.id));
+
+  let at: number;
+  if (to.beforeId !== null) {
+    at = rest.findIndex((b) => b.id === to.beforeId);
+  } else if (to.parentId !== null) {
+    const inside = subtreeIds(rest, to.parentId);
+    at = rest.findLastIndex((b) => inside.has(b.id)) + 1;
+  } else {
+    at = rest.length;
+  }
+  const result = [...rest.slice(0, at), ...movingBlocks, ...rest.slice(at)];
+
+  const unchanged =
+    (blocks.find((b) => b.id === id)!.parentId ?? null) === to.parentId &&
+    result.every((b, i) => b.id === blocks[i].id);
+  return unchanged ? blocks : result;
+};
+
+/**
  * Swaps a block with its previous (-1) or next (1) sibling, each taking
  * everything inside it along. Does nothing at either end.
  */
@@ -191,16 +269,10 @@ export const moveBlock = <T extends TreeBlock>(
 
   const parentId = target.parentId ?? null;
   const siblings = blocks.filter((b) => (b.parentId ?? null) === parentId);
-  const other = siblings[siblings.indexOf(target) + direction];
-  if (!other) return blocks;
+  const index = siblings.indexOf(target);
+  if (!siblings[index + direction]) return blocks;
 
-  const moving = subtreeIds(blocks, id);
-  const passed = subtreeIds(blocks, other.id);
-  const movingBlocks = blocks.filter((b) => moving.has(b.id));
-  const rest = blocks.filter((b) => !moving.has(b.id));
-  const at =
-    direction === -1
-      ? rest.indexOf(other)
-      : rest.findLastIndex((b) => passed.has(b.id)) + 1;
-  return [...rest.slice(0, at), ...movingBlocks, ...rest.slice(at)];
+  // Up: before the previous sibling. Down: before the one after the next.
+  const before = direction === -1 ? siblings[index - 1] : siblings[index + 2];
+  return moveBlockTo(blocks, id, { parentId, beforeId: before?.id ?? null });
 };

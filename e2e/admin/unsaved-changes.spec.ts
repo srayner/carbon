@@ -145,3 +145,31 @@ test.describe("leaving the page editor with unsaved changes", () => {
     await expect(summary(page)).toHaveValue("Not saved yet");
   });
 });
+
+// The editor opens empty only once the page has arrived, so nothing done
+// while it loads can be overwritten by it
+test.describe("opening the page editor", () => {
+  test("nothing can be edited until the page has loaded", async ({ page }) => {
+    const search = await page.request.get("/api/pages?search=Hello%20World");
+    const { content } = await search.json();
+    const id = content.find((p: { slug: string }) => p.slug === "hello-world").id;
+
+    // Hold the page's response until the loading state has been checked
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route(`**/api/pages/${id}`, async (route) => {
+      if (route.request().method() === "GET") await held;
+      await route.continue();
+    });
+
+    await page.goto(`/admin/pages/${id}`);
+    await expect(page.getByText("Loading…")).toBeVisible();
+    await expect(page.getByRole("button", { name: "+ Add Block" })).toHaveCount(0);
+    await expect(page.getByPlaceholder("page-slug")).toHaveCount(0);
+
+    release();
+    await expect(page.getByPlaceholder("page-slug")).toHaveValue("hello-world");
+    await expect(richText(page)).toBeVisible();
+    await expect(unsaved(page)).toHaveCount(0);
+  });
+});
