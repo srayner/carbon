@@ -33,7 +33,7 @@ RUN rm -rf node_modules/@playwright node_modules/playwright node_modules/playwri
 FROM node:26-alpine AS runner
 
 # Prisma's query engine needs openssl at runtime
-RUN apk add --no-cache openssl
+RUN apk upgrade --no-cache && apk add --no-cache openssl
 
 WORKDIR /app
 
