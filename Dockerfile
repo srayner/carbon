@@ -39,6 +39,11 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Nothing at runtime needs npm: the app starts via node, and migrations run
+# from the locked prisma CLI in node_modules (a regular dependency for that
+# reason). Removing npm drops its bundled packages from the image.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -54,8 +59,8 @@ COPY --from=builder /app/next.config.ts ./next.config.ts
 ENV UPLOAD_DIR=/data/uploads
 RUN mkdir -p /data/uploads
 
-# npm start uses PORT; without it, it falls back to the local port 3003.
+# next start listens on PORT.
 ENV PORT=3000
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["node", "node_modules/next/dist/bin/next", "start"]
