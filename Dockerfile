@@ -17,7 +17,8 @@ RUN npx prisma generate
 RUN npm run build
 
 # ---- Stage 2: production dependencies ----
-# Dev dependencies (vitest, playwright, tsx, prisma CLI, ...) are never installed here.
+# Dev dependencies (vitest, playwright, tsx, ...) are never installed here. The
+# prisma CLI is a regular dependency, so migrations can run in the image.
 FROM node:26-alpine AS prod-deps
 
 WORKDIR /app
