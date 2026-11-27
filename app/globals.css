@@ -181,6 +181,33 @@
 .block-container {
   display: flex;
 }
+.block-column {
+  flex-direction: column;
+}
+.block-row,
+.block-row-fixed {
+  flex-direction: row;
+}
+
+/* The space a Container measures to decide whether a row stacks: each
+   template area and the editor canvas, so both stack at the same width.
+   Inline-size containment stops the area sizing itself from its content, so
+   it must sit in a grid column with a set size (fr, px), never auto. */
+.block-area {
+  container-type: inline-size;
+}
+
+/* A row stacks when its space is narrower than the template grid's
+   breakpoint. The children then sit one above another at full width, so
+   Grow, which shares out a row's width, is off. */
+@container (width < 768px) {
+  .block-row {
+    flex-direction: column;
+  }
+  .block-row > .block-item {
+    flex: 0 1 auto;
+  }
+}
 .block-container > * {
   margin-block: 0;
   /* lets a Grow share hold even when the content is wider */
@@ -213,9 +240,17 @@
   font-weight: inherit;
   text-decoration: none;
 }
+/* Grow arrives as --block-grow (lib/container-style.ts), so a stacked row
+   can override it; unset, the item keeps the browser's default flex. Not
+   inherited, so a nested container's children don't take their parent's. */
+@property --block-grow {
+  syntax: "*";
+  inherits: false;
+}
 .block-item {
   display: flex;
   flex-direction: column;
+  flex: var(--block-grow, 0 1 auto);
 }
 .block-item > * {
   margin-block: 0;

@@ -2,6 +2,8 @@ import { SquareDashed } from "lucide-react";
 import { SPACING_STEPS } from "@/lib/theme";
 import {
   ALIGN_OPTIONS,
+  DEFAULT_DIRECTION,
+  DIRECTION_LABELS,
   DIRECTIONS,
   ELEMENTS,
   JUSTIFY_OPTIONS,
@@ -36,11 +38,13 @@ export const ContainerBlockConfig = {
       group: "Layout",
     },
     {
+      // A row by default: blocks already stack in a column without a Container
       name: "direction",
       displayName: "Direction",
       type: "enum",
       values: DIRECTIONS,
-      default: "column",
+      labels: DIRECTION_LABELS,
+      default: DEFAULT_DIRECTION,
       group: "Layout",
     },
     {

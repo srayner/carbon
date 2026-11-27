@@ -2,7 +2,7 @@
 
 import React from "react";
 import { EditableProps } from "@/types/blocks";
-import { getContainerStyle, isInlineContainer } from "@/lib/container-style";
+import { getContainerClass, getContainerStyle, isInlineContainer } from "@/lib/container-style";
 
 // Shows the container's layout on the canvas. Its children are drawn inside
 // it by the block editor.
@@ -23,7 +23,7 @@ const ContainerEditable = ({
 
   return (
     <div
-      className="block-container min-h-12 rounded-sm border border-dashed border-current/30 p-2"
+      className={`${getContainerClass(block.properties)} min-h-12 rounded-sm border border-dashed border-current/30 p-2`}
       style={getContainerStyle(block.properties)}
     >
       {hasChildren ? (
