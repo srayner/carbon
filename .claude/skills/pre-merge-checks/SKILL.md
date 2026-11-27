@@ -20,8 +20,3 @@ Run these in order on the committed code. All must pass.
 5. `docker build -t carbon:premerge .`, the real production path. When it passes, remove
    the image with `docker rmi carbon:premerge` so nothing is left behind. If Docker isn't
    available, say so: that check was skipped.
-
-## For the deploy
-
-- If the branch added anything under `prisma/migrations/`, say that the deploy must run
-  `npx prisma migrate deploy`.
