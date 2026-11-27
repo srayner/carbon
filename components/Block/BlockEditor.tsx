@@ -188,7 +188,8 @@ const BlockEditor: React.FC<BlockEditorProps> = ({
       {/* The canvas shows the page as the site will: the site theme, in both
           light and dark mode of the admin UI */}
       <div className="site-theme light min-w-0 flex-1 overflow-y-auto">
-        <div className="p-5 prose max-w-none">
+        {/* Measured by Containers, as each area of the site is (.block-area) */}
+        <div className="block-area p-5 prose max-w-none">
           {renderNodes(buildTree(blocks))}
         </div>
       </div>

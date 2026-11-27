@@ -8,6 +8,8 @@ export type BlockProperty = {
   displayName: string;
   type: string;
   values?: readonly string[] | undefined;
+  // The panel's wording for an enum's values; a value with none shows as itself
+  labels?: Readonly<Record<string, string>>;
   default?: string;
   optional?: boolean | undefined;
   group?: string;

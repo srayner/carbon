@@ -110,7 +110,7 @@ const BlockPropertyEditor: React.FC<PropertyEditorProps> = ({
             {prop.values?.map((v) => (
               <option key={v} value={v}>
                 {/* "" is a theme token left unset */}
-                {v === "" ? "Theme default" : v}
+                {prop.labels?.[v] ?? (v === "" ? "Theme default" : v)}
               </option>
             ))}
           </select>

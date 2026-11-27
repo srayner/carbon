@@ -1,5 +1,5 @@
 import { ViewProps } from "@/types/blocks";
-import { getContainerStyle, isInlineContainer } from "@/lib/container-style";
+import { getContainerClass, getContainerStyle, isInlineContainer } from "@/lib/container-style";
 import { safeHref } from "@/lib/link-url";
 
 const ContainerView = ({ block, shared, children }: ViewProps<"Container">) => {
@@ -32,7 +32,7 @@ const ContainerView = ({ block, shared, children }: ViewProps<"Container">) => {
   return (
     <Tag
       id={shared.id}
-      className={["block-container", href && "block-link", shared.className]
+      className={[getContainerClass(block.properties), href && "block-link", shared.className]
         .filter(Boolean)
         .join(" ")}
       style={{ ...getContainerStyle(block.properties), ...shared.style }}

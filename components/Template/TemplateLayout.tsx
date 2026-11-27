@@ -26,7 +26,7 @@ const TemplateLayout = ({ layout, slots, children }: Props) => (
         return (
           <main
             key={name}
-            className={`min-w-0 ${CONTENT_CLASS[layout.contentWidth]}`}
+            className={`block-area min-w-0 ${CONTENT_CLASS[layout.contentWidth]}`}
             style={{ gridArea: name }}
           >
             {children}
@@ -58,7 +58,7 @@ const TemplateLayout = ({ layout, slots, children }: Props) => (
       return (
         <Tag
           key={name}
-          className={`prose min-w-0 max-w-none px-6 ${frame} [&>*:first-child]:mt-0 [&>*:last-child]:mb-0`}
+          className={`block-area prose min-w-0 max-w-none px-6 ${frame} [&>*:first-child]:mt-0 [&>*:last-child]:mb-0`}
           style={{ gridArea: name }}
         >
           <BlocksView blocks={blocks} />

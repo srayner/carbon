@@ -164,7 +164,7 @@ function headerBlocks() {
 
   const logo = add(
     "Container",
-    { direction: "row", align: "center", gap: "s", url: "/", cssId: "site-logo" },
+    { direction: "row-fixed", align: "center", gap: "s", url: "/", cssId: "site-logo" },
     bar
   );
   add("Image", { src: "/logo-icon.svg", alt: "", width: "36px", height: "36px" }, logo);
@@ -180,7 +180,7 @@ function headerBlocks() {
 
   const menu = add(
     "Container",
-    { direction: "row", align: "center", gap: "l", weight: "medium", textSize: "s", cssId: "site-menu" },
+    { direction: "row-fixed", align: "center", gap: "l", weight: "medium", textSize: "s", cssId: "site-menu" },
     bar
   );
   for (const label of ["Projects", "Build log", "Videos", "About"]) {
@@ -546,6 +546,11 @@ async function seedLayoutPages() {
   add(valid, "Paragraph", { content: "Two parts", cssId: "ratio-two", grow: "2" }, ratioRow);
   add(valid, "Paragraph", { content: "One part", cssId: "ratio-one", grow: "1" }, ratioRow);
 
+  // A row that stays a row on small screens, where the rows above stack
+  const fixedRow = add(valid, "Container", { direction: "row-fixed", gap: "l", cssId: "fixed-row" });
+  add(valid, "Paragraph", { content: "Fixed left", cssId: "fixed-left" }, fixedRow);
+  add(valid, "Paragraph", { content: "Fixed right", cssId: "fixed-right" }, fixedRow);
+
   await prisma.page.create({
     data: {
       title: "Layout Showcase",
@@ -609,7 +614,7 @@ async function seedLayoutPages() {
   });
   // Font weight set once on the Container; the links inherit it
   const nav = add(links, "Container", {
-    direction: "row",
+    direction: "row-fixed",
     gap: "l",
     weight: "medium",
     cssId: "link-nav",

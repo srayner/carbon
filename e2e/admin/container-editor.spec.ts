@@ -312,8 +312,10 @@ test("Grow set in the panel splits a row evenly, in the editor and on the site",
   page,
   request,
 }) => {
+  // A fixed row: the canvas, between the editor's panels, is narrow enough
+  // for a stacking row to stack at this test's screen width
   await createPage(request, [
-    container("row", undefined, "row"),
+    container("row", undefined, "row-fixed"),
     paragraph("short", "Short", "row"),
     paragraph("long", "A much longer paragraph that would take most of the row on its own", "row"),
   ]);
@@ -476,6 +478,9 @@ test("an existing nested page opens with its children inside their containers", 
     "0:Container",
     "0:Container",
     "1:KeyValueTable",
+    "1:Paragraph",
+    "0:Container",
+    "1:Paragraph",
     "1:Paragraph",
     "0:Container",
     "1:Paragraph",

@@ -1,16 +1,54 @@
 import { describe, expect, it } from "vitest";
 import { ContainerBlockConfig } from "@/config/blocks/container";
 import { GROW_PROPERTY } from "@/config/blocks/shared";
-import { getContainerStyle, getGrowStyle, isInlineContainer } from "@/lib/container-style";
+import {
+  DIRECTIONS,
+  getContainerClass,
+  getContainerStyle,
+  getGrowStyle,
+  isInlineContainer,
+} from "@/lib/container-style";
 
 const defaults = Object.fromEntries(
   ContainerBlockConfig.properties.map((p) => [p.name, p.default])
 );
 
+// The layout of each class is in globals.css: a row stacks on small screens,
+// a fixed row never does. The browser test (e2e/guest/layout.spec.ts) checks it.
+describe("getContainerClass", () => {
+  it.each([
+    ["column", "block-container block-column"],
+    ["row", "block-container block-row"],
+    ["row-fixed", "block-container block-row-fixed"],
+  ])("gives %s its own class", (direction, expected) => {
+    expect(getContainerClass({ direction })).toBe(expected);
+  });
+
+  it("covers every Direction the editor offers", () => {
+    const classes = DIRECTIONS.map((direction) => getContainerClass({ direction }));
+    expect(new Set(classes).size).toBe(DIRECTIONS.length);
+  });
+
+  // Rows made before a direction was stored read as the config default,
+  // as the properties panel shows them
+  it("reads a missing direction as the config default, a stacking row", () => {
+    expect(defaults.direction).toBe("row");
+    expect(getContainerClass({})).toBe(getContainerClass(defaults));
+  });
+
+  it.each(["row-reverse", "ROW", "", 1, null])("treats %p as the default", (direction) => {
+    expect(getContainerClass({ direction })).toBe("block-container block-row");
+  });
+
+  // An inline flex-direction would beat the stylesheet's container query
+  it.each(DIRECTIONS)("leaves %s out of the inline style", (direction) => {
+    expect(getContainerStyle({ direction })).not.toHaveProperty("flexDirection");
+  });
+});
+
 describe("getContainerStyle", () => {
-  it("lays a new container out as a column with the default gap", () => {
+  it("lays a new container out with the default gap", () => {
     expect(getContainerStyle(defaults)).toEqual({
-      flexDirection: "column",
       justifyContent: "flex-start",
       alignItems: "stretch",
       gap: `var(--site-space-${defaults.gap})`,
@@ -19,9 +57,8 @@ describe("getContainerStyle", () => {
 
   it("turns each option into its flexbox value", () => {
     expect(
-      getContainerStyle({ direction: "row", justify: "between", align: "center", gap: "xl" })
+      getContainerStyle({ justify: "between", align: "center", gap: "xl" })
     ).toEqual({
-      flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
       gap: "var(--site-space-xl)",
@@ -30,7 +67,7 @@ describe("getContainerStyle", () => {
 
   // Every choice the editor offers must give its own CSS, none falling back
   // to another choice's value
-  it.each(["direction", "justify", "align", "gap"])(
+  it.each(["justify", "align", "gap"])(
     "gives each %s choice a different value",
     (name) => {
       const prop = ContainerBlockConfig.properties.find((p) => p.name === name);
@@ -49,13 +86,11 @@ describe("getContainerStyle", () => {
   it("ignores values that are not one of the options", () => {
     expect(
       getContainerStyle({
-        direction: "row-reverse",
         justify: "space-evenly",
         align: 7,
         gap: "10px; color: red",
       })
     ).toEqual({
-      flexDirection: "column",
       justifyContent: "flex-start",
       alignItems: "stretch",
     });
@@ -68,9 +103,10 @@ describe("getGrowStyle", () => {
     expect(getGrowStyle({})).toEqual({});
   });
 
-  // A number ignores the content's size (basis 0) and shares space by ratio
+  // A number ignores the content's size (basis 0) and shares space by ratio.
+  // It is a variable, not an inline flex, so a stacked row can switch it off.
   it.each(GROW_PROPERTY.values.filter((v) => v !== "content"))("shares space on %s", (n) => {
-    expect(getGrowStyle({ grow: n })).toEqual({ flex: `${n} 1 0` });
+    expect(getGrowStyle({ grow: n })).toEqual({ "--block-grow": `${n} 1 0` });
   });
 
   it("ignores values that are not one of the options", () => {

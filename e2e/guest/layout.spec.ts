@@ -112,6 +112,40 @@ test.describe("Grow", () => {
   });
 });
 
+// On a phone the content area is narrower than the stacking width, so a Row
+// stacks and a "Row, never stacks" stays a row
+test.describe("at phone width", () => {
+  test.use({ viewport: { width: 375, height: 800 } });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/layout-showcase");
+  });
+
+  test("a row stacks its children at full width, with Grow off", async ({ page }) => {
+    const row = page.locator("#grow-row");
+    await expect(row).toHaveCSS("flex-direction", "column");
+    const [table, text, rowBox] = await Promise.all(
+      ["#grow-table", "#grow-text", "#grow-row"].map((id) => box(page.locator(id)))
+    );
+    // One above the other, each as wide as the row, though both are on Grow 1
+    expect(text.y).toBeGreaterThanOrEqual(table.y + table.height);
+    expect(Math.abs(table.width - rowBox.width)).toBeLessThan(1);
+    expect(Math.abs(text.width - rowBox.width)).toBeLessThan(1);
+    for (const item of await row.locator("> .block-item").all()) {
+      await expect(item).toHaveCSS("flex-grow", "0");
+    }
+  });
+
+  test("a fixed row keeps its children side by side", async ({ page }) => {
+    await expect(page.locator("#fixed-row")).toHaveCSS("flex-direction", "row");
+    const [left, right] = await Promise.all(
+      ["#fixed-left", "#fixed-right"].map((id) => box(page.locator(id)))
+    );
+    expect(right.x).toBeGreaterThan(left.x + left.width);
+    expect(Math.abs(right.y - left.y)).toBeLessThan(1);
+  });
+});
+
 // Rows that saving would refuse (see prisma/seed.ts) must not break the page
 test.describe("a page with bad nested blocks", () => {
   test.beforeEach(async ({ page }) => {
